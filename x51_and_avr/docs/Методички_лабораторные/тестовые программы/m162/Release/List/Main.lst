@@ -1,0 +1,587 @@
+##############################################################################
+#                                                                            #
+#                                                      28/Jun/2007  00:57:53 #
+# IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  D:\stend\src\m162\Main.c                                #
+#    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D     #
+#                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb         #
+#                    D:\stend\src\m162\Release\List\ -y                      #
+#                    --initializers_in_flash -z9 -e -I "D:\Program           #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program     #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"               #
+#                    --eeprom_size 512 D:\stend\src\m162\Main.c              #
+#    List file    =  D:\stend\src\m162\Release\List\Main.lst                 #
+#    Object file  =  D:\stend\src\m162\Release\Obj\Main.r90                  #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+D:\stend\src\m162\Main.c
+      1          #include "BEEP.H"
+      2          #include "DELAY.H"
+      3          #include "SPI.H"
+      4          #include "LCD_HD44780.H"
+      5          #include "I2C.H"
+      6          #include "KEYBOARD.H"
+      7          #include "LED7.H"
+      8          #include "UART.H"
+      9          #include "DS1307.H"
+     10          #include "DS1820.H"
+     11          #include "AT24CXX.H"
+     12          #include "CONVERT.H"
+     13          
+     14          // Строковые константы, которые храняться в flash-памяти, чтобы избежать
+     15          // переполнения оперативной памяти
+     16          
+     17          flash char UartMessage[] = "                -=  STEND RK-10  =-\r\n"
+     18          						   "       Hardware ver. 1.0, Firmware ver. 2.0\r\n";
+     19          
+     20          flash unsigned char LcdMessageLine1[] = { 45, 61, 67, 84, 69, 72, 224, 32, 32, 80, 75, 45, 49, 48, 61, 45, 0 };
+     21          flash unsigned char LcdMessageLine2[] = "   Ver. 2.0";
+     22          
+     23          flash char timeStr[] = "Time: ";
+     24          flash char dateStr[] = "Date: ";
+     25          flash char enterAddressStr[] = "Enter address(0..255): ";
+     26          flash char enterValueStr[] = "Enter value(0..255): ";
+     27          flash char valueStr[] = "Value: ";
+     28          flash char temperatureStr[] = "Temperature: ";
+     29          
+     30          flash char enterHourStr[] = "Enter hour: ";
+     31          flash char enterMinuteStr[] = "Enter minute: ";
+     32          flash char enterSecondStr[] = "Enter second: ";
+     33          flash char enterDayStr[] = "Enter day: ";
+     34          flash char enterMonthStr[] = "Enter month: ";
+     35          flash char enterYearStr[] = "Enter year: ";
+     36          flash char sensorNotConnectedStr[] = "Sensor is not connected";
+     37          
+     38          flash char enterTaskNumberStr[] = "Enter task number: ";
+     39          
+     40          // Задание 1: пользователь нажимает на кнопки(цифры) телефонной клавиатуры и 
+     41          //			  соответствующая цифра появляется на LCD-экране
+     42          //			  при нажатии * экран очищается
+     43          //			  при нажатии # осуществляется выход из задания
+     44          void ExecuteTask1()
+     45          {
+     46          	unsigned char key = 0;
+     47          	char keyname;	
+     48          	unsigned char keyCount = 0;
+     49          
+     50          	LCD_clrscr();
+     51          	while( key != KEY_BAR )
+     52          	{
+     53          		key = KEY_getkey();
+     54          
+     55          		if( !key )
+     56          			continue;
+     57          
+     58          		keyname = KEY_getkeyname( key );
+     59          	
+     60          		if( keyname >= '0' && keyname  <= '9' )
+     61          		{	
+     62          			LCD_printchar( keyname );
+     63          			keyCount++;
+     64          
+     65          			if( keyCount == LCD_WIDTH )
+     66          				LCD_gotoxy( 0, 1 );
+     67          		}
+     68          		else if( key == KEY_ASTERISK )
+     69          		{
+     70          			LCD_clrscr();
+     71          			keyCount = 0;
+     72          		}
+     73          	
+     74          		KEY_waitforkeyrelease();
+     75          	}
+     76          }
+     77          
+     78          // Задание 2: пользователь нажимает на кнопки(цифры) телефонной клавиатуры и 
+     79          //			  соответствующая цифра появляется на семисегментном индикаторе
+     80          //			  при нажатии # осуществляется выход из задания
+     81          void ExecuteTask2()
+     82          {
+     83          	unsigned char key = 0;
+     84          	
+     85          	while( key != KEY_BAR )
+     86          	{
+     87          		key = KEY_getkey();
+     88          
+     89          		if( !key )
+     90          			continue;
+     91          
+     92          		LED7_setdigit( KEY_getkeyname( key ) - '0' );
+     93          		KEY_waitforkeyrelease();
+     94          	}
+     95          }
+     96          
+     97          // Задание 3: при нажатии на кнопки телефонной клавиатуры раздается 
+     98          //			  сигнал зуммера
+     99          //			  при нажатии # осуществляется выход из задания
+    100          void ExecuteTask3()
+    101          {
+    102          	unsigned char key = 0;
+    103          	
+    104          	while( key != KEY_BAR )
+    105          	{
+    106          		key = KEY_getkey();
+    107          
+    108          		if( !key )
+    109          			continue;
+    110          
+    111          		Beep( 100 );
+    112          		KEY_waitforkeyrelease();
+    113          	}
+    114          }
+    115          
+    116          // Задание 4: при нажатии на кнопки телефонной клавиатуры(1,2,3) меняет 
+    117          //			  состояние соответствующий этой кнопке LED-индикатор
+    118          //			  при нажатии # осуществляется выход из задания
+    119          void ExecuteTask4()
+    120          {
+    121          	unsigned char key = 0;
+    122          	
+    123          	while( key != KEY_BAR )
+    124          	{
+    125          		key = KEY_getkey();
+    126          
+    127          		if( !key )
+    128          			continue;
+    129          
+    130          		switch( KEY_getkeyname( key ) ) {
+    131          		case '1':
+    132          			LED1_PORT = !LED1_PORT;
+    133          			break;
+    134          		case '2':
+    135          			LED2_PORT = !LED2_PORT;
+    136          			break;
+    137          		case '3':
+    138          			LED3_PORT = !LED3_PORT;
+    139          			break;
+    140          		}
+    141          		KEY_waitforkeyrelease();
+    142          	}
+    143          }
+    144          
+    145          // Задание 5: в UART выводится текущее время и дата, полученные из
+    146          // 			  микросхемы DS1307
+    147          void ExecuteTask5()
+    148          {
+    149          	char time[9], date[9];
+    150          	DS1307_gettime(time);
+    151          	DS1307_getdate(date);
+    152          
+    153          	UART_sendstring_flash( timeStr );
+    154          	UART_sendstring( time );
+    155          	UART_sendcrlf();
+    156          	UART_sendstring_flash( dateStr );
+    157          	UART_sendstring( date );
+    158          	UART_sendcrlf();
+    159          }
+    160          
+    161          // Задание 6: через UART-интерфейс пользователь вводит новое время и дату,
+    162          // 			  которые устанавливаются в микросхему DS1307
+    163          void ExecuteTask6()
+    164          {
+    165          	unsigned char hour, minute, second;
+    166          	unsigned char day, month, year;
+    167          	
+    168          	UART_sendstring_flash( enterHourStr );
+    169          	hour = UART_receivevalue();	
+    170          	UART_sendstring_flash( enterMinuteStr );
+    171          	minute = UART_receivevalue();	
+    172          	UART_sendstring_flash( enterSecondStr );
+    173          	second = UART_receivevalue();	
+    174          	
+    175          	DS1307_settime( hour, minute, second );
+    176          
+    177          	UART_sendstring_flash( enterDayStr );
+    178          	day = UART_receivevalue();	
+    179          	UART_sendstring_flash( enterMonthStr );
+    180          	month = UART_receivevalue();	
+    181          	UART_sendstring_flash( enterYearStr );
+    182          	year = UART_receivevalue();	
+    183          	
+    184          	DS1307_setdate( day, month, year );
+    185          }
+    186          
+    187          // Задание 7: через UART-интерфейс пользователь вводит адрес и значение ячейки,
+    188          //			  которые заносятся во внешнюю EEPROM память AT24CXX
+    189          void ExecuteTask7()
+    190          {
+    191          	unsigned char addr, value;
+    192          
+    193          	UART_sendstring_flash( enterAddressStr );
+    194          	addr = UART_receivevalue();
+    195          	UART_sendstring_flash( enterValueStr );
+    196          	value = UART_receivevalue();
+    197          	
+    198          	AT24CXX_write( addr, value );
+    199          }
+    200          
+    201          // Задание 8: через UART-интерфейс пользователь вводит адрес ячейки,
+    202          //			  значение которой считывается из внешней EEPROM памяти AT24CXX
+    203          //			  и выводиться в UART
+    204          void ExecuteTask8()
+    205          {
+    206          	unsigned char addr;
+    207          	
+    208          	UART_sendstring_flash( enterAddressStr );
+    209          	addr = UART_receivevalue();
+    210          
+    211          	UART_sendstring_flash( valueStr );
+    212          	UART_sendvalue( AT24CXX_read( addr ) );
+    213          	UART_sendcrlf();	
+    214          }
+    215          
+    216          // Задание 9: в UART-интерфейс выводиться текущее значение температуры,
+    217          //			  полученное из микрочхемы DS1820
+    218          void ExecuteTask9()
+    219          {
+    220          	char strTemp[ 5 ];
+    221          
+    222          	if( !DS1820_startconverttemp() )
+    223          	{
+    224          		UART_sendstring_flash( sensorNotConnectedStr );
+    225          		UART_sendcrlf();
+    226          		return;
+    227          	}
+    228          
+    229          	while( !DS1820_getconvertstatus() );
+    230          		
+    231          	if( DS1820_gettemperature( strTemp ) )
+    232          	{
+    233          		UART_sendstring_flash( temperatureStr );
+    234          		UART_sendstring( strTemp );
+    235          		UART_sendcrlf();
+    236          	}
+    237          }
+    238          
+    239          // Функция выводит на LCD приветственное сообщение
+    240          void OutputStartLCDMessage()
+    241          {
+    242          	LCD_print_flash( LcdMessageLine1 );
+    243          	LCD_gotoxy( 0, 1 );
+    244          	LCD_print_flash( LcdMessageLine2 );
+    245          }
+    246          
+    247          // Функция-обработчик прерывания, возникающего когда во входном буфере UART
+    248          // имеются данные. 
+    249          // В этой функции мы получаем номер задания и выполняем его.
+    250          
+    251          #pragma vector = UART_RXC_vect
+    252           __interrupt void UART0_RX_interrupt()
+    253          {
+    254          	unsigned char task;
+    255          	task = UART_receivevalue();
+    256          	
+    257          	switch( task ) {
+    258          	case 1:
+    259          		ExecuteTask1();
+    260          		break;
+    261          	case 2:
+    262          		ExecuteTask2();
+    263          		break;
+    264          	case 3:
+    265          		ExecuteTask3();
+    266          		break;
+    267          	case 4:
+    268          		ExecuteTask4();
+    269          		break;
+    270          	case 5:
+    271          		ExecuteTask5();
+    272          		break;
+    273          	case 6:
+    274          		ExecuteTask6();
+    275          		break;
+    276          	case 7:
+    277          		ExecuteTask7();
+    278          		break;
+    279          	case 8:
+    280          		ExecuteTask8();
+    281          		break;
+    282          	case 9:
+    283          		ExecuteTask9();
+    284          		break;
+    285          	}
+    286          	UART_sendstring_flash( enterTaskNumberStr );
+    287          }
+    288          
+    289          // Функция автономного режима, то есть режима, когда нет подключения к 
+    290          // компьютеру через UART-интерфейс.
+    291          // На LCD-экран выводятся:
+    292          // 		в первой строке - текущая температура и текущее время
+    293          //		во второй строке - текущая дата
+    294          // LED индикаторы меняют свое состояние
+    295          void AutonomousMode()
+    296          {
+    297          	LCD_clrscr();
+    298          	
+    299          	static char strTemp[ 9 ] = { 0 };
+    300          	LCD_gotoxy( 0, 0 );
+    301          
+    302          	switch( DS1820_gettemperature( strTemp ) ) {	// Получаем температуру 
+    303          	case 0:											// Сенсор не подключен
+    304          		strTemp[ 0 ] = 0;
+    305          		break;
+    306          	case 2:											// Данные не готовы
+    307          		DS1820_startconverttemp();
+    308          		break;
+    309          	}
+    310          	LCD_print( strTemp );
+    311          
+    312          	char time[9] = { 0 };
+    313          	DS1307_gettime(time);
+    314          	
+    315          	LCD_gotoxy( 6, 0 );
+    316          	LCD_print( time );
+    317          
+    318          	
+    319          	LCD_gotoxy( 0, 1 );
+    320          	char keyname = KEY_getkeyname( KEY_getkey() );
+    321          	if( keyname != 0 )
+    322          		LCD_printchar( keyname );
+    323          	
+    324          	
+    325          	char date[9] = { 0 };
+    326          	DS1307_getdate(date);
+    327          
+    328          	LCD_gotoxy( 6, 1 );
+    329          	LCD_print( date );
+    330          	
+    331          	static unsigned char ledCount = 0;
+    332          	if( ledCount % 3 == 0 )							// Чтобы индикаторы слишком
+    333          	{												// часто не мигали, меняем
+    334          		LED1_PORT = !LED1_PORT;						// их состояние один раз на
+    335          		LED2_PORT = !LED2_PORT;						// три вызова функции
+    336          		LED3_PORT = !LED3_PORT;
+    337          	}
+    338          	ledCount++;
+    339          }
+    340          
+    341          // Главная функция программы
+    342          // Производится инициализация устройств, вывод сообщения на LCD-экран, а также
+    343          // вывод сообщения в UART-интерфейс
+    344          // Также включается зуммер на 0.5 с
+    345          // В бесконечном цикле выполняется функция автономного режима
+    346          int main()
+    347          {
+    348          	LED1_DDR = 1;
+    349          	LED2_DDR = 1;
+    350          	LED3_DDR = 1;
+    351          	
+    352          	I2C_init();
+    353          	SPI_init();
+    354          	LCD_init();
+    355          	LCD_clrscr();
+    356          
+    357          	UART_init( CALC_UBRR( 57600 ) );
+    358          	__enable_interrupt();
+    359          
+    360          	DS1820_startconverttemp();
+    361          	
+    362          	UART_sendstring_flash( UartMessage );
+    363          	OutputStartLCDMessage();
+    364          
+    365          	UART_sendstring_flash( enterTaskNumberStr );
+    366          
+    367          	Beep( 500 );
+    368          
+    369          	DELAY_MS( 1000 );
+    370          
+    371          	while(1) 
+    372          	{
+    373          		AutonomousMode();
+    374          		DELAY_MS( 200 );
+    375          	}
+    376            
+    377          }
+
+   Maximum stack usage in bytes:
+
+     Function                     CSTACK RSTACK
+     --------                     ------ ------
+     AutonomousMode                  20      4
+       -> LCD_clrscr                 20      2
+       -> LCD_gotoxy                 20      2
+       -> DS1820_gettemperature      20      2
+       -> DS1820_startconverttemp    20      2
+       -> LCD_print                  20      2
+       -> DS1307_gettime             20      2
+       -> LCD_gotoxy                 20      2
+       -> LCD_print                  20      2
+       -> LCD_gotoxy                 20      2
+       -> KEY_getkey                 20      2
+       -> KEY_getkeyname             20      2
+       -> LCD_printchar              20      2
+       -> DS1307_getdate             20      2
+       -> LCD_gotoxy                 20      2
+       -> LCD_print                  20      2
+     ExecuteTask1                     2      2
+       -> LCD_clrscr                  2      2
+       -> KEY_getkey                  2      2
+       -> KEY_getkeyname              2      2
+       -> LCD_printchar               2      2
+       -> LCD_gotoxy                  2      2
+       -> LCD_clrscr                  2      2
+       -> KEY_waitforkeyrelease       2      2
+     ExecuteTask2                     1      2
+       -> KEY_getkey                  1      2
+       -> KEY_getkeyname              1      2
+       -> LED7_setdigit               1      2
+       -> KEY_waitforkeyrelease       1      2
+     ExecuteTask3                     1      2
+       -> KEY_getkey                  1      2
+       -> Beep                        1      2
+       -> KEY_waitforkeyrelease       1      2
+     ExecuteTask4                     1      2
+       -> KEY_getkey                  1      2
+       -> KEY_getkeyname              1      2
+       -> KEY_waitforkeyrelease       1      2
+     ExecuteTask5                    18      2
+       -> DS1307_gettime             18      2
+       -> DS1307_getdate             18      2
+       -> UART_sendstring_flash      18      2
+       -> UART_sendstring            18      2
+       -> UART_sendcrlf              18      2
+       -> UART_sendstring_flash      18      2
+       -> UART_sendstring            18      2
+       -> UART_sendcrlf              18      2
+     ExecuteTask6                     2      2
+       -> UART_sendstring_flash       2      2
+       -> UART_receivevalue           2      2
+       -> UART_sendstring_flash       2      2
+       -> UART_receivevalue           2      2
+       -> UART_sendstring_flash       2      2
+       -> UART_receivevalue           2      2
+       -> DS1307_settime              2      2
+       -> UART_sendstring_flash       2      2
+       -> UART_receivevalue           2      2
+       -> UART_sendstring_flash       2      2
+       -> UART_receivevalue           2      2
+       -> UART_sendstring_flash       2      2
+       -> UART_receivevalue           2      2
+       -> DS1307_setdate              2      2
+     ExecuteTask7                     1      2
+       -> UART_sendstring_flash       1      2
+       -> UART_receivevalue           1      2
+       -> UART_sendstring_flash       1      2
+       -> UART_receivevalue           1      2
+       -> AT24CXX_write               1      2
+     ExecuteTask8                     1      2
+       -> UART_sendstring_flash       1      2
+       -> UART_receivevalue           1      2
+       -> UART_sendstring_flash       1      2
+       -> AT24CXX_read                1      2
+       -> UART_sendvalue              1      2
+       -> UART_sendcrlf               1      2
+     ExecuteTask9                     5      2
+       -> DS1820_startconverttemp     5      2
+       -> UART_sendstring_flash       5      2
+       -> UART_sendcrlf               5      2
+       -> DS1820_getconvertstatus     5      2
+       -> DS1820_gettemperature       5      2
+       -> UART_sendstring_flash       5      2
+       -> UART_sendstring             5      2
+       -> UART_sendcrlf               5      2
+     OutputStartLCDMessage            0      2
+       -> LCD_print_flash             0      2
+       -> LCD_gotoxy                  0      2
+       -> LCD_print_flash             0      2
+     UART0_RX_interrupt              15      2
+       -> UART_receivevalue          15      2
+       -> ExecuteTask1               15      2
+       -> ExecuteTask2               15      2
+       -> ExecuteTask3               15      2
+       -> ExecuteTask4               15      2
+       -> ExecuteTask5               15      2
+       -> ExecuteTask6               15      2
+       -> ExecuteTask7               15      2
+       -> ExecuteTask8               15      2
+       -> ExecuteTask9               15      2
+       -> UART_sendstring_flash      15      2
+     main                             0      2
+       -> I2C_init                    0      2
+       -> SPI_init                    0      2
+       -> LCD_init                    0      2
+       -> LCD_clrscr                  0      2
+       -> UART_init                   0      2
+       -> DS1820_startconverttemp     0      2
+       -> UART_sendstring_flash       0      2
+       -> OutputStartLCDMessage       0      2
+       -> UART_sendstring_flash       0      2
+       -> Beep                        0      2
+       -> delay_func_ms               0      2
+       -> AutonomousMode              0      2
+       -> delay_func_ms               0      2
+
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     UartMessage                     103
+     LcdMessageLine1                  29
+     timeStr                          14
+     enterAddressStr                  54
+     temperatureStr                   38
+     enterHourStr                     82
+     ExecuteTask1                     50
+     ?Subroutine18                     6
+     ?Subroutine5                      4
+     ?Subroutine0                     10
+     ?Subroutine4                      4
+     ?Subroutine2                      4
+     ?Subroutine21                     4
+     ?Subroutine3                      4
+     ExecuteTask2                     22
+     ?Subroutine19                     4
+     ExecuteTask3                     22
+     ExecuteTask4                     64
+     ExecuteTask5                     36
+     ?Subroutine12                     4
+     ?Subroutine17                     4
+     ?Subroutine10                     8
+     ?Subroutine15                     8
+     ?Subroutine9                      6
+     ExecuteTask6                     58
+     ?Subroutine8                      2
+     ?Subroutine20                     4
+     ?Subroutine7                     10
+     ?Subroutine16                     6
+     ExecuteTask7                     16
+     ?Subroutine1                     12
+     ExecuteTask8                     22
+     ExecuteTask9                     46
+     ?Subroutine13                     4
+     OutputStartLCDMessage            18
+     UART0_RX_interrupt              116
+     AutonomousMode                  176
+     ?Subroutine14                     4
+     ?Subroutine6                      4
+     strTemp                          10
+     main                             70
+     ??INTVEC 76                       4
+     ?<Jumptable for UART0_RX_interrupt>_0
+                                      24
+     ?<Constant {'\000'}>             18
+     _A_PORTB                          1
+     _A_DDRB                           1
+     _A_PORTD                          1
+     _A_DDRD                           1
+      Others                           6
+
+ 
+   4 bytes in segment ABSOLUTE
+ 832 bytes in segment CODE
+   6 bytes in segment INITTAB
+   4 bytes in segment INTVEC
+ 338 bytes in segment NEAR_F
+  10 bytes in segment NEAR_Z
+  24 bytes in segment SWITCH
+ 
+ 1 194 bytes of CODE memory (+ 10 bytes shared)
+    10 bytes of DATA memory (+  4 bytes shared)
+
+Errors: none
+Warnings: none

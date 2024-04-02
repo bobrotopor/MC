@@ -1,0 +1,92 @@
+##############################################################################
+#                                                                            #
+#                                                      23/Apr/2006  03:05:38 #
+# IAR Atmel AVR C/C++ Compiler V4.12A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\DELAY.c     #
+#    Command line =  F:\Projects\VitalyIgorevich\Packet\src\m162\DELAY.c     #
+#                    --cpu=m162 -ms -o F:\Projects\VitalyIgorevich\Packet\sr #
+#                    c\m162\Debug\Obj\ -lCN F:\Projects\VitalyIgorevich\Pack #
+#                    et\src\m162\Debug\List\ -y --initializers_in_flash -z9  #
+#                    --cross_call_passes=2 --debug -e -I "E:\Program         #
+#                    Files\IAR Systems\Embedded Workbench 4.0                #
+#                    Evaluation\avr\INC\" -I "E:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 4.0                          #
+#                    Evaluation\avr\INC\CLIB\" --eeprom_size 512             #
+#    List file    =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\List\ #
+#                    DELAY.lst                                               #
+#    Object file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\Obj\D #
+#                    ELAY.r90                                                #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+F:\Projects\VitalyIgorevich\Packet\src\m162\DELAY.c
+      1          #include "DELAY.H"
+      2          
+      3          // Вспомогательная функция для выполнения задержки
+
+   \                                 In segment CODE, align 2, keep-with-next
+      4          void delay_func_mcs( unsigned short count)
+   \                     delay_func_mcs:
+   \                     ??delay_func_mcs_0:
+      5          {
+      6          	while( count-- > 0 );
+   \   00000000   0198               MOVW    R19:R18, R17:R16
+   \   00000002   5001               SUBI    R16, 1
+   \   00000004   4010               SBCI    R17, 0
+   \   00000006   2B23               OR      R18, R19
+   \   00000008   F7D9               BRNE    ??delay_func_mcs_0
+      7          }
+   \   0000000A   9508               RET
+      8          
+      9          // Вспомогательная функция для выполнения задержки
+
+   \                                 In segment CODE, align 2, keep-with-next
+     10          void delay_func_ms( unsigned short count)
+   \                     delay_func_ms:
+     11          {
+   \   00000000   939A               ST      -Y, R25
+   \   00000002   938A               ST      -Y, R24
+   \   00000004   01C8               MOVW    R25:R24, R17:R16
+   \   00000006   C003               RJMP    ??delay_func_ms_0
+     12          	while( count-- > 0 )
+     13          		DELAY_MCS( 100 );
+   \                     ??delay_func_ms_1:
+   \   00000008   EF02               LDI     R16, 242
+   \   0000000A   E010               LDI     R17, 0
+   \   0000000C   ....               RCALL   delay_func_mcs
+   \                     ??delay_func_ms_0:
+   \   0000000E   01FC               MOVW    R31:R30, R25:R24
+   \   00000010   9701               SBIW    R25:R24, 1
+   \   00000012   2BEF               OR      R30, R31
+   \   00000014   F7C9               BRNE    ??delay_func_ms_1
+     14          }
+   \   00000016   9189               LD      R24, Y+
+   \   00000018   9199               LD      R25, Y+
+   \   0000001A   9508               RET
+
+   Maximum stack usage in bytes:
+
+     Function            CSTACK RSTACK
+     --------            ------ ------
+     delay_func_mcs          0      2
+     delay_func_ms           2      2
+       -> delay_func_mcs     2      2
+
+
+   Segment part sizes:
+
+     Function/Label     Bytes
+     --------------     -----
+     ??delay_func_mcs_0   12
+     delay_func_ms        28
+
+ 
+ 40 bytes in segment CODE
+ 
+ 40 bytes of CODE memory
+
+Errors: none
+Warnings: none

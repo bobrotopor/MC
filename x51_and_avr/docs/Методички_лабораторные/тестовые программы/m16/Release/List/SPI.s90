@@ -1,0 +1,103 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     21/May/2007  11:45:20 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m16\SPI.c                                 /
+//    Command line =  --cpu=m16 -mt -o D:\stend\src\m16\Release\Obj\ -D      /
+//                    NDEBUG -lb D:\stend\src\m16\Release\List\              /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m16\SPI.c               /
+//    List file    =  D:\stend\src\m16\Release\List\SPI.s90                  /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME SPI
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        PUBLIC SPI_init
+        PUBLIC SPI_rw
+        PUBWEAK _A_DDRB
+        PUBWEAK _A_PORTB
+        PUBWEAK _A_SPCR
+        PUBWEAK _A_SPDR
+        PUBWEAK _A_SPSR
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+
+        RSEG CODE:CODE:NOROOT(1)
+SPI_init:
+        SBI	0x17, 0x05
+        CBI	0x17, 0x06
+        SBI	0x17, 0x07
+        SBI	0x17, 0x04
+        SBI	0x18, 0x04
+        LDI	R16, 92
+        OUT	0x0D, R16
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+SPI_rw:
+        OUT	0x0F, R16
+??SPI_rw_0:
+        SBIS	0x0E, 0x07
+        RJMP	??SPI_rw_0
+        IN	R16, 0x0F
+        RET
+
+        ASEGN ABSOLUTE:DATA:NOROOT,038H
+// union <unnamed> volatile __io _A_PORTB
+_A_PORTB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,037H
+// union <unnamed> volatile __io _A_DDRB
+_A_DDRB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,02fH
+// union <unnamed> volatile __io _A_SPDR
+_A_SPDR:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,02eH
+// union <unnamed> volatile __io _A_SPSR
+_A_SPSR:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,02dH
+// union <unnamed> volatile __io _A_SPCR
+_A_SPCR:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+//  5 bytes in segment ABSOLUTE
+// 26 bytes in segment CODE
+// 
+// 26 bytes of CODE memory
+//  0 bytes of DATA memory (+ 5 bytes shared)
+//
+//Errors: none
+//Warnings: none

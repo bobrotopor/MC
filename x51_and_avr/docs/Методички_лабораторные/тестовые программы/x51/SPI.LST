@@ -1,0 +1,71 @@
+C51 COMPILER V7.20   SPI                                                                   05/08/2007 12:58:50 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE SPI
+OBJECT MODULE PLACED IN SPI.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE SPI.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include "SPI.h"
+   2          
+   3          void SPI_init()
+   4          {
+   5   1              SPCR = 0x5C;                    // Включаем SPI: режим ведущий, порядок загрузки регистра
+   6   1                                                              // от старшего бита к младшему
+   7   1      }
+   8          
+   9          unsigned char SPI_rw(const unsigned char w_data)
+  10          {
+  11   1              SPDR = w_data;                  //      Заполняем SPI буфер
+  12   1              while(!(SPSR & 0x80));  // Ждем пока передача данных будет завершена
+  13   1              return SPDR;
+  14   1      }
+  15          
+  16          
+C51 COMPILER V7.20   SPI                                                                   05/08/2007 12:58:50 PAGE 2   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION SPI_init (BEGIN)
+                                           ; SOURCE LINE # 3
+                                           ; SOURCE LINE # 4
+                                           ; SOURCE LINE # 5
+0000 75D55C            MOV     SPCR,#05CH
+                                           ; SOURCE LINE # 7
+0003 22                RET     
+             ; FUNCTION SPI_init (END)
+
+             ; FUNCTION _SPI_rw (BEGIN)
+                                           ; SOURCE LINE # 9
+;---- Variable 'w_data' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 10
+                                           ; SOURCE LINE # 11
+0000 8F86              MOV     SPDR,R7
+0002         ?C0002:
+                                           ; SOURCE LINE # 12
+0002 E5AA              MOV     A,SPSR
+0004 30E7FB            JNB     ACC.7,?C0002
+0007         ?C0003:
+                                           ; SOURCE LINE # 13
+0007 AF86              MOV     R7,SPDR
+                                           ; SOURCE LINE # 14
+0009         ?C0004:
+0009 22                RET     
+             ; FUNCTION _SPI_rw (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     14    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

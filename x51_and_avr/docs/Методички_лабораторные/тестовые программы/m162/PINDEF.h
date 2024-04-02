@@ -1,0 +1,55 @@
+#ifndef _PINDEF_H_
+#define _PINDEF_H_
+
+#include <iom162.h>
+#include <ina90.h> 
+
+#define BEEP_PORT			PORTB_PORTB4
+#define BEEP_DDR			DDRB_DDB4
+
+#define LCD_E_PORT			PORTD_PORTD2
+#define LCD_E_DDR			DDRD_DDD2
+#define LCD_RS_PORT			PORTD_PORTD3
+#define LCD_RS_DDR			DDRD_DDD3
+#define ST_PORT				PORTD_PORTD4
+#define ST_DDR				DDRD_DDD4
+
+#define SCL_PORT			PORTA_PORTA0
+#define SCL_DDR				DDRA_DDA0
+#define SDA_PORT			PORTA_PORTA1
+#define SDA_PIN				PINA_PINA1
+#define SDA_DDR				DDRA_DDA1
+
+#define LED1_PORT			PORTB_PORTB0
+#define LED1_DDR			DDRB_DDB0
+#define LED2_PORT			PORTB_PORTB1
+#define LED2_DDR			DDRB_DDB1
+#define LED3_PORT			PORTD_PORTD5
+#define LED3_DDR			DDRD_DDD5
+
+#define KEY_PORT			PORTC
+#define KEY_PIN				PINC
+#define KEY_DDR				DDRC
+
+#define DS_BUS_PORT			PORTA_PORTA2
+#define DS_BUS_PIN			PINA_PINA2
+#define DS_BUS_DDR			DDRA_DDA2
+
+#define SPI_MISO_DDR		DDRB_DDB6
+#define SPI_MOSI_DDR		DDRB_DDB5
+#define SPI_SCK_DDR			DDRB_DDB7
+#define SPI_SS_DDR			DDRB_DDB4
+#define SPI_SS				PORTB_PORTB4
+
+#define UART_UBRRL			UBRR0L
+#define UART_UBRRH			UBRR0H
+#define UART_UCSRB_RXEN		UCSR0B_RXEN0
+#define UART_UCSRB_TXEN		UCSR0B_TXEN0
+#define UART_UCSRB_RXCIE	UCSR0B_RXCIE0
+#define UART_UCSRA_UDRE		UCSR0A_UDRE0
+#define UART_UDR			UDR0
+#define UART_UCSRA_RXC		UCSR0A_RXC0
+
+#define UART_RXC_vect		USART0_RXC_vect
+
+#endif

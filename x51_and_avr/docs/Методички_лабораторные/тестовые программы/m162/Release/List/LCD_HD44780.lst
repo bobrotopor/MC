@@ -1,0 +1,166 @@
+##############################################################################
+#                                                                            #
+#                                                      28/Jun/2007  00:57:52 #
+# IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  D:\stend\src\m162\LCD_HD44780.c                         #
+#    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D     #
+#                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb         #
+#                    D:\stend\src\m162\Release\List\ -y                      #
+#                    --initializers_in_flash -z9 -e -I "D:\Program           #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program     #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"               #
+#                    --eeprom_size 512 D:\stend\src\m162\LCD_HD44780.c       #
+#    List file    =  D:\stend\src\m162\Release\List\LCD_HD44780.lst          #
+#    Object file  =  D:\stend\src\m162\Release\Obj\LCD_HD44780.r90           #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+D:\stend\src\m162\LCD_HD44780.c
+      1          #include "LCD_HD44780.h"
+      2          #include "SHIFT.h"
+      3          #include "DELAY.h"
+      4          
+      5          // Функция записи байта в LCD
+      6          // Если rs == 0 - режим записи комманд
+      7          // Если rs == 1 - режим записи данных
+      8          void LCD_write(unsigned char w_byte, unsigned char rs)
+      9          {
+     10          	if(rs == 0)
+     11          		LCD_RS_PORT = 0;	// Режим записи команд
+     12          	else
+     13          		LCD_RS_PORT = 1;	// Режим записи данных
+     14          	
+     15          	LCD_E_PORT = 1;			// Выставляем строб для записи данных
+     16          	
+     17          	SHIFT_write(w_byte);	// Выводим данные в SPI порт
+     18          
+     19          	__no_operation();		// Ждем такт
+     20          	LCD_E_PORT = 0;			// Сбрасываем строб
+     21          
+     22          	DELAY_MCS(500);			// Ждем пока данные будут обработаны
+     23          }                          	
+     24          
+     25          // Функция инициализации LCD
+     26          void LCD_init()
+     27          {
+     28          	LCD_E_DDR = 1;
+     29          	LCD_RS_DDR = 1;
+     30          	
+     31          	LCD_E_PORT = 0;
+     32          	LCD_RS_PORT = 0;
+     33          	DELAY_MS(41);			// Выдерживаем паузу после подачи питания на LCD
+     34          	
+     35          	LCD_write(0x30, 0);		// Необходимые действия для инициализации LCD
+     36          	DELAY_MS(5);
+     37          	LCD_write(0x30, 0);
+     38          	DELAY_MCS(700);
+     39          	LCD_write(0x30, 0);
+     40          	DELAY_MCS(700);
+     41          	LCD_write(0x38, 0);		// Инциализируем LCD: 2 строки, символы 5*7, 8-битный интерфейс
+     42          	LCD_write(0x01, 0);		// Очищаем экран
+     43          	DELAY_MS(3);
+     44          	LCD_write(0x06, 0);     // Задаем направление движения курсора - направо
+     45          	LCD_write(0x0C, 0);		// Включаем дисплей, выключаем курсор, выключаем мерцание
+     46          }
+     47          
+     48          // Функция очистки экрана LCD
+     49          void LCD_clrscr()
+     50          {
+     51          	LCD_write(0x01, 0);
+     52          	DELAY_MS(5);
+     53          }
+     54          
+     55          // Функция установки позиция курсора
+     56          void LCD_gotoxy(unsigned char x, unsigned char y)
+     57          {
+     58          	if(y != 0)
+     59          		x += 0x40;
+     60          	x |= 0x80;													
+     61          	LCD_write(x, 0);
+     62          }
+     63          
+     64          // Функия вывода символа на экран
+     65          void LCD_printchar( char ch )
+     66          {
+     67          	LCD_write( ch, 1 );
+     68          }
+     69          
+     70          // Функция вывода строки из памяти
+     71          void LCD_print( char string[] )				
+     72          {									
+     73          	while((*string) != 0)
+     74          		LCD_printchar(*(string++));
+     75          }
+     76          
+     77          // Функция вывода строки из flash
+     78          void LCD_print_flash(flash unsigned char string[])
+     79          {
+     80          		while((*string) != 0)
+     81          		LCD_printchar(*(string++));
+     82          }
+
+   Maximum stack usage in bytes:
+
+     Function            CSTACK RSTACK
+     --------            ------ ------
+     LCD_clrscr              0      2
+       -> LCD_write          0      2
+       -> delay_func_ms      0      2
+     LCD_gotoxy              0      2
+       -> LCD_write          0      2
+     LCD_init                0      2
+       -> delay_func_ms      0      2
+       -> LCD_write          0      2
+       -> delay_func_ms      0      2
+       -> LCD_write          0      2
+       -> delay_func_mcs     0      2
+       -> LCD_write          0      2
+       -> delay_func_mcs     0      2
+       -> LCD_write          0      2
+       -> LCD_write          0      2
+       -> delay_func_ms      0      2
+       -> LCD_write          0      2
+       -> LCD_write          0      2
+     LCD_print               2      2
+       -> LCD_printchar      2      2
+     LCD_print_flash         2      2
+       -> LCD_printchar      2      2
+     LCD_printchar           0      2
+       -> LCD_write          0      2
+     LCD_write               0      2
+       -> SHIFT_write        0      2
+       -> delay_func_mcs     0      2
+
+
+   Segment part sizes:
+
+     Function/Label  Bytes
+     --------------  -----
+     LCD_write         24
+     ?Subroutine5       4
+     LCD_init          52
+     ?Subroutine2       2
+     ?Subroutine7       4
+     ?Subroutine0      12
+     ?Subroutine1       6
+     ?Subroutine6       2
+     LCD_clrscr         8
+     LCD_gotoxy        10
+     LCD_printchar      4
+     LCD_print         24
+     LCD_print_flash   28
+     _A_PORTD           1
+     _A_DDRD            1
+
+ 
+   2 bytes in segment ABSOLUTE
+ 180 bytes in segment CODE
+ 
+ 180 bytes of CODE memory
+   0 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none

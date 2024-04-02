@@ -1,0 +1,167 @@
+##############################################################################
+#                                                                            #
+#                                                      22/Apr/2006  01:58:04 #
+# IAR Atmel AVR C/C++ Compiler V4.12A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\LED7.c      #
+#    Command line =  F:\Projects\VitalyIgorevich\Packet\src\m162\LED7.c      #
+#                    --cpu=m162 -ms -o F:\Projects\VitalyIgorevich\Packet\sr #
+#                    c\m162\Debug\Obj\ -lCN F:\Projects\VitalyIgorevich\Pack #
+#                    et\src\m162\Debug\List\ -y --initializers_in_flash -z9  #
+#                    --cross_call_passes=2 --debug -e -I "E:\Program         #
+#                    Files\IAR Systems\Embedded Workbench 4.0                #
+#                    Evaluation\avr\INC\" -I "E:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 4.0                          #
+#                    Evaluation\avr\INC\CLIB\" --eeprom_size 512             #
+#    List file    =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\List\ #
+#                    LED7.lst                                                #
+#    Object file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\Obj\L #
+#                    ED7.r90                                                 #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+F:\Projects\VitalyIgorevich\Packet\src\m162\LED7.c
+      1          #include "LED7.h"
+      2          #include "SHIFT.h"
+      3          
+      4          // Коды цифр для 7-сегментного индикатора (при условии что 
+      5          // первым передается MSB слова данных)
+      6          #define CODE_0	0xC0
+      7          #define CODE_1	0xF9
+      8          #define CODE_2	0xA4
+      9          #define CODE_3	0xB0
+     10          #define CODE_4	0x99
+     11          #define CODE_5	0x92
+     12          #define CODE_6	0x82
+     13          #define CODE_7	0xf8
+     14          #define CODE_8	0x80
+     15          #define CODE_9	0x90
+     16          
+     17          // Функция вывода цифры на семисегментный индикатор
+
+   \                                 In segment CODE, align 2, keep-with-next
+     18          void LED7_setdigit(unsigned char digit)
+   \                     LED7_setdigit:
+     19          {
+     20          	switch(digit) {
+   \   00000000   ....               LDI     R30, LOW(`?<Jumptable for LED7_setdigit>_0`)
+   \   00000002   ....               LDI     R31, (`?<Jumptable for LED7_setdigit>_0`) >> 8
+   \   00000004   ........           JMP     ?CV_SWITCH_L06
+     21          	case 0:
+     22          		SHIFT_write(CODE_0);
+   \                     ??LED7_setdigit_0:
+   \   00000008   EC00               LDI     R16, 192
+   \   0000000A   C001               RJMP    ??LED7_setdigit_1
+     23          		break;
+     24          	case 1:
+     25          		SHIFT_write(CODE_1);
+   \                     ??LED7_setdigit_2:
+   \   0000000C   EF09               LDI     R16, 249
+   \                     ??LED7_setdigit_1:
+   \   0000000E   ........           JMP     SHIFT_write
+     26          		break;
+     27          	case 2:
+     28          		SHIFT_write(CODE_2);
+   \                     ??LED7_setdigit_3:
+   \   00000012   EA04               LDI     R16, 164
+   \   00000014   CFFC               RJMP    ??LED7_setdigit_1
+     29          		break;
+     30          	case 3:
+     31          		SHIFT_write(CODE_3);
+   \                     ??LED7_setdigit_4:
+   \   00000016   EB00               LDI     R16, 176
+   \   00000018   CFFA               RJMP    ??LED7_setdigit_1
+     32          		break;
+     33          	case 4:
+     34          		SHIFT_write(CODE_4);
+   \                     ??LED7_setdigit_5:
+   \   0000001A   E909               LDI     R16, 153
+   \   0000001C   CFF8               RJMP    ??LED7_setdigit_1
+     35          		break;
+     36          	case 5:
+     37          		SHIFT_write(CODE_5);
+   \                     ??LED7_setdigit_6:
+   \   0000001E   E902               LDI     R16, 146
+   \   00000020   CFF6               RJMP    ??LED7_setdigit_1
+     38          		break;
+     39          	case 6:
+     40          		SHIFT_write(CODE_6);
+   \                     ??LED7_setdigit_7:
+   \   00000022   E802               LDI     R16, 130
+   \   00000024   CFF4               RJMP    ??LED7_setdigit_1
+     41          		break;
+     42          	case 7:
+     43          		SHIFT_write(CODE_7);
+   \                     ??LED7_setdigit_8:
+   \   00000026   EF08               LDI     R16, 248
+   \   00000028   CFF2               RJMP    ??LED7_setdigit_1
+     44          		break;
+     45          	case 8:
+     46          		SHIFT_write(CODE_8);
+   \                     ??LED7_setdigit_9:
+   \   0000002A   E800               LDI     R16, 128
+   \   0000002C   CFF0               RJMP    ??LED7_setdigit_1
+     47          		break;
+     48          	case 9:
+     49          		SHIFT_write(CODE_9);
+   \                     ??LED7_setdigit_10:
+   \   0000002E   E900               LDI     R16, 144
+   \   00000030   ........           CALL    SHIFT_write
+     50          		break;
+     51          	}
+     52          }
+   \                     ??LED7_setdigit_11:
+   \   00000034   9508               RET
+
+   \                                 In segment SWITCH, align 2, keep-with-next
+   \                     `?<Jumptable for LED7_setdigit>_0`:
+   \   00000000   00                 DB      0
+   \   00000001   00                 DB      0
+   \   00000002   ....               DW      (??LED7_setdigit_11) /2
+   \   00000004   000A               DW      10
+   \   00000006   ....               DW      (??LED7_setdigit_0) /2
+   \   00000008   ....               DW      (??LED7_setdigit_2) /2
+   \   0000000A   ....               DW      (??LED7_setdigit_3) /2
+   \   0000000C   ....               DW      (??LED7_setdigit_4) /2
+   \   0000000E   ....               DW      (??LED7_setdigit_5) /2
+   \   00000010   ....               DW      (??LED7_setdigit_6) /2
+   \   00000012   ....               DW      (??LED7_setdigit_7) /2
+   \   00000014   ....               DW      (??LED7_setdigit_8) /2
+   \   00000016   ....               DW      (??LED7_setdigit_9) /2
+   \   00000018   ....               DW      (??LED7_setdigit_10) /2
+
+   Maximum stack usage in bytes:
+
+     Function         CSTACK RSTACK
+     --------         ------ ------
+     LED7_setdigit        0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     LED7_setdigit                    54
+     ?<Jumptable for LED7_setdigit>_0
+                                      26
+
+ 
+ 54 bytes in segment CODE
+ 26 bytes in segment SWITCH
+ 
+ 80 bytes of CODE memory
+
+Errors: none
+Warnings: none

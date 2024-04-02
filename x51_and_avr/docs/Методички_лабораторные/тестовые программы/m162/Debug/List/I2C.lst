@@ -1,0 +1,298 @@
+##############################################################################
+#                                                                            #
+#                                                      23/Apr/2006  03:05:38 #
+# IAR Atmel AVR C/C++ Compiler V4.12A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\I2C.c       #
+#    Command line =  F:\Projects\VitalyIgorevich\Packet\src\m162\I2C.c       #
+#                    --cpu=m162 -ms -o F:\Projects\VitalyIgorevich\Packet\sr #
+#                    c\m162\Debug\Obj\ -lCN F:\Projects\VitalyIgorevich\Pack #
+#                    et\src\m162\Debug\List\ -y --initializers_in_flash -z9  #
+#                    --cross_call_passes=2 --debug -e -I "E:\Program         #
+#                    Files\IAR Systems\Embedded Workbench 4.0                #
+#                    Evaluation\avr\INC\" -I "E:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 4.0                          #
+#                    Evaluation\avr\INC\CLIB\" --eeprom_size 512             #
+#    List file    =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\List\ #
+#                    I2C.lst                                                 #
+#    Object file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\Obj\I #
+#                    2C.r90                                                  #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+F:\Projects\VitalyIgorevich\Packet\src\m162\I2C.c
+      1          #include "I2C.h"
+
+   \                                 In segment ABSOLUTE, at 0x3b
+   \   union <unnamed> volatile __io _A_PORTA
+   \                     _A_PORTA:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x3a
+   \   union <unnamed> volatile __io _A_DDRA
+   \                     _A_DDRA:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x39
+   \   union <unnamed> volatile __io _A_PINA
+   \                     _A_PINA:
+   \   00000000                      DS 1
+      2          #include "DELAY.h"
+      3          
+      4          // Инициализация шины I2C
+
+   \                                 In segment CODE, align 2, keep-with-next
+      5          void I2C_init()
+   \                     I2C_init:
+      6          {
+      7          	SDA_DDR = 0;
+   \   00000000   98D1               CBI     0x1A, 0x01
+      8          	SCL_DDR = 0;
+   \   00000002   98D0               CBI     0x1A, 0x00
+      9          	
+     10          	SDA_PORT = 0;
+   \   00000004   98D9               CBI     0x1B, 0x01
+     11          	SCL_PORT = 0;
+   \   00000006   98D8               CBI     0x1B, 0x00
+     12          }
+   \   00000008   9508               RET
+     13          
+     14          // Функция начала передачи данных
+
+   \                                 In segment CODE, align 2, keep-with-next
+     15          void I2C_start()
+   \                     I2C_start:
+     16          {
+     17          	SCL_DDR = 0;
+   \   00000000   98D0               CBI     0x1A, 0x00
+     18          	SDA_DDR = 0;
+   \   00000002   98D1               CBI     0x1A, 0x01
+     19          	DELAY_MCS( 20 );
+   \   00000004   ....               RCALL   ?Subroutine3
+     20          	SDA_DDR = 1;
+   \                     ??CrossCallReturnLabel_5:
+   \   00000006   9AD1               SBI     0x1A, 0x01
+     21          	DELAY_MCS( 20 );	
+   \   00000008                      REQUIRE ?Subroutine1
+   \   00000008                      ;               // Fall through to label ?Subroutine1
+     22          	SCL_DDR = 1;
+     23          }
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine1:
+   \   00000000   ....               RCALL   ?Subroutine3
+   \                     ??CrossCallReturnLabel_9:
+   \   00000002   9AD0               SBI     0x1A, 0x00
+   \   00000004   9508               RET
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine3:
+   \   00000000   E20E               LDI     R16, 46
+   \   00000002   E010               LDI     R17, 0
+   \   00000004   ........           JMP     delay_func_mcs
+     24          
+     25          // Функция окончания передачи данных
+
+   \                                 In segment CODE, align 2, keep-with-next
+     26          void I2C_stop()
+   \                     I2C_stop:
+     27          {
+     28          	SDA_DDR = 1;
+   \   00000000   9AD1               SBI     0x1A, 0x01
+     29          	DELAY_MCS( 20 );
+   \   00000002   ....               RCALL   ?Subroutine3
+     30          	SCL_DDR = 0;
+   \                     ??CrossCallReturnLabel_6:
+   \   00000004   ....               RCALL   ?Subroutine0
+     31          	DELAY_MCS( 20 );
+     32          	SDA_DDR = 0;
+   \                     ??CrossCallReturnLabel_2:
+   \   00000006   98D1               CBI     0x1A, 0x01
+     33          }
+   \   00000008   9508               RET
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine0:
+   \   00000000   98D0               CBI     0x1A, 0x00
+   \   00000002                      REQUIRE ?Subroutine3
+   \   00000002                      ;               // Fall through to label ?Subroutine3
+     34          
+     35          // Функция передачи байта по шине
+
+   \                                 In segment CODE, align 2, keep-with-next
+     36          unsigned char I2C_write(unsigned char value)
+   \                     I2C_write:
+     37          {
+   \   00000000   939A               ST      -Y, R25
+   \   00000002   938A               ST      -Y, R24
+   \   00000004   2F80               MOV     R24, R16
+     38          	unsigned char i = 8;
+   \   00000006   E098               LDI     R25, 8
+   \   00000008   C005               RJMP    ??CrossCallReturnLabel_7
+     39          	while( i-- )
+     40          	{
+     41          		if( value & 0x80 )
+     42          			SDA_DDR = 0;
+     43          		else
+     44          			SDA_DDR = 1;
+   \                     ??I2C_write_0:
+   \   0000000A   9AD1               SBI     0x1A, 0x01
+     45          		value = value << 1;
+   \                     ??I2C_write_1:
+   \   0000000C   0F88               LSL     R24
+     46          		SCL_DDR = 0;
+   \   0000000E   ....               RCALL   ?Subroutine0
+     47          		DELAY_MCS( 20 );
+     48          		SCL_DDR = 1;
+   \                     ??CrossCallReturnLabel_3:
+   \   00000010   9AD0               SBI     0x1A, 0x00
+     49          		DELAY_MCS( 20 );
+   \   00000012   ....               RCALL   ?Subroutine3
+   \                     ??CrossCallReturnLabel_7:
+   \   00000014   2F09               MOV     R16, R25
+   \   00000016   959A               DEC     R25
+   \   00000018   2300               TST     R16
+   \   0000001A   F021               BREQ    ??I2C_write_2
+   \   0000001C   FB87               BST     R24, 7
+   \   0000001E   F7AE               BRTC    ??I2C_write_0
+   \   00000020   98D1               CBI     0x1A, 0x01
+   \   00000022   CFF4               RJMP    ??I2C_write_1
+     50          	}
+     51          	SDA_DDR = 0;
+   \                     ??I2C_write_2:
+   \   00000024   98D1               CBI     0x1A, 0x01
+     52          	SCL_DDR = 0;
+   \   00000026   ....               RCALL   ?Subroutine0
+     53          	DELAY_MCS( 20 );
+     54          	if( SDA_PIN )
+   \                     ??CrossCallReturnLabel_4:
+   \   00000028   9BC9               SBIS    0x19, 0x01
+   \   0000002A   C002               RJMP    ??I2C_write_3
+     55          		value = 255;
+   \   0000002C   EF8F               LDI     R24, 255
+   \   0000002E   C001               RJMP    ??I2C_write_4
+     56          	else
+     57          		value= 0;
+   \                     ??I2C_write_3:
+   \   00000030   E080               LDI     R24, 0
+     58          	DELAY_MCS( 20 );
+   \                     ??I2C_write_4:
+   \   00000032   ....               RCALL   ?Subroutine1
+     59          	SCL_DDR = 1;
+     60          	return value;
+   \                     ??CrossCallReturnLabel_0:
+   \   00000034                      REQUIRE ?Subroutine4
+   \   00000034                      ;               // Fall through to label ?Subroutine4
+     61          }
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine4:
+   \   00000000   2F08               MOV     R16, R24
+   \   00000002   9189               LD      R24, Y+
+   \   00000004   9199               LD      R25, Y+
+   \   00000006   9508               RET
+     62          
+     63          // Функция чтения байта
+
+   \                                 In segment CODE, align 2, keep-with-next
+     64          unsigned char I2C_read()
+   \                     I2C_read:
+     65          {
+   \   00000000   939A               ST      -Y, R25
+   \   00000002   938A               ST      -Y, R24
+     66          	unsigned char value = 0, i = 8;
+   \   00000004   E080               LDI     R24, 0
+   \   00000006   E098               LDI     R25, 8
+     67          	SDA_DDR = 0;
+   \   00000008   98D1               CBI     0x1A, 0x01
+   \   0000000A   C007               RJMP    ??CrossCallReturnLabel_8
+     68          	while( i-- )
+     69          	{
+     70          		SCL_DDR = 0;
+   \                     ??I2C_read_0:
+   \   0000000C   ........           CALL    delay_func_mcs
+     71          		DELAY_MCS( 20 );
+     72          		value = value << 1;
+   \   00000010   0F88               LSL     R24
+     73          		if( SDA_PIN )
+   \   00000012   99C9               SBIC    0x19, 0x01
+     74          			value |= 1;
+   \   00000014   6081               ORI     R24, 0x01
+     75          
+     76          		DELAY_MCS( 20 );
+   \                     ??I2C_read_1:
+   \   00000016   ....               RCALL   ?Subroutine1
+     77          		SCL_DDR = 1;
+     78          		DELAY_MCS( 20 );
+   \                     ??CrossCallReturnLabel_1:
+   \   00000018   ....               RCALL   ?Subroutine3
+     79          	}
+   \                     ??CrossCallReturnLabel_8:
+   \   0000001A   2F09               MOV     R16, R25
+   \   0000001C   959A               DEC     R25
+   \   0000001E   2300               TST     R16
+   \   00000020   98D0               CBI     0x1A, 0x00
+   \   00000022   E20E               LDI     R16, 46
+   \   00000024   E010               LDI     R17, 0
+   \   00000026   F791               BRNE    ??I2C_read_0
+     80          	SCL_DDR = 0;
+   \   00000028   ........           CALL    delay_func_mcs
+     81          	DELAY_MCS( 20 );
+     82          	SCL_DDR = 1;
+   \   0000002C   9AD0               SBI     0x1A, 0x00
+     83          	
+     84          	return value;
+   \   0000002E   ....               RJMP    ?Subroutine4
+     85          }
+
+   Maximum stack usage in bytes:
+
+     Function            CSTACK RSTACK
+     --------            ------ ------
+     I2C_init                0      2
+     I2C_read                2      2
+       -> delay_func_mcs     2      2
+       -> delay_func_mcs     2      2
+       -> delay_func_mcs     2      2
+       -> delay_func_mcs     2      2
+     I2C_start               0      2
+       -> delay_func_mcs     0      2
+       -> delay_func_mcs     0      2
+     I2C_stop                0      2
+       -> delay_func_mcs     0      2
+       -> delay_func_mcs     0      2
+     I2C_write               2      2
+       -> delay_func_mcs     2      2
+       -> delay_func_mcs     2      2
+       -> delay_func_mcs     2      2
+       -> delay_func_mcs     2      2
+
+
+   Segment part sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     _A_PORTA          1
+     _A_DDRA           1
+     _A_PINA           1
+     I2C_init         10
+     I2C_start         8
+     ?Subroutine1      6
+     ?Subroutine3      8
+     I2C_stop         10
+     ?Subroutine0      2
+     I2C_write        52
+     ?Subroutine4      8
+     I2C_read         48
+
+ 
+   3 bytes in segment ABSOLUTE
+ 152 bytes in segment CODE
+ 
+ 152 bytes of CODE memory
+   0 bytes of DATA memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none

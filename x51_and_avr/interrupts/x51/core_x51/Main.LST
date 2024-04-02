@@ -1,0 +1,1208 @@
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN Main.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE Main.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include <stdio.h>
+   2          #include <intrins.h>
+   3          #include <string.h>
+   4          
+   5          #include "KEYBOARD.H"
+   6          #include "SPI.H"
+   7          #include "LCD_HD44780.H"
+   8          #include "DELAY.H"
+   9          #include "LED7.H"
+  10          #include "DS1307.H"
+  11          #include "DS1820.H"
+  12          #include "AT24CXX.H"
+  13          #include "BEEP.H"
+  14          #include "I2C.H"
+  15          #include "SHIFT.H"
+  16          
+  17          //Задание 1: при нажатии на кнопки(цифры) телефонной клавиатуры
+  18          //                       на LCD экран выводится значение кнопки,
+  19          //                       при нажатии на решетку происходит выход в главное меню
+  20          
+  21          void ExecuteTask1()
+  22          {
+  23   1              unsigned char key = 0;
+  24   1              unsigned char keynumber;        
+  25   1              unsigned char keyCount = 0;
+  26   1      
+  27   1              LCD_clrscr();
+  28   1              while( key != KEY_BAR )
+  29   1              {
+  30   2                      key = KEY_getkey();
+  31   2      
+  32   2                      if( !key )
+  33   2                              continue;
+  34   2      
+  35   2                      keynumber = KEY_getkeynumber( key );
+  36   2              
+  37   2                      if( keynumber <= 9 )
+  38   2                      {       
+  39   3                              LCD_printchar( keynumber + '0' );
+  40   3                              keyCount++;
+  41   3      
+  42   3                              if( keyCount == LCD_WIDTH )
+  43   3                                      LCD_gotoxy( 0, 1 );
+  44   3                      }
+  45   2                      else if( key == KEY_ASTERISK )
+  46   2                              LCD_clrscr();
+  47   2              
+  48   2                      KEY_waitforkeyrelease();
+  49   2                      SHIFT_write(0);
+  50   2              }
+  51   1      }
+  52          
+  53          //Задание 2: при нажатии на кнопки(цифры) телефонной клавиатуры
+  54          //                   на 7-сегментном индикаторе выводится значение кнопки,
+  55          //                       при нажатии на решетку происходит выход в главное меню
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 2   
+
+  56          
+  57          void ExecuteTask2()
+  58          {
+  59   1              unsigned char key = 0;
+  60   1              
+  61   1              LCD_clrscr();
+  62   1              
+  63   1              while( key != KEY_BAR )
+  64   1              {
+  65   2                      key = KEY_getkey();
+  66   2      
+  67   2                      if( !key )
+  68   2                              continue;
+  69   2      
+  70   2                      LED7_setdigit( KEY_getkeynumber( key ) );
+  71   2                      KEY_waitforkeyrelease();
+  72   2              }
+  73   1      }
+  74          
+  75          //Задание 3: при нажатии на кнопки телефонной клавиатуры раздается сигнал,
+  76          //                       при нажатии на решетку происходит выход в главное меню
+  77          
+  78          void ExecuteTask3()
+  79          {
+  80   1              unsigned char key = 0;
+  81   1              
+  82   1              while( key != KEY_BAR )
+  83   1              {
+  84   2                      key = KEY_getkey();
+  85   2      
+  86   2                      if( !key )
+  87   2                              continue;
+  88   2      
+  89   2                      Beep( 100 );
+  90   2                      KEY_waitforkeyrelease();
+  91   2              }
+  92   1      }
+  93          
+  94          //Задание 4: при нажатии на кнопки(1, 2, 3) загорается или гаснет
+  95          //                       соответствующий световой индикатор,
+  96          //                   при нажатии на решетку происходит выход в главное меню
+  97          
+  98          void ExecuteTask4()
+  99          {
+ 100   1              unsigned char key = 0;
+ 101   1              
+ 102   1              while( key != KEY_BAR )
+ 103   1              {
+ 104   2                      key = KEY_getkey();
+ 105   2      
+ 106   2                      if( !key )
+ 107   2                              continue;
+ 108   2      
+ 109   2                      switch( KEY_getkeynumber( key ) ) {
+ 110   3                      case 1:
+ 111   3                              LED1 = !LED1;
+ 112   3                              break;
+ 113   3                      case 2:
+ 114   3                              LED2 = !LED2;
+ 115   3                              break;
+ 116   3                      case 3:
+ 117   3                              LED3 = !LED3;
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 3   
+
+ 118   3                              break;  
+ 119   3                      }
+ 120   2                      KEY_waitforkeyrelease();
+ 121   2              }
+ 122   1      }
+ 123          
+ 124          //Задание 5: в последовательный порт выводиться текущее время,
+ 125          //                       полученное с датчика DS1307
+ 126          
+ 127          void ExecuteTask5()
+ 128          {
+ 129   1          char time[9], date[9];
+ 130   1              DS1307_gettime(time);
+ 131   1              DS1307_getdate(date);
+ 132   1      
+ 133   1              printf("%s\n",time);
+ 134   1              printf("%s\n",date);
+ 135   1      }
+ 136          
+ 137          //Задание 6: в терминальной программе пользователь вводит время и 
+ 138          //           дату и они устанавливаются как текущие в датчик DS1307
+ 139          
+ 140          void ExecuteTask6()
+ 141          {
+ 142   1          unsigned char hour, minute, second;
+ 143   1              unsigned char day, month, year;
+ 144   1      
+ 145   1          printf( "Enter hour: ");
+ 146   1              scanf( "%bu", &hour );
+ 147   1          printf( "Enter minute: ");
+ 148   1              scanf( "%bu", &minute );
+ 149   1          printf( "Enter second: ");
+ 150   1              scanf( "%bu", &second );
+ 151   1      
+ 152   1              DS1307_settime( hour, minute, second );
+ 153   1              
+ 154   1              printf( "Enter day: ");
+ 155   1              scanf( "%bu", &day );
+ 156   1          printf( "Enter month: ");
+ 157   1              scanf( "%bu", &month );
+ 158   1          printf( "Enter year: ");
+ 159   1              scanf( "%bu", &year );
+ 160   1      
+ 161   1              DS1307_setdate( day, month, year );     
+ 162   1      }
+ 163          
+ 164          //Задание 7: в терминальной программе пользователь вводит адрес и 
+ 165          //           значение ячейки, далее данные записываются в EEPROM AT24CXX
+ 166          
+ 167          void ExecuteTask7()
+ 168          {
+ 169   1          unsigned char addr, value;
+ 170   1              printf( "Enter address: ");
+ 171   1              scanf( "%bu", &addr );
+ 172   1              printf( "Enter value(0..255): ");
+ 173   1              scanf( "%bu", &value );
+ 174   1      
+ 175   1              AT24CXX_write( addr, value );
+ 176   1      }
+ 177          
+ 178          // Задание 8: через UART-интерфейс пользователь вводит адрес ячейки, значение 
+ 179          //            которой считывается из внешней EEPROM памяти AT24CXX и выводиться в UART
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 4   
+
+ 180          
+ 181          void ExecuteTask8()
+ 182          {
+ 183   1              unsigned char addr;
+ 184   1      
+ 185   1              printf( "Enter address: ");
+ 186   1              scanf( "%bu", &addr );
+ 187   1        
+ 188   1              printf( "Value: %bu\n", AT24CXX_read( addr ) );
+ 189   1      }
+ 190          
+ 191          //Задание 9: в последовательный порт выводиться температура,
+ 192          //                       полученная с датчика DS1820
+ 193          
+ 194          void ExecuteTask9()
+ 195          {
+ 196   1          char strTemp[ 5 ];
+ 197   1      
+ 198   1              if( !DS1820_startconverttemp() )
+ 199   1              {
+ 200   2                  printf("Sensor is not connected\n");        
+ 201   2                      return;
+ 202   2              }
+ 203   1      
+ 204   1              while( !DS1820_getconvertstatus() );
+ 205   1                      
+ 206   1              if( DS1820_gettemperature( strTemp ) )
+ 207   1              {
+ 208   2                  printf("%s\n",strTemp);
+ 209   2              }
+ 210   1      }
+ 211          
+ 212          // Вывод приветствия на LCD экран
+ 213          
+ 214          void OutputStartLCDMessage()
+ 215          {
+ 216   1              unsigned char mes_line1[] = { 45, 61, 67, 84, 69, 72, 224, 32, 32, 80, 75, 45, 49, 48, 61, 45, 0 };
+ 217   1              unsigned char mes_line2[] = "   Ver. 1.0";
+ 218   1      
+ 219   1              LCD_print( mes_line1 );
+ 220   1              LCD_gotoxy( 0, 1 );
+ 221   1              LCD_print( mes_line2 );
+ 222   1      }
+ 223          
+ 224          // Вывод информации на LCD в автономном режиме
+ 225          
+ 226          void AutonomousMode()
+ 227          {
+ 228   1          static char strTemp[ 9 ] = { 0 };
+ 229   1              char time[9] = { 0 };
+ 230   1              char date[9] = { 0 };
+ 231   1          static char sec=0;
+ 232   1          
+ 233   1          DS1307_gettime(time);
+ 234   1          if(time[7]==sec)
+ 235   1                {
+ 236   2                   return;      
+ 237   2                }
+ 238   1          sec = time[7]; 
+ 239   1       
+ 240   1              switch( DS1820_gettemperature( strTemp ) ) {    // Получаем температуру 
+ 241   2              case 0:                                                                                 // Сенсор не подключен
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 5   
+
+ 242   2                      strTemp[ 0 ] = 0;
+ 243   2                      break;
+ 244   2              case 2:                                                                                 // Данные не готовы
+ 245   2                      DS1820_startconverttemp();
+ 246   2                      break;
+ 247   2              }
+ 248   1              
+ 249   1              DS1307_getdate(date);
+ 250   1      
+ 251   1          LCD_clrscr();       
+ 252   1              
+ 253   1              LCD_gotoxy( 0, 0 );
+ 254   1              LCD_print( strTemp );
+ 255   1              
+ 256   1              LCD_gotoxy( 6, 0 );
+ 257   1              LCD_print( time );
+ 258   1      
+ 259   1              LCD_gotoxy( 6, 1 );
+ 260   1              LCD_print( date );      
+ 261   1                                              
+ 262   1              LED1 = !LED1;                                       
+ 263   1              LED2 = !LED2;                                   
+ 264   1              LED3 = !LED3;
+ 265   1      }
+ 266          
+ 267          // Обработчик прерываний от UART
+ 268          
+ 269          void Serial_ISR(void) interrupt 4 using 0 
+ 270          {
+ 271   1          unsigned char task;
+ 272   1      
+ 273   1          if(RI){
+ 274   2              
+ 275   2              scanf( "%bu", &task );
+ 276   2      
+ 277   2          switch( task ) {
+ 278   3                      case 1:
+ 279   3                              ExecuteTask1();
+ 280   3                              break;
+ 281   3                      case 2:
+ 282   3                              ExecuteTask2();
+ 283   3                              break;
+ 284   3                      case 3:
+ 285   3                              ExecuteTask3();
+ 286   3                              break;
+ 287   3                      case 4:
+ 288   3                              ExecuteTask4();
+ 289   3                              break;
+ 290   3                      case 5:
+ 291   3                              ExecuteTask5();
+ 292   3                              break;
+ 293   3                      case 6:
+ 294   3                              ExecuteTask6();
+ 295   3                              break;
+ 296   3                      case 7:
+ 297   3                              ExecuteTask7();
+ 298   3                              break;
+ 299   3                      case 8:
+ 300   3                              ExecuteTask8();
+ 301   3                              break;
+ 302   3              case 9:
+ 303   3                  ExecuteTask9();
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 6   
+
+ 304   3                  break;      
+ 305   3                      }
+ 306   2      
+ 307   2          printf( "Enter task number:" );}
+ 308   1      }
+ 309          
+ 310          
+ 311          void main()
+ 312          {   
+ 313   1          
+ 314   1          P0 = 0xFF;                          // Настраиваем порты на вывод 
+ 315   1              P1 = 0xFF;
+ 316   1              P2 = 0xFF;      
+ 317   1              P3 = 0xFF;
+ 318   1      
+ 319   1              SCON  = 0x50;                   // 8-битовый UART
+ 320   1              TMOD  = 0x20;                   // Таймер 1: 8-битовый режим, авто-перезагружаемый 
+ 321   1              TH1   = 250;                    // Задаем начальное значение таймера для скорости 9600 бод
+ 322   1              TL1   = 250;                    
+ 323   1              TR1   = 1;                              // Запускаем таймер
+ 324   1              TI    = 1;
+ 325   1              ES=1;                   // Разрешаем прерывание от UART
+ 326   1      
+ 327   1              printf ("                -=  STEND RK-10  =-\n");                       // Посылаем в UART сообщение 
+ 328   1              printf ("       Hardware ver. 1.0, Firmware ver. 1.0\n");
+ 329   1      
+ 330   1              DELAY_MCS( 174 );
+ 331   1      
+ 332   1              SPI_init();             // Инициализируем SPI интерфейс
+ 333   1      
+ 334   1              I2C_init();                             // Инициализируем I2C интерфейс
+ 335   1              DS1307_init();          // Инициализируем часы реального времени
+ 336   1              DS1820_startconverttemp();
+ 337   1         
+ 338   1              LCD_init();                             // Инициализируем LCD дисплей
+ 339   1              LCD_clrscr();                   // Очищаем экран LCD дисплея
+ 340   1      
+ 341   1              OutputStartLCDMessage();
+ 342   1      
+ 343   1          printf( "Enter task number:" );
+ 344   1      
+ 345   1          Beep( 300 );
+ 346   1      
+ 347   1          while(1) 
+ 348   1              { 
+ 349   2                   char keyname;
+ 350   2                   EA=0;      
+ 351   2                   
+ 352   2                       AutonomousMode();
+ 353   2                               
+ 354   2                       keyname = KEY_getkeynumber( KEY_getkey() );
+ 355   2               if( keyname <= 9 )
+ 356   2                  LED7_setdigit( keyname );
+ 357   2                       else
+ 358   2                          SHIFT_write(0);
+ 359   2      
+ 360   2                   EA=1;
+ 361   2      
+ 362   2                       delay_ms( 10 );
+ 363   2              }
+ 364   1      }   
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 7   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION ExecuteTask1 (BEGIN)
+                                           ; SOURCE LINE # 21
+                                           ; SOURCE LINE # 22
+                                           ; SOURCE LINE # 23
+0000 E4                CLR     A
+0001 F500        R     MOV     key,A
+                                           ; SOURCE LINE # 25
+0003 F500        R     MOV     keyCount,A
+                                           ; SOURCE LINE # 27
+0005 120000      E     LCALL   LCD_clrscr
+0008         ?C0001:
+                                           ; SOURCE LINE # 28
+0008 E500        R     MOV     A,key
+000A 6448              XRL     A,#048H
+000C 603D              JZ      ?C0008
+                                           ; SOURCE LINE # 29
+                                           ; SOURCE LINE # 30
+000E 120000      E     LCALL   KEY_getkey
+0011 8F00        R     MOV     key,R7
+                                           ; SOURCE LINE # 32
+0013 E500        R     MOV     A,key
+0015 60F1              JZ      ?C0001
+                                           ; SOURCE LINE # 33
+0017         ?C0003:
+                                           ; SOURCE LINE # 35
+0017 AF00        R     MOV     R7,key
+0019 120000      E     LCALL   _KEY_getkeynumber
+;---- Variable 'keynumber' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 37
+001C EF                MOV     A,R7
+001D D3                SETB    C
+001E 9409              SUBB    A,#09H
+0020 5017              JNC     ?C0004
+                                           ; SOURCE LINE # 38
+                                           ; SOURCE LINE # 39
+0022 EF                MOV     A,R7
+0023 2430              ADD     A,#030H
+0025 FF                MOV     R7,A
+0026 120000      E     LCALL   _LCD_printchar
+                                           ; SOURCE LINE # 40
+0029 0500        R     INC     keyCount
+                                           ; SOURCE LINE # 42
+002B E500        R     MOV     A,keyCount
+002D B41011            CJNE    A,#010H,?C0006
+                                           ; SOURCE LINE # 43
+0030 7D01              MOV     R5,#01H
+0032 E4                CLR     A
+0033 FF                MOV     R7,A
+0034 120000      E     LCALL   _LCD_gotoxy
+                                           ; SOURCE LINE # 44
+0037 8008              SJMP    ?C0006
+0039         ?C0004:
+                                           ; SOURCE LINE # 45
+0039 E500        R     MOV     A,key
+003B B41803            CJNE    A,#018H,?C0006
+                                           ; SOURCE LINE # 46
+003E 120000      E     LCALL   LCD_clrscr
+0041         ?C0006:
+                                           ; SOURCE LINE # 48
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 8   
+
+0041 120000      E     LCALL   KEY_waitforkeyrelease
+                                           ; SOURCE LINE # 49
+0044 E4                CLR     A
+0045 FF                MOV     R7,A
+0046 120000      E     LCALL   _SHIFT_write
+                                           ; SOURCE LINE # 50
+0049 80BD              SJMP    ?C0001
+                                           ; SOURCE LINE # 51
+004B         ?C0008:
+004B 22                RET     
+             ; FUNCTION ExecuteTask1 (END)
+
+             ; FUNCTION ExecuteTask2 (BEGIN)
+                                           ; SOURCE LINE # 57
+                                           ; SOURCE LINE # 58
+                                           ; SOURCE LINE # 59
+0000 E4                CLR     A
+0001 F500        R     MOV     key,A
+                                           ; SOURCE LINE # 61
+0003 120000      E     LCALL   LCD_clrscr
+0006         ?C0009:
+                                           ; SOURCE LINE # 63
+0006 E500        R     MOV     A,key
+0008 6448              XRL     A,#048H
+000A 6016              JZ      ?C0012
+                                           ; SOURCE LINE # 64
+                                           ; SOURCE LINE # 65
+000C 120000      E     LCALL   KEY_getkey
+000F 8F00        R     MOV     key,R7
+                                           ; SOURCE LINE # 67
+0011 E500        R     MOV     A,key
+0013 60F1              JZ      ?C0009
+                                           ; SOURCE LINE # 68
+0015         ?C0011:
+                                           ; SOURCE LINE # 70
+0015 AF00        R     MOV     R7,key
+0017 120000      E     LCALL   _KEY_getkeynumber
+001A 120000      E     LCALL   _LED7_setdigit
+                                           ; SOURCE LINE # 71
+001D 120000      E     LCALL   KEY_waitforkeyrelease
+                                           ; SOURCE LINE # 72
+0020 80E4              SJMP    ?C0009
+                                           ; SOURCE LINE # 73
+0022         ?C0012:
+0022 22                RET     
+             ; FUNCTION ExecuteTask2 (END)
+
+             ; FUNCTION ExecuteTask3 (BEGIN)
+                                           ; SOURCE LINE # 78
+                                           ; SOURCE LINE # 79
+                                           ; SOURCE LINE # 80
+0000 E4                CLR     A
+0001 F500        R     MOV     key,A
+0003         ?C0013:
+                                           ; SOURCE LINE # 82
+0003 E500        R     MOV     A,key
+0005 6448              XRL     A,#048H
+0007 6015              JZ      ?C0016
+                                           ; SOURCE LINE # 83
+                                           ; SOURCE LINE # 84
+0009 120000      E     LCALL   KEY_getkey
+000C 8F00        R     MOV     key,R7
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 9   
+
+                                           ; SOURCE LINE # 86
+000E E500        R     MOV     A,key
+0010 60F1              JZ      ?C0013
+                                           ; SOURCE LINE # 87
+0012         ?C0015:
+                                           ; SOURCE LINE # 89
+0012 7F64              MOV     R7,#064H
+0014 7E00              MOV     R6,#00H
+0016 120000      E     LCALL   _Beep
+                                           ; SOURCE LINE # 90
+0019 120000      E     LCALL   KEY_waitforkeyrelease
+                                           ; SOURCE LINE # 91
+001C 80E5              SJMP    ?C0013
+                                           ; SOURCE LINE # 92
+001E         ?C0016:
+001E 22                RET     
+             ; FUNCTION ExecuteTask3 (END)
+
+             ; FUNCTION ExecuteTask4 (BEGIN)
+                                           ; SOURCE LINE # 98
+                                           ; SOURCE LINE # 99
+                                           ; SOURCE LINE # 100
+0000 E4                CLR     A
+0001 F500        R     MOV     key,A
+0003         ?C0017:
+                                           ; SOURCE LINE # 102
+0003 E500        R     MOV     A,key
+0005 6448              XRL     A,#048H
+0007 6029              JZ      ?C0024
+                                           ; SOURCE LINE # 103
+                                           ; SOURCE LINE # 104
+0009 120000      E     LCALL   KEY_getkey
+000C 8F00        R     MOV     key,R7
+                                           ; SOURCE LINE # 106
+000E E500        R     MOV     A,key
+0010 60F1              JZ      ?C0017
+                                           ; SOURCE LINE # 107
+0012         ?C0019:
+                                           ; SOURCE LINE # 109
+0012 AF00        R     MOV     R7,key
+0014 120000      E     LCALL   _KEY_getkeynumber
+0017 EF                MOV     A,R7
+0018 24FE              ADD     A,#0FEH
+001A 600B              JZ      ?C0022
+001C 14                DEC     A
+001D 600C              JZ      ?C0023
+001F 2402              ADD     A,#02H
+0021 700A              JNZ     ?C0020
+                                           ; SOURCE LINE # 110
+0023         ?C0021:
+                                           ; SOURCE LINE # 111
+0023 B290              CPL     LED1
+                                           ; SOURCE LINE # 112
+0025 8006              SJMP    ?C0020
+                                           ; SOURCE LINE # 113
+0027         ?C0022:
+                                           ; SOURCE LINE # 114
+0027 B291              CPL     LED2
+                                           ; SOURCE LINE # 115
+0029 8002              SJMP    ?C0020
+                                           ; SOURCE LINE # 116
+002B         ?C0023:
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 10  
+
+                                           ; SOURCE LINE # 117
+002B B2B5              CPL     LED3
+                                           ; SOURCE LINE # 118
+                                           ; SOURCE LINE # 119
+002D         ?C0020:
+                                           ; SOURCE LINE # 120
+002D 120000      E     LCALL   KEY_waitforkeyrelease
+                                           ; SOURCE LINE # 121
+0030 80D1              SJMP    ?C0017
+                                           ; SOURCE LINE # 122
+0032         ?C0024:
+0032 22                RET     
+             ; FUNCTION ExecuteTask4 (END)
+
+             ; FUNCTION ExecuteTask5 (BEGIN)
+                                           ; SOURCE LINE # 127
+                                           ; SOURCE LINE # 128
+                                           ; SOURCE LINE # 130
+0000 7B00              MOV     R3,#00H
+0002 7A00        R     MOV     R2,#HIGH time
+0004 7900        R     MOV     R1,#LOW time
+0006 120000      E     LCALL   _DS1307_gettime
+                                           ; SOURCE LINE # 131
+0009 7B00              MOV     R3,#00H
+000B 7A00        R     MOV     R2,#HIGH date
+000D 7900        R     MOV     R1,#LOW date
+000F 120000      E     LCALL   _DS1307_getdate
+                                           ; SOURCE LINE # 133
+0012 750000      E     MOV     ?_printf?BYTE+03H,#00H
+0015 750000      R     MOV     ?_printf?BYTE+04H,#HIGH time
+0018 750000      R     MOV     ?_printf?BYTE+05H,#LOW time
+001B 7BFF              MOV     R3,#0FFH
+001D 7A00        R     MOV     R2,#HIGH ?SC_0
+001F 7900        R     MOV     R1,#LOW ?SC_0
+0021 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 134
+0024 750000      E     MOV     ?_printf?BYTE+03H,#00H
+0027 750000      R     MOV     ?_printf?BYTE+04H,#HIGH date
+002A 750000      R     MOV     ?_printf?BYTE+05H,#LOW date
+002D 7BFF              MOV     R3,#0FFH
+002F 7A00        R     MOV     R2,#HIGH ?SC_0
+0031 7900        R     MOV     R1,#LOW ?SC_0
+0033 020000      E     LJMP    _printf
+             ; FUNCTION ExecuteTask5 (END)
+
+             ; FUNCTION ExecuteTask6 (BEGIN)
+                                           ; SOURCE LINE # 140
+                                           ; SOURCE LINE # 141
+                                           ; SOURCE LINE # 145
+0000 7BFF              MOV     R3,#0FFH
+0002 7A00        R     MOV     R2,#HIGH ?SC_4
+0004 7900        R     MOV     R1,#LOW ?SC_4
+0006 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 146
+0009 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+000C 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH hour
+000F 750000      R     MOV     ?_scanf?BYTE+05H,#LOW hour
+0012 7BFF              MOV     R3,#0FFH
+0014 7A00        R     MOV     R2,#HIGH ?SC_17
+0016 7900        R     MOV     R1,#LOW ?SC_17
+0018 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 147
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 11  
+
+001B 7BFF              MOV     R3,#0FFH
+001D 7A00        R     MOV     R2,#HIGH ?SC_21
+001F 7900        R     MOV     R1,#LOW ?SC_21
+0021 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 148
+0024 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+0027 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH minute
+002A 750000      R     MOV     ?_scanf?BYTE+05H,#LOW minute
+002D 7BFF              MOV     R3,#0FFH
+002F 7A00        R     MOV     R2,#HIGH ?SC_17
+0031 7900        R     MOV     R1,#LOW ?SC_17
+0033 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 149
+0036 7BFF              MOV     R3,#0FFH
+0038 7A00        R     MOV     R2,#HIGH ?SC_36
+003A 7900        R     MOV     R1,#LOW ?SC_36
+003C 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 150
+003F 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+0042 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH second
+0045 750000      R     MOV     ?_scanf?BYTE+05H,#LOW second
+0048 7BFF              MOV     R3,#0FFH
+004A 7A00        R     MOV     R2,#HIGH ?SC_17
+004C 7900        R     MOV     R1,#LOW ?SC_17
+004E 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 152
+0051 AB00        R     MOV     R3,second
+0053 AD00        R     MOV     R5,minute
+0055 AF00        R     MOV     R7,hour
+0057 120000      E     LCALL   _DS1307_settime
+                                           ; SOURCE LINE # 154
+005A 7BFF              MOV     R3,#0FFH
+005C 7A00        R     MOV     R2,#HIGH ?SC_51
+005E 7900        R     MOV     R1,#LOW ?SC_51
+0060 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 155
+0063 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+0066 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH day
+0069 750000      R     MOV     ?_scanf?BYTE+05H,#LOW day
+006C 7BFF              MOV     R3,#0FFH
+006E 7A00        R     MOV     R2,#HIGH ?SC_17
+0070 7900        R     MOV     R1,#LOW ?SC_17
+0072 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 156
+0075 7BFF              MOV     R3,#0FFH
+0077 7A00        R     MOV     R2,#HIGH ?SC_63
+0079 7900        R     MOV     R1,#LOW ?SC_63
+007B 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 157
+007E 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+0081 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH month
+0084 750000      R     MOV     ?_scanf?BYTE+05H,#LOW month
+0087 7BFF              MOV     R3,#0FFH
+0089 7A00        R     MOV     R2,#HIGH ?SC_17
+008B 7900        R     MOV     R1,#LOW ?SC_17
+008D 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 158
+0090 7BFF              MOV     R3,#0FFH
+0092 7A00        R     MOV     R2,#HIGH ?SC_77
+0094 7900        R     MOV     R1,#LOW ?SC_77
+0096 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 159
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 12  
+
+0099 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+009C 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH year
+009F 750000      R     MOV     ?_scanf?BYTE+05H,#LOW year
+00A2 7BFF              MOV     R3,#0FFH
+00A4 7A00        R     MOV     R2,#HIGH ?SC_17
+00A6 7900        R     MOV     R1,#LOW ?SC_17
+00A8 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 161
+00AB AB00        R     MOV     R3,year
+00AD AD00        R     MOV     R5,month
+00AF AF00        R     MOV     R7,day
+00B1 020000      E     LJMP    _DS1307_setdate
+             ; FUNCTION ExecuteTask6 (END)
+
+             ; FUNCTION ExecuteTask7 (BEGIN)
+                                           ; SOURCE LINE # 167
+                                           ; SOURCE LINE # 168
+                                           ; SOURCE LINE # 170
+0000 7BFF              MOV     R3,#0FFH
+0002 7A00        R     MOV     R2,#HIGH ?SC_90
+0004 7900        R     MOV     R1,#LOW ?SC_90
+0006 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 171
+0009 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+000C 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH addr
+000F 750000      R     MOV     ?_scanf?BYTE+05H,#LOW addr
+0012 7BFF              MOV     R3,#0FFH
+0014 7A00        R     MOV     R2,#HIGH ?SC_17
+0016 7900        R     MOV     R1,#LOW ?SC_17
+0018 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 172
+001B 7BFF              MOV     R3,#0FFH
+001D 7A00        R     MOV     R2,#HIGH ?SC_106
+001F 7900        R     MOV     R1,#LOW ?SC_106
+0021 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 173
+0024 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+0027 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH value
+002A 750000      R     MOV     ?_scanf?BYTE+05H,#LOW value
+002D 7BFF              MOV     R3,#0FFH
+002F 7A00        R     MOV     R2,#HIGH ?SC_17
+0031 7900        R     MOV     R1,#LOW ?SC_17
+0033 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 175
+0036 AD00        R     MOV     R5,value
+0038 AF00        R     MOV     R7,addr
+003A 020000      E     LJMP    _AT24CXX_write
+             ; FUNCTION ExecuteTask7 (END)
+
+             ; FUNCTION ExecuteTask8 (BEGIN)
+                                           ; SOURCE LINE # 181
+                                           ; SOURCE LINE # 182
+                                           ; SOURCE LINE # 185
+0000 7BFF              MOV     R3,#0FFH
+0002 7A00        R     MOV     R2,#HIGH ?SC_90
+0004 7900        R     MOV     R1,#LOW ?SC_90
+0006 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 186
+0009 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+000C 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH addr
+000F 750000      R     MOV     ?_scanf?BYTE+05H,#LOW addr
+0012 7BFF              MOV     R3,#0FFH
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 13  
+
+0014 7A00        R     MOV     R2,#HIGH ?SC_17
+0016 7900        R     MOV     R1,#LOW ?SC_17
+0018 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 188
+001B AF00        R     MOV     R7,addr
+001D 120000      E     LCALL   _AT24CXX_read
+0020 8F00        E     MOV     ?_printf?BYTE+03H,R7
+0022 7BFF              MOV     R3,#0FFH
+0024 7A00        R     MOV     R2,#HIGH ?SC_128
+0026 7900        R     MOV     R1,#LOW ?SC_128
+0028 020000      E     LJMP    _printf
+             ; FUNCTION ExecuteTask8 (END)
+
+             ; FUNCTION ExecuteTask9 (BEGIN)
+                                           ; SOURCE LINE # 194
+                                           ; SOURCE LINE # 195
+                                           ; SOURCE LINE # 198
+0000 120000      E     LCALL   DS1820_startconverttemp
+0003 EF                MOV     A,R7
+0004 7008              JNZ     ?C0031
+                                           ; SOURCE LINE # 199
+                                           ; SOURCE LINE # 200
+0006 7BFF              MOV     R3,#0FFH
+0008 7A00        R     MOV     R2,#HIGH ?SC_140
+000A 7900        R     MOV     R1,#LOW ?SC_140
+000C 8021              SJMP    ?C0059
+                                           ; SOURCE LINE # 202
+000E         ?C0031:
+                                           ; SOURCE LINE # 204
+000E 120000      E     LCALL   DS1820_getconvertstatus
+0011 EF                MOV     A,R7
+0012 60FA              JZ      ?C0031
+0014         ?C0032:
+                                           ; SOURCE LINE # 206
+0014 7B00              MOV     R3,#00H
+0016 7A00        R     MOV     R2,#HIGH strTemp
+0018 7900        R     MOV     R1,#LOW strTemp
+001A 120000      E     LCALL   _DS1820_gettemperature
+001D EF                MOV     A,R7
+001E 6012              JZ      ?C0030
+                                           ; SOURCE LINE # 207
+                                           ; SOURCE LINE # 208
+0020 750000      E     MOV     ?_printf?BYTE+03H,#00H
+0023 750000      R     MOV     ?_printf?BYTE+04H,#HIGH strTemp
+0026 750000      R     MOV     ?_printf?BYTE+05H,#LOW strTemp
+0029 7BFF              MOV     R3,#0FFH
+002B 7A00        R     MOV     R2,#HIGH ?SC_0
+002D 7900        R     MOV     R1,#LOW ?SC_0
+002F         ?C0059:
+002F 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 209
+                                           ; SOURCE LINE # 210
+0032         ?C0030:
+0032 22                RET     
+             ; FUNCTION ExecuteTask9 (END)
+
+             ; FUNCTION OutputStartLCDMessage (BEGIN)
+                                           ; SOURCE LINE # 214
+                                           ; SOURCE LINE # 215
+                                           ; SOURCE LINE # 216
+0000 7800        R     MOV     R0,#LOW mes_line1
+0002 7C00        R     MOV     R4,#HIGH mes_line1
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 14  
+
+0004 7D00              MOV     R5,#00H
+0006 7BFF              MOV     R3,#0FFH
+0008 7A00        R     MOV     R2,#HIGH _?ix1000
+000A 7900        R     MOV     R1,#LOW _?ix1000
+000C 7E00              MOV     R6,#00H
+000E 7F11              MOV     R7,#011H
+0010 120000      E     LCALL   ?C?COPY
+                                           ; SOURCE LINE # 217
+0013 7800        R     MOV     R0,#LOW mes_line2
+0015 7C00        R     MOV     R4,#HIGH mes_line2
+0017 7D00              MOV     R5,#00H
+0019 7BFF              MOV     R3,#0FFH
+001B 7A00        R     MOV     R2,#HIGH _?ix1001
+001D 7900        R     MOV     R1,#LOW _?ix1001
+001F 7E00              MOV     R6,#00H
+0021 7F0C              MOV     R7,#0CH
+0023 120000      E     LCALL   ?C?COPY
+                                           ; SOURCE LINE # 219
+0026 7B00              MOV     R3,#00H
+0028 7A00        R     MOV     R2,#HIGH mes_line1
+002A 7900        R     MOV     R1,#LOW mes_line1
+002C 120000      E     LCALL   _LCD_print
+                                           ; SOURCE LINE # 220
+002F 7D01              MOV     R5,#01H
+0031 E4                CLR     A
+0032 FF                MOV     R7,A
+0033 120000      E     LCALL   _LCD_gotoxy
+                                           ; SOURCE LINE # 221
+0036 7B00              MOV     R3,#00H
+0038 7A00        R     MOV     R2,#HIGH mes_line2
+003A 7900        R     MOV     R1,#LOW mes_line2
+003C 020000      E     LJMP    _LCD_print
+             ; FUNCTION OutputStartLCDMessage (END)
+
+             ; FUNCTION AutonomousMode (BEGIN)
+                                           ; SOURCE LINE # 226
+                                           ; SOURCE LINE # 227
+                                           ; SOURCE LINE # 229
+0000 7800        R     MOV     R0,#LOW time
+0002 7C00        R     MOV     R4,#HIGH time
+0004 7D00              MOV     R5,#00H
+0006 7BFF              MOV     R3,#0FFH
+0008 7A00        R     MOV     R2,#HIGH _?ix1002
+000A 7900        R     MOV     R1,#LOW _?ix1002
+000C 7E00              MOV     R6,#00H
+000E 7F09              MOV     R7,#09H
+0010 120000      E     LCALL   ?C?COPY
+                                           ; SOURCE LINE # 230
+0013 7800        R     MOV     R0,#LOW date
+0015 7C00        R     MOV     R4,#HIGH date
+0017 7D00              MOV     R5,#00H
+0019 7BFF              MOV     R3,#0FFH
+001B 7A00        R     MOV     R2,#HIGH _?ix1003
+001D 7900        R     MOV     R1,#LOW _?ix1003
+001F 7E00              MOV     R6,#00H
+0021 7F09              MOV     R7,#09H
+0023 120000      E     LCALL   ?C?COPY
+                                           ; SOURCE LINE # 233
+0026 7B00              MOV     R3,#00H
+0028 7A00        R     MOV     R2,#HIGH time
+002A 7900        R     MOV     R1,#LOW time
+002C 120000      E     LCALL   _DS1307_gettime
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 15  
+
+                                           ; SOURCE LINE # 234
+002F E500        R     MOV     A,time+07H
+0031 6500        R     XRL     A,sec
+0033 605E              JZ      ?C0036
+                                           ; SOURCE LINE # 235
+                                           ; SOURCE LINE # 237
+0035         ?C0035:
+                                           ; SOURCE LINE # 238
+0035 850000      R     MOV     sec,time+07H
+                                           ; SOURCE LINE # 240
+0038 7B00              MOV     R3,#00H
+003A 7A00        R     MOV     R2,#HIGH strTemp
+003C 7900        R     MOV     R1,#LOW strTemp
+003E 120000      E     LCALL   _DS1820_gettemperature
+0041 EF                MOV     A,R7
+0042 24FE              ADD     A,#0FEH
+0044 6009              JZ      ?C0039
+0046 2402              ADD     A,#02H
+0048 7008              JNZ     ?C0037
+                                           ; SOURCE LINE # 241
+004A         ?C0038:
+                                           ; SOURCE LINE # 242
+004A E4                CLR     A
+004B F500        R     MOV     strTemp,A
+                                           ; SOURCE LINE # 243
+004D 8003              SJMP    ?C0037
+                                           ; SOURCE LINE # 244
+004F         ?C0039:
+                                           ; SOURCE LINE # 245
+004F 120000      E     LCALL   DS1820_startconverttemp
+                                           ; SOURCE LINE # 246
+                                           ; SOURCE LINE # 247
+0052         ?C0037:
+                                           ; SOURCE LINE # 249
+0052 7B00              MOV     R3,#00H
+0054 7A00        R     MOV     R2,#HIGH date
+0056 7900        R     MOV     R1,#LOW date
+0058 120000      E     LCALL   _DS1307_getdate
+                                           ; SOURCE LINE # 251
+005B 120000      E     LCALL   LCD_clrscr
+                                           ; SOURCE LINE # 253
+005E E4                CLR     A
+005F FD                MOV     R5,A
+0060 FF                MOV     R7,A
+0061 120000      E     LCALL   _LCD_gotoxy
+                                           ; SOURCE LINE # 254
+0064 7B00              MOV     R3,#00H
+0066 7A00        R     MOV     R2,#HIGH strTemp
+0068 7900        R     MOV     R1,#LOW strTemp
+006A 120000      E     LCALL   _LCD_print
+                                           ; SOURCE LINE # 256
+006D E4                CLR     A
+006E FD                MOV     R5,A
+006F 7F06              MOV     R7,#06H
+0071 120000      E     LCALL   _LCD_gotoxy
+                                           ; SOURCE LINE # 257
+0074 7B00              MOV     R3,#00H
+0076 7A00        R     MOV     R2,#HIGH time
+0078 7900        R     MOV     R1,#LOW time
+007A 120000      E     LCALL   _LCD_print
+                                           ; SOURCE LINE # 259
+007D 7D01              MOV     R5,#01H
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 16  
+
+007F 7F06              MOV     R7,#06H
+0081 120000      E     LCALL   _LCD_gotoxy
+                                           ; SOURCE LINE # 260
+0084 7B00              MOV     R3,#00H
+0086 7A00        R     MOV     R2,#HIGH date
+0088 7900        R     MOV     R1,#LOW date
+008A 120000      E     LCALL   _LCD_print
+                                           ; SOURCE LINE # 262
+008D B290              CPL     LED1
+                                           ; SOURCE LINE # 263
+008F B291              CPL     LED2
+                                           ; SOURCE LINE # 264
+0091 B2B5              CPL     LED3
+                                           ; SOURCE LINE # 265
+0093         ?C0036:
+0093 22                RET     
+             ; FUNCTION AutonomousMode (END)
+
+             ; FUNCTION Serial_ISR (BEGIN)
+0000 C0E0              PUSH    ACC
+0002 C0F0              PUSH    B
+0004 C083              PUSH    DPH
+0006 C082              PUSH    DPL
+0008 C0D0              PUSH    PSW
+000A 75D000            MOV     PSW,#00H
+                                           ; SOURCE LINE # 269
+                                           ; SOURCE LINE # 273
+000D 309877            JNB     RI,?C0051
+                                           ; SOURCE LINE # 275
+0010 750000      E     MOV     ?_scanf?BYTE+03H,#00H
+0013 750000      R     MOV     ?_scanf?BYTE+04H,#HIGH task
+0016 750000      R     MOV     ?_scanf?BYTE+05H,#LOW task
+0019 7BFF              MOV     R3,#0FFH
+001B 7A00        R     MOV     R2,#HIGH ?SC_17
+001D 7900        R     MOV     R1,#LOW ?SC_17
+001F 120000      E     LCALL   _scanf
+                                           ; SOURCE LINE # 277
+0022 E500        R     MOV     A,task
+0024 14                DEC     A
+0025 B40900            CJNE    A,#09H,?C0057
+0028         ?C0057:
+0028 5054              JNC     ?C0041
+002A 900000      R     MOV     DPTR,#?C0058
+002D 75F003            MOV     B,#03H
+0030 A4                MUL     AB
+0031 C583              XCH     A,DPH
+0033 25F0              ADD     A,B
+0035 C583              XCH     A,DPH
+0037 73                JMP     @A+DPTR
+0038         ?C0058:
+0038 020000      R     LJMP    ?C0042
+003B 020000      R     LJMP    ?C0043
+003E 020000      R     LJMP    ?C0044
+0041 020000      R     LJMP    ?C0045
+0044 020000      R     LJMP    ?C0046
+0047 020000      R     LJMP    ?C0047
+004A 020000      R     LJMP    ?C0048
+004D 020000      R     LJMP    ?C0049
+0050 020000      R     LJMP    ?C0050
+                                           ; SOURCE LINE # 278
+0053         ?C0042:
+                                           ; SOURCE LINE # 279
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 17  
+
+0053 120000      R     LCALL   ExecuteTask1
+                                           ; SOURCE LINE # 280
+0056 8026              SJMP    ?C0041
+                                           ; SOURCE LINE # 281
+0058         ?C0043:
+                                           ; SOURCE LINE # 282
+0058 120000      R     LCALL   ExecuteTask2
+                                           ; SOURCE LINE # 283
+005B 8021              SJMP    ?C0041
+                                           ; SOURCE LINE # 284
+005D         ?C0044:
+                                           ; SOURCE LINE # 285
+005D 120000      R     LCALL   ExecuteTask3
+                                           ; SOURCE LINE # 286
+0060 801C              SJMP    ?C0041
+                                           ; SOURCE LINE # 287
+0062         ?C0045:
+                                           ; SOURCE LINE # 288
+0062 120000      R     LCALL   ExecuteTask4
+                                           ; SOURCE LINE # 289
+0065 8017              SJMP    ?C0041
+                                           ; SOURCE LINE # 290
+0067         ?C0046:
+                                           ; SOURCE LINE # 291
+0067 120000      R     LCALL   ExecuteTask5
+                                           ; SOURCE LINE # 292
+006A 8012              SJMP    ?C0041
+                                           ; SOURCE LINE # 293
+006C         ?C0047:
+                                           ; SOURCE LINE # 294
+006C 120000      R     LCALL   ExecuteTask6
+                                           ; SOURCE LINE # 295
+006F 800D              SJMP    ?C0041
+                                           ; SOURCE LINE # 296
+0071         ?C0048:
+                                           ; SOURCE LINE # 297
+0071 120000      R     LCALL   ExecuteTask7
+                                           ; SOURCE LINE # 298
+0074 8008              SJMP    ?C0041
+                                           ; SOURCE LINE # 299
+0076         ?C0049:
+                                           ; SOURCE LINE # 300
+0076 120000      R     LCALL   ExecuteTask8
+                                           ; SOURCE LINE # 301
+0079 8003              SJMP    ?C0041
+                                           ; SOURCE LINE # 302
+007B         ?C0050:
+                                           ; SOURCE LINE # 303
+007B 120000      R     LCALL   ExecuteTask9
+                                           ; SOURCE LINE # 304
+                                           ; SOURCE LINE # 305
+007E         ?C0041:
+                                           ; SOURCE LINE # 307
+007E 7BFF              MOV     R3,#0FFH
+0080 7A00        R     MOV     R2,#HIGH ?SC_165
+0082 7900        R     MOV     R1,#LOW ?SC_165
+0084 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 308
+0087         ?C0051:
+0087 D0D0              POP     PSW
+0089 D082              POP     DPL
+008B D083              POP     DPH
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 18  
+
+008D D0F0              POP     B
+008F D0E0              POP     ACC
+0091 32                RETI    
+             ; FUNCTION Serial_ISR (END)
+
+             ; FUNCTION main (BEGIN)
+                                           ; SOURCE LINE # 311
+                                           ; SOURCE LINE # 312
+                                           ; SOURCE LINE # 314
+0000 7580FF            MOV     P0,#0FFH
+                                           ; SOURCE LINE # 315
+0003 7590FF            MOV     P1,#0FFH
+                                           ; SOURCE LINE # 316
+0006 75A0FF            MOV     P2,#0FFH
+                                           ; SOURCE LINE # 317
+0009 75B0FF            MOV     P3,#0FFH
+                                           ; SOURCE LINE # 319
+000C 759850            MOV     SCON,#050H
+                                           ; SOURCE LINE # 320
+000F 758920            MOV     TMOD,#020H
+                                           ; SOURCE LINE # 321
+0012 758DFA            MOV     TH1,#0FAH
+                                           ; SOURCE LINE # 322
+0015 758BFA            MOV     TL1,#0FAH
+                                           ; SOURCE LINE # 323
+0018 D28E              SETB    TR1
+                                           ; SOURCE LINE # 324
+001A D299              SETB    TI
+                                           ; SOURCE LINE # 325
+001C D2AC              SETB    ES
+                                           ; SOURCE LINE # 327
+001E 7BFF              MOV     R3,#0FFH
+0020 7A00        R     MOV     R2,#HIGH ?SC_184
+0022 7900        R     MOV     R1,#LOW ?SC_184
+0024 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 328
+0027 7BFF              MOV     R3,#0FFH
+0029 7A00        R     MOV     R2,#HIGH ?SC_221
+002B 7900        R     MOV     R1,#LOW ?SC_221
+002D 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 330
+0030 7F12              MOV     R7,#012H
+0032 7E00              MOV     R6,#00H
+0034 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 332
+0037 120000      E     LCALL   SPI_init
+                                           ; SOURCE LINE # 334
+003A 120000      E     LCALL   I2C_init
+                                           ; SOURCE LINE # 335
+003D 120000      E     LCALL   DS1307_init
+                                           ; SOURCE LINE # 336
+0040 120000      E     LCALL   DS1820_startconverttemp
+                                           ; SOURCE LINE # 338
+0043 120000      E     LCALL   LCD_init
+                                           ; SOURCE LINE # 339
+0046 120000      E     LCALL   LCD_clrscr
+                                           ; SOURCE LINE # 341
+0049 120000      R     LCALL   OutputStartLCDMessage
+                                           ; SOURCE LINE # 343
+004C 7BFF              MOV     R3,#0FFH
+004E 7A00        R     MOV     R2,#HIGH ?SC_165
+0050 7900        R     MOV     R1,#LOW ?SC_165
+C51 COMPILER V7.20   MAIN                                                                  05/08/2007 12:58:49 PAGE 19  
+
+0052 120000      E     LCALL   _printf
+                                           ; SOURCE LINE # 345
+0055 7F2C              MOV     R7,#02CH
+0057 7E01              MOV     R6,#01H
+0059 120000      E     LCALL   _Beep
+005C         ?C0052:
+                                           ; SOURCE LINE # 347
+                                           ; SOURCE LINE # 348
+                                           ; SOURCE LINE # 350
+005C C2AF              CLR     EA
+                                           ; SOURCE LINE # 352
+005E 120000      R     LCALL   AutonomousMode
+                                           ; SOURCE LINE # 354
+0061 120000      E     LCALL   KEY_getkey
+0064 120000      E     LCALL   _KEY_getkeynumber
+0067 8F00        R     MOV     keyname,R7
+                                           ; SOURCE LINE # 355
+0069 D3                SETB    C
+006A E500        R     MOV     A,keyname
+006C 6480              XRL     A,#080H
+006E 9489              SUBB    A,#089H
+0070 5005              JNC     ?C0054
+                                           ; SOURCE LINE # 356
+0072 120000      E     LCALL   _LED7_setdigit
+0075 8005              SJMP    ?C0055
+0077         ?C0054:
+                                           ; SOURCE LINE # 358
+0077 E4                CLR     A
+0078 FF                MOV     R7,A
+0079 120000      E     LCALL   _SHIFT_write
+007C         ?C0055:
+                                           ; SOURCE LINE # 360
+007C D2AF              SETB    EA
+                                           ; SOURCE LINE # 362
+007E 7F0A              MOV     R7,#0AH
+0080 7E00              MOV     R6,#00H
+0082 120000      E     LCALL   _delay_ms
+                                           ; SOURCE LINE # 363
+0085 80D5              SJMP    ?C0052
+             ; FUNCTION main (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1074    ----
+   CONSTANT SIZE    =    313    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     10      86
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

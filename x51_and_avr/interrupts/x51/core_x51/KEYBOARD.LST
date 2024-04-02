@@ -1,0 +1,324 @@
+C51 COMPILER V7.20   KEYBOARD                                                              05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE KEYBOARD
+OBJECT MODULE PLACED IN KEYBOARD.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE KEYBOARD.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include "KEYBOARD.h"
+   2          #include "DELAY.H"
+   3          
+   4          unsigned char KEY_getkey()
+   5          {
+   6   1              KEY_PORT = 240; 
+   7   1              DELAY_MCS(40);
+   8   1              if (KEY_PORT == 240) 
+   9   1                      return 0; 
+  10   1              KEY_PORT = 254;
+  11   1              DELAY_MCS(40);
+  12   1              if (KEY_PORT != 254) 
+  13   1                      return ~KEY_PORT; 
+  14   1              KEY_PORT = 253;
+  15   1              DELAY_MCS(40);
+  16   1              if (KEY_PORT != 253) 
+  17   1                      return ~KEY_PORT; 
+  18   1              KEY_PORT = 251;
+  19   1              DELAY_MCS(40);
+  20   1              if (KEY_PORT != 251) 
+  21   1                      return ~KEY_PORT; 
+  22   1              KEY_PORT = 247;
+  23   1              DELAY_MCS(40);
+  24   1              return ~KEY_PORT;
+  25   1      }
+  26          
+  27          void KEY_waitforkeyrelease()
+  28          {
+  29   1              while( KEY_getkey() );
+  30   1      }
+  31          
+  32          unsigned char KEY_getkeynumber( unsigned char keycode )
+  33          {
+  34   1              switch( keycode ) {
+  35   2          case KEY_0:
+  36   2                      return 0;
+  37   2              case KEY_1:
+  38   2                      return 1;
+  39   2              case KEY_2:
+  40   2                      return 2;
+  41   2              case KEY_3:
+  42   2                      return 3;
+  43   2              case KEY_4:
+  44   2                      return 4;
+  45   2              case KEY_5:
+  46   2                      return 5;
+  47   2              case KEY_6:
+  48   2                      return 6;
+  49   2              case KEY_7:
+  50   2                      return 7;
+  51   2              case KEY_8:
+  52   2                      return 8;
+  53   2              case KEY_9:
+  54   2                      return 9;
+  55   2              case KEY_A:
+C51 COMPILER V7.20   KEYBOARD                                                              05/08/2007 12:58:49 PAGE 2   
+
+  56   2                      return 10;
+  57   2              case KEY_B:
+  58   2                      return 11;
+  59   2              case KEY_C:
+  60   2                      return 12;
+  61   2              case KEY_D:
+  62   2                      return 13;
+  63   2              case KEY_ASTERISK:
+  64   2                      return 14;
+  65   2              case KEY_BAR:
+  66   2                      return 15;
+  67   2              default:
+  68   2                      return 16;
+  69   2              }
+  70   1      }
+  71          
+C51 COMPILER V7.20   KEYBOARD                                                              05/08/2007 12:58:49 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION KEY_getkey (BEGIN)
+                                           ; SOURCE LINE # 4
+                                           ; SOURCE LINE # 5
+                                           ; SOURCE LINE # 6
+0000 75A0F0            MOV     P2,#0F0H
+                                           ; SOURCE LINE # 7
+0003 7F03              MOV     R7,#03H
+0005 7E00              MOV     R6,#00H
+0007 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 8
+000A E5A0              MOV     A,P2
+000C B4F003            CJNE    A,#0F0H,?C0001
+                                           ; SOURCE LINE # 9
+000F 7F00              MOV     R7,#00H
+0011 22                RET     
+0012         ?C0001:
+                                           ; SOURCE LINE # 10
+0012 75A0FE            MOV     P2,#0FEH
+                                           ; SOURCE LINE # 11
+0015 7F03              MOV     R7,#03H
+0017 7E00              MOV     R6,#00H
+0019 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 12
+001C E5A0              MOV     A,P2
+001E 64FE              XRL     A,#0FEH
+0020 6002              JZ      ?C0003
+                                           ; SOURCE LINE # 13
+0022 802E              SJMP    ?C0030
+0024         ?C0003:
+                                           ; SOURCE LINE # 14
+0024 75A0FD            MOV     P2,#0FDH
+                                           ; SOURCE LINE # 15
+0027 7F03              MOV     R7,#03H
+0029 7E00              MOV     R6,#00H
+002B 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 16
+002E E5A0              MOV     A,P2
+0030 64FD              XRL     A,#0FDH
+0032 6002              JZ      ?C0004
+                                           ; SOURCE LINE # 17
+0034         ?C0029:
+0034 801C              SJMP    ?C0030
+0036         ?C0004:
+                                           ; SOURCE LINE # 18
+0036 75A0FB            MOV     P2,#0FBH
+                                           ; SOURCE LINE # 19
+0039 7F03              MOV     R7,#03H
+003B 7E00              MOV     R6,#00H
+003D 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 20
+0040 E5A0              MOV     A,P2
+0042 64FB              XRL     A,#0FBH
+0044 6002              JZ      ?C0005
+                                           ; SOURCE LINE # 21
+0046 800A              SJMP    ?C0028
+0048         ?C0005:
+                                           ; SOURCE LINE # 22
+0048 75A0F7            MOV     P2,#0F7H
+                                           ; SOURCE LINE # 23
+C51 COMPILER V7.20   KEYBOARD                                                              05/08/2007 12:58:49 PAGE 4   
+
+004B 7F03              MOV     R7,#03H
+004D 7E00              MOV     R6,#00H
+004F 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 24
+0052         ?C0028:
+0052         ?C0030:
+0052 E5A0              MOV     A,P2
+0054 F4                CPL     A
+0055 FF                MOV     R7,A
+                                           ; SOURCE LINE # 25
+0056         ?C0002:
+0056 22                RET     
+             ; FUNCTION KEY_getkey (END)
+
+             ; FUNCTION KEY_waitforkeyrelease (BEGIN)
+                                           ; SOURCE LINE # 27
+                                           ; SOURCE LINE # 28
+0000         ?C0006:
+                                           ; SOURCE LINE # 29
+0000 120000      R     LCALL   KEY_getkey
+0003 EF                MOV     A,R7
+0004 70FA              JNZ     ?C0006
+                                           ; SOURCE LINE # 30
+0006         ?C0008:
+0006 22                RET     
+             ; FUNCTION KEY_waitforkeyrelease (END)
+
+             ; FUNCTION _KEY_getkeynumber (BEGIN)
+                                           ; SOURCE LINE # 32
+;---- Variable 'keycode' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 33
+                                           ; SOURCE LINE # 34
+0000 EF                MOV     A,R7
+0001 120000      E     LCALL   ?C?CCASE
+0004 0000        R     DW      ?C0012
+0006 11                DB      011H
+0007 0000        R     DW      ?C0015
+0009 12                DB      012H
+000A 0000        R     DW      ?C0018
+000C 14                DB      014H
+000D 0000        R     DW      ?C0025
+000F 18                DB      018H
+0010 0000        R     DW      ?C0013
+0012 21                DB      021H
+0013 0000        R     DW      ?C0016
+0015 22                DB      022H
+0016 0000        R     DW      ?C0019
+0018 24                DB      024H
+0019 0000        R     DW      ?C0010
+001B 28                DB      028H
+001C 0000        R     DW      ?C0014
+001E 41                DB      041H
+001F 0000        R     DW      ?C0017
+0021 42                DB      042H
+0022 0000        R     DW      ?C0020
+0024 44                DB      044H
+0025 0000        R     DW      ?C0026
+0027 48                DB      048H
+0028 0000        R     DW      ?C0021
+002A 81                DB      081H
+002B 0000        R     DW      ?C0022
+002D 82                DB      082H
+C51 COMPILER V7.20   KEYBOARD                                                              05/08/2007 12:58:49 PAGE 5   
+
+002E 0000        R     DW      ?C0023
+0030 84                DB      084H
+0031 0000        R     DW      ?C0024
+0033 88                DB      088H
+0034 0000              DW      00H
+0036 0000        R     DW      ?C0027
+                                           ; SOURCE LINE # 35
+0038         ?C0010:
+                                           ; SOURCE LINE # 36
+0038 7F00              MOV     R7,#00H
+003A 22                RET     
+                                           ; SOURCE LINE # 37
+003B         ?C0012:
+                                           ; SOURCE LINE # 38
+003B 7F01              MOV     R7,#01H
+003D 22                RET     
+                                           ; SOURCE LINE # 39
+003E         ?C0013:
+                                           ; SOURCE LINE # 40
+003E 7F02              MOV     R7,#02H
+0040 22                RET     
+                                           ; SOURCE LINE # 41
+0041         ?C0014:
+                                           ; SOURCE LINE # 42
+0041 7F03              MOV     R7,#03H
+0043 22                RET     
+                                           ; SOURCE LINE # 43
+0044         ?C0015:
+                                           ; SOURCE LINE # 44
+0044 7F04              MOV     R7,#04H
+0046 22                RET     
+                                           ; SOURCE LINE # 45
+0047         ?C0016:
+                                           ; SOURCE LINE # 46
+0047 7F05              MOV     R7,#05H
+0049 22                RET     
+                                           ; SOURCE LINE # 47
+004A         ?C0017:
+                                           ; SOURCE LINE # 48
+004A 7F06              MOV     R7,#06H
+004C 22                RET     
+                                           ; SOURCE LINE # 49
+004D         ?C0018:
+                                           ; SOURCE LINE # 50
+004D 7F07              MOV     R7,#07H
+004F 22                RET     
+                                           ; SOURCE LINE # 51
+0050         ?C0019:
+                                           ; SOURCE LINE # 52
+0050 7F08              MOV     R7,#08H
+0052 22                RET     
+                                           ; SOURCE LINE # 53
+0053         ?C0020:
+                                           ; SOURCE LINE # 54
+0053 7F09              MOV     R7,#09H
+0055 22                RET     
+                                           ; SOURCE LINE # 55
+0056         ?C0021:
+                                           ; SOURCE LINE # 56
+0056 7F0A              MOV     R7,#0AH
+0058 22                RET     
+                                           ; SOURCE LINE # 57
+C51 COMPILER V7.20   KEYBOARD                                                              05/08/2007 12:58:49 PAGE 6   
+
+0059         ?C0022:
+                                           ; SOURCE LINE # 58
+0059 7F0B              MOV     R7,#0BH
+005B 22                RET     
+                                           ; SOURCE LINE # 59
+005C         ?C0023:
+                                           ; SOURCE LINE # 60
+005C 7F0C              MOV     R7,#0CH
+005E 22                RET     
+                                           ; SOURCE LINE # 61
+005F         ?C0024:
+                                           ; SOURCE LINE # 62
+005F 7F0D              MOV     R7,#0DH
+0061 22                RET     
+                                           ; SOURCE LINE # 63
+0062         ?C0025:
+                                           ; SOURCE LINE # 64
+0062 7F0E              MOV     R7,#0EH
+0064 22                RET     
+                                           ; SOURCE LINE # 65
+0065         ?C0026:
+                                           ; SOURCE LINE # 66
+0065 7F0F              MOV     R7,#0FH
+0067 22                RET     
+                                           ; SOURCE LINE # 67
+0068         ?C0027:
+                                           ; SOURCE LINE # 68
+0068 7F10              MOV     R7,#010H
+                                           ; SOURCE LINE # 69
+                                           ; SOURCE LINE # 70
+006A         ?C0011:
+006A 22                RET     
+             ; FUNCTION _KEY_getkeynumber (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    201    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

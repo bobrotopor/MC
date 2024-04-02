@@ -1,0 +1,96 @@
+##############################################################################
+#                                                                            #
+#                                                      23/Apr/2006  03:05:37 #
+# IAR Atmel AVR C/C++ Compiler V4.12A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\BEEP.c      #
+#    Command line =  F:\Projects\VitalyIgorevich\Packet\src\m162\BEEP.c      #
+#                    --cpu=m162 -ms -o F:\Projects\VitalyIgorevich\Packet\sr #
+#                    c\m162\Debug\Obj\ -lCN F:\Projects\VitalyIgorevich\Pack #
+#                    et\src\m162\Debug\List\ -y --initializers_in_flash -z9  #
+#                    --cross_call_passes=2 --debug -e -I "E:\Program         #
+#                    Files\IAR Systems\Embedded Workbench 4.0                #
+#                    Evaluation\avr\INC\" -I "E:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 4.0                          #
+#                    Evaluation\avr\INC\CLIB\" --eeprom_size 512             #
+#    List file    =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\List\ #
+#                    BEEP.lst                                                #
+#    Object file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\Obj\B #
+#                    EEP.r90                                                 #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+F:\Projects\VitalyIgorevich\Packet\src\m162\BEEP.c
+      1          #include "BEEP.H"
+
+   \                                 In segment ABSOLUTE, at 0x38
+   \   union <unnamed> volatile __io _A_PORTB
+   \                     _A_PORTB:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x37
+   \   union <unnamed> volatile __io _A_DDRB
+   \                     _A_DDRB:
+   \   00000000                      DS 1
+      2          #include "DELAY.H"
+      3          
+      4          // Функция включения зуммера на определенное время
+
+   \                                 In segment CODE, align 2, keep-with-next
+      5          void Beep( unsigned int ms )
+   \                     Beep:
+      6          {
+   \   00000000   939A               ST      -Y, R25
+   \   00000002   938A               ST      -Y, R24
+   \   00000004   01C8               MOVW    R25:R24, R17:R16
+      7              BEEP_DDR = 1;
+   \   00000006   9ABC               SBI     0x17, 0x04
+      8          	BEEP_PORT = 0;
+   \   00000008   98C4               CBI     0x18, 0x04
+   \   0000000A   C004               RJMP    ??Beep_0
+      9          	while( ms-- > 0 )
+     10          		DELAY_MS( 1 );
+   \                     ??Beep_1:
+   \   0000000C   E009               LDI     R16, 9
+   \   0000000E   E010               LDI     R17, 0
+   \   00000010   ........           CALL    delay_func_ms
+   \                     ??Beep_0:
+   \   00000014   01FC               MOVW    R31:R30, R25:R24
+   \   00000016   9701               SBIW    R25:R24, 1
+   \   00000018   2BEF               OR      R30, R31
+   \   0000001A   F7C1               BRNE    ??Beep_1
+     11              BEEP_PORT = 1;
+   \   0000001C   9AC4               SBI     0x18, 0x04
+     12          }
+   \   0000001E   9189               LD      R24, Y+
+   \   00000020   9199               LD      R25, Y+
+   \   00000022   9508               RET
+     13          
+
+   Maximum stack usage in bytes:
+
+     Function           CSTACK RSTACK
+     --------           ------ ------
+     Beep                   2      2
+       -> delay_func_ms     2      2
+
+
+   Segment part sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     _A_PORTB          1
+     _A_DDRB           1
+     Beep             36
+
+ 
+  2 bytes in segment ABSOLUTE
+ 36 bytes in segment CODE
+ 
+ 36 bytes of CODE memory
+  0 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none

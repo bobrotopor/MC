@@ -1,0 +1,208 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     28/Jun/2007  00:57:51 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m162\I2C.c                                /
+//    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D    /
+//                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb        /
+//                    D:\stend\src\m162\Release\List\ -y                     /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m162\I2C.c              /
+//    List file    =  D:\stend\src\m162\Release\List\I2C.s90                 /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME I2C
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+?Subroutine2 EQU 0
+        PUBLIC I2C_init
+        PUBLIC I2C_read
+        PUBLIC I2C_start
+        PUBLIC I2C_stop
+        PUBLIC I2C_write
+        PUBWEAK _A_DDRA
+        PUBWEAK _A_PINA
+        PUBWEAK _A_PORTA
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN delay_func_mcs
+
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_init:
+        CBI	0x1A, 0x01
+        CBI	0x1A, 0x00
+        CBI	0x1B, 0x01
+        CBI	0x1B, 0x00
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_start:
+        CBI	0x1A, 0x00
+        CBI	0x1A, 0x01
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_5:
+        SBI	0x1A, 0x01
+        REQUIRE ?Subroutine1
+        ;		// Fall through to label ?Subroutine1
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine1:
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_4:
+        SBI	0x1A, 0x00
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_stop:
+        SBI	0x1A, 0x01
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_6:
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_9:
+        CBI	0x1A, 0x01
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_write:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R24, R16
+        LDI	R25, 8
+        RJMP	??CrossCallReturnLabel_7
+??I2C_write_0:
+        SBI	0x1A, 0x01
+??I2C_write_1:
+        LSL	R24
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_10:
+        SBI	0x1A, 0x00
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_7:
+        MOV	R16, R25
+        DEC	R25
+        TST	R16
+        BREQ	??I2C_write_2
+        BST	R24, 7
+        BRTC	??I2C_write_0
+        CBI	0x1A, 0x01
+        RJMP	??I2C_write_1
+??I2C_write_2:
+        CBI	0x1A, 0x01
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_11:
+        SBIS	0x19, 0x01
+        RJMP	??I2C_write_3
+        LDI	R24, 255
+        RJMP	??I2C_write_4
+??I2C_write_3:
+        LDI	R24, 0
+??I2C_write_4:
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_0:
+        REQUIRE ?Subroutine5
+        ;		// Fall through to label ?Subroutine5
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine5:
+        MOV	R16, R24
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine0:
+        CBI	0x1A, 0x00
+        REQUIRE ?Subroutine3
+        ;		// Fall through to label ?Subroutine3
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine3:
+        LDI	R16, 46
+        LDI	R17, 0
+        REQUIRE ?Subroutine4
+        ;		// Fall through to label ?Subroutine4
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine4:
+        JMP	delay_func_mcs
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_read:
+        ST	-Y, R25
+        ST	-Y, R24
+        LDI	R24, 0
+        LDI	R25, 8
+        CBI	0x1A, 0x01
+        RJMP	??CrossCallReturnLabel_8
+??I2C_read_0:
+        RCALL	?Subroutine4
+??CrossCallReturnLabel_3:
+        LSL	R24
+        SBIC	0x19, 0x01
+        ORI	R24, 0x01
+??I2C_read_1:
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_1:
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_8:
+        MOV	R16, R25
+        DEC	R25
+        TST	R16
+        CBI	0x1A, 0x00
+        LDI	R16, 46
+        LDI	R17, 0
+        BRNE	??I2C_read_0
+        RCALL	?Subroutine4
+??CrossCallReturnLabel_2:
+        SBI	0x1A, 0x00
+        RJMP	?Subroutine5
+
+        ASEGN ABSOLUTE:DATA:NOROOT,03bH
+// union <unnamed> volatile __io _A_PORTA
+_A_PORTA:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,03aH
+// union <unnamed> volatile __io _A_DDRA
+_A_DDRA:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,039H
+// union <unnamed> volatile __io _A_PINA
+_A_PINA:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+//   3 bytes in segment ABSOLUTE
+// 148 bytes in segment CODE
+// 
+// 148 bytes of CODE memory
+//   0 bytes of DATA memory (+ 3 bytes shared)
+//
+//Errors: none
+//Warnings: none

@@ -1,0 +1,141 @@
+##############################################################################
+#                                                                            #
+#                                                      28/Jun/2007  00:57:49 #
+# IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  D:\stend\src\m162\KEYBOARD.c                            #
+#    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D     #
+#                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb         #
+#                    D:\stend\src\m162\Release\List\ -y                      #
+#                    --initializers_in_flash -z9 -e -I "D:\Program           #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program     #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"               #
+#                    --eeprom_size 512 D:\stend\src\m162\KEYBOARD.c          #
+#    List file    =  D:\stend\src\m162\Release\List\KEYBOARD.lst             #
+#    Object file  =  D:\stend\src\m162\Release\Obj\KEYBOARD.r90              #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+D:\stend\src\m162\KEYBOARD.c
+      1          #include "KEYBOARD.h"
+      2          #include "DELAY.H"
+      3          
+      4          // Функция получения кода нажатой клавиши
+      5          // Сканируем клавиатуру по линиям: выводим сигнал в одну линию, проверяем 
+      6          //								   статус, во вторую, и так далее
+      7          unsigned char KEY_getkey()
+      8          {
+      9          	KEY_DDR = 0x0F;
+     10          	
+     11          	KEY_PORT = 240;	
+     12          	DELAY_MCS(40);
+     13           	if (KEY_PIN == 240) 
+     14          		return 0; 
+     15          	KEY_PORT = 254;
+     16          	DELAY_MCS(40);
+     17           	if (KEY_PIN != 254) 
+     18          		return ~KEY_PIN; 
+     19          	KEY_PORT = 253;
+     20          	DELAY_MCS(40);
+     21           	if (KEY_PIN != 253) 
+     22          		return ~KEY_PIN;
+     23          	KEY_PORT = 251;
+     24          	DELAY_MCS(40);
+     25           	if (KEY_PIN != 251) 
+     26          		return ~KEY_PIN; 
+     27          	KEY_PORT = 247;
+     28          	DELAY_MCS(40);
+     29          	return ~KEY_PIN;
+     30          }
+     31          
+     32          // Функция ожидания отпескания клавиши
+     33          void KEY_waitforkeyrelease()
+     34          {
+     35          	while( KEY_getkey() );
+     36          }
+     37          
+     38          // Функция преобразования кода клавиши в номер
+     39          char KEY_getkeyname( unsigned char keycode )
+     40          {
+     41          	switch( keycode ) {
+     42          	case KEY_0:
+     43          		return '0';
+     44          	case KEY_1:
+     45          		return '1';
+     46          	case KEY_2:
+     47          		return '2';
+     48          	case KEY_3:
+     49          		return '3';
+     50          	case KEY_4:
+     51          		return '4';
+     52          	case KEY_5:
+     53          		return '5';
+     54          	case KEY_6:
+     55          		return '6';
+     56          	case KEY_7:
+     57          		return '7';
+     58          	case KEY_8:
+     59          		return '8';
+     60          	case KEY_9:
+     61          		return '9';
+     62          	case KEY_A:
+     63          		return 'A';
+     64          	case KEY_B:
+     65          		return 'B';
+     66          	case KEY_C:
+     67          		return 'C';
+     68          	case KEY_D:
+     69          		return 'D';
+     70          	case KEY_ASTERISK:
+     71          		return '*';
+     72          	case KEY_BAR:
+     73          		return '#';
+     74          	default:
+     75          		return 0;
+     76          	}
+     77          }
+     78          
+
+   Maximum stack usage in bytes:
+
+     Function              CSTACK RSTACK
+     --------              ------ ------
+     KEY_getkey                0      2
+       -> delay_func_mcs       0      2
+       -> delay_func_mcs       0      2
+       -> delay_func_mcs       0      2
+       -> delay_func_mcs       0      2
+       -> delay_func_mcs       0      2
+     KEY_getkeyname            0      2
+     KEY_waitforkeyrelease     0      2
+       -> KEY_getkey           0      2
+
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     KEY_getkey                       50
+     ?Subroutine0                      6
+     ?Subroutine1                     10
+     ?Subroutine2                      4
+     ??KEY_waitforkeyrelease_0         8
+     KEY_getkeyname                   72
+     ?<Jumptable for KEY_getkeyname>_0
+                                      52
+     _A_PORTC                          1
+     _A_DDRC                           1
+     _A_PINC                           1
+
+ 
+   3 bytes in segment ABSOLUTE
+ 150 bytes in segment CODE
+  52 bytes in segment SWITCH
+ 
+ 202 bytes of CODE memory
+   0 bytes of DATA memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none

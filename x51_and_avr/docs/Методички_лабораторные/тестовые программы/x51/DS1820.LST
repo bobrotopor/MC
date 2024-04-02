@@ -1,0 +1,683 @@
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE DS1820
+OBJECT MODULE PLACED IN DS1820.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE DS1820.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          /*#include "DS1820.h"
+   2          #include "DELAY.h"
+   3          
+   4          bit DS1820_reset()                              // 0 = presence, 1 = no part
+   5          {
+   6                  bit presence;
+   7                  OW_DATABIT = 0;                         // pull OW_DATABIT line low
+   8                  DELAY_MCS(500);
+   9                  OW_DATABIT = 1;                         // allow line to return high
+  10                  DELAY_MCS(70);                          // wait for presence 55 uS
+  11                  presence = OW_DATABIT;          // get presence signal
+  12                  DELAY_MCS(320);                                 // wait for end of timeslot 316 uS 
+  13                  return !presence;                       // presence signal returned
+  14          }                                                       
+  15          
+  16          //-----------------------------------------
+  17          // Read one bit from DS1820
+  18          //-----------------------------------------
+  19          bit DS1820_readbit()
+  20          {
+  21                  OW_DATABIT = 0;                                         // pull OW_DATABIT low to start timeslot
+  22                  OW_DATABIT = 1;
+  23                  DELAY_MCS( 20 );
+  24                  return OW_DATABIT;                                      // return value of OW_DATABIT line
+  25          }
+  26          
+  27          //-----------------------------------------
+  28          // Write one bit to DS1820
+  29          //-----------------------------------------
+  30          void DS1820_writebit(bit bitData)
+  31          {
+  32              OW_DATABIT=0;       
+  33                  OW_DATABIT = bitData ? 1 : 0;
+  34                  DELAY_MCS(40);                  
+  35                  OW_DATABIT = 1;
+  36          }
+  37          
+  38          //-----------------------------------------
+  39          // Read 1 byte from DS1820
+  40          //-----------------------------------------
+  41          unsigned char DS1820_readbyte()
+  42          {
+  43                  unsigned char i;
+  44                  unsigned char datain = 0;
+  45                  for ( i = 0; i < 8; i++ )
+  46                  {
+  47                          datain |= DS1820_readbit() ? ( 0x01 << i ) : datain;
+  48                          DELAY_MCS( 120 ); 
+  49                  }
+  50                  return datain;
+  51          }
+  52          
+  53          //-----------------------------------------
+  54          // Write 1 byte
+  55          //-----------------------------------------
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 2   
+
+  56          void DS1820_writebyte(unsigned char out)
+  57          {
+  58                  unsigned char i;
+  59                  for ( i = 0; i < 8; i++ ) // writes byte, one bit at a time
+  60                  {           
+  61                          DS1820_writebit( ( bit )( out & 0x1 ) );                // write bit in temp into
+  62                          out = out >> 1;
+  63                  }
+  64                  DELAY_MCS(110);
+  65          }
+  66          
+  67          //-----------------------------------------
+  68          // Read temperature
+  69          //-----------------------------------------
+  70          bit DS1820_readtemperature(unsigned char* buff)
+  71          {
+  72                  unsigned char n;
+  73                  bit oldEA = EA;
+  74          
+  75                  EA = 0;                                                         // disable all interrupt
+  76                  if( !DS1820_reset() )
+  77                          return 0;
+  78          
+  79              DS1820_writebyte(0xcc);                     // skip ROM
+  80              DS1820_writebyte(0x44);                     // perform temperature conversion
+  81              while (DS1820_readbyte()==0xff);    // wait for conversion complete 
+  82              DS1820_reset();
+  83              DS1820_writebyte(0xcc);                     // skip ROM
+  84              DS1820_writebyte(0xbe);                     // read the result
+  85              
+  86              for (n = 0; n < 9; n++)                     // read 9 bytes but, use only one byte
+  87              {
+  88                 buff[n] = DS1820_readbyte();             // read DS1820
+  89              }
+  90                  EA = oldEA;
+  91          
+  92                  return 1;
+  93          }
+  94          
+  95          bit DS1820_gettemperature( float* pTemp )
+  96          {
+  97                  unsigned char buff[ 9 ];
+  98                  unsigned short temperature;
+  99          
+ 100                  if( !DS1820_readtemperature( buff ) )
+ 101                          return 0;
+ 102          
+ 103                  temperature = buff[ 1 ];
+ 104                  temperature = temperature << 8 + buff[ 2 ];
+ 105          
+ 106                  *pTemp = temperature;
+ 107                  *pTemp /= 2;
+ 108          
+ 109          
+ 110                  return 1;
+ 111          }
+ 112          */
+ 113          /*
+ 114          #include "DS1820.h"
+ 115          #include "DELAY.h"
+ 116          #include "CONVERT.H"
+ 117          #include "stdio.h"
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 3   
+
+ 118          
+ 119          // Функция сброса
+ 120          // Возвращает 1 если на шине 1-Wire присутствует устройство
+ 121          //                        0 если устройств нет
+ 122          unsigned char DS1820_reset()                            
+ 123          {
+ 124                  OW_DATABIT = 1;
+ 125                  //DELAY_MCS( 6 );
+ 126                  delay_func_mcs(6);
+ 127                  OW_DATABIT = 0;
+ 128                  DELAY_MCS( 530 );
+ 129                  OW_DATABIT = 1;
+ 130                  DELAY_MCS( 80 );
+ 131                  if( OW_DATABIT )
+ 132                          return 0;
+ 133                  else
+ 134                  {
+ 135                          DELAY_MCS( 420 );
+ 136                          return 1;
+ 137                  }
+ 138          }                                                       
+ 139          
+ 140          // Функция записи/чтения байта линии 1-Wire
+ 141          // Для чтения необходимо передать в качестве параметра 0xFF
+ 142          unsigned char DS1820_rw( unsigned char tdata )
+ 143          {
+ 144                  register unsigned char i;
+ 145          
+ 146                  OW_DATABIT = 1; 
+ 147                  for ( i = 0; i <= 7; i++ ) 
+ 148                  {
+ 149                          OW_DATABIT = 0;
+ 150                          //DELAY_MCS( 2 );
+ 151                          delay_func_mcs(2);
+ 152                          
+ 153                          if( tdata & 0x01 )
+ 154                                  OW_DATABIT = 1;
+ 155                          else
+ 156                                  OW_DATABIT = 0;
+ 157          
+ 158                      //DELAY_MCS( 8 );
+ 159                          delay_func_mcs(8);
+ 160          
+ 161                          tdata >>= 1;
+ 162          
+ 163                          if( OW_DATABIT )
+ 164                                  tdata |= ( 1 << 7 );
+ 165                          else
+ 166                                  tdata &= ~( 1 << 7 );
+ 167                                          
+ 168                          DELAY_MCS( 55 );
+ 169                          OW_DATABIT = 1;
+ 170                  //      DELAY_MCS( 6 );
+ 171                      delay_func_mcs(6);
+ 172                  }
+ 173          
+ 174                  return tdata; 
+ 175          }
+ 176          
+ 177          // Функция старта преобразования температуры
+ 178          unsigned char DS1820_startconverttemp()
+ 179          {
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 4   
+
+ 180                  if( !DS1820_reset() )           // Если на шине никого нет
+ 181                          return 0;                       
+ 182          
+ 183              DS1820_rw( 0xcc );                  // Пропускаем ROM
+ 184              DS1820_rw( 0x44 );                  // Выводим команду преобразования температуры
+ 185                  
+ 186                  return 1;
+ 187          }
+ 188          
+ 189          // Функция проверки статуса преобразования температуры
+ 190          unsigned char DS1820_getconvertstatus()
+ 191          {
+ 192                  if( DS1820_rw( 0xFF ) != 0x00 ) // Проверяем состояние линии
+ 193                          return 1;
+ 194                  else
+ 195                          return 0;
+ 196          }
+ 197          
+ 198          // Функция чтения данных из памяти микросхемы DS1820
+ 199          unsigned char DS1820_readdata(unsigned char* buff)
+ 200          {
+ 201                  unsigned char n;
+ 202          
+ 203                  if( !DS1820_reset() )
+ 204                          return 0;
+ 205          
+ 206              DS1820_rw( 0xcc );                          // Пропускаем ROM
+ 207              DS1820_rw( 0xbe );                          // Выводим функцию чтения данных памяти
+ 208              
+ 209              for (n = 0; n < 9; n++)             // Читаем 9 байт памяти
+ 210                 buff[ n ] = DS1820_rw( 0xFF ); 
+ 211          
+ 212                  return 1;
+ 213          }
+ 214          
+ 215          // Функция получения значения температуры
+ 216          unsigned char DS1820_gettemperature( char strTemp[] )
+ 217          {
+ 218                  unsigned char buff[ 9 ];
+ 219                  signed short temperature;
+ 220                  unsigned char intLen;
+ 221          
+ 222                  if( !DS1820_getconvertstatus() )
+ 223                          return 1;
+ 224          
+ 225                  if( !DS1820_readdata( buff ) )
+ 226                          return 0;
+ 227                  
+ 228                  temperature = buff[ 1 ];
+ 229                  temperature <<= 8;
+ 230                  temperature = buff[ 0 ];
+ 231          
+ 232                  printf( "%d\n", temperature );
+ 233                  printf( "%d\n", sizeof(char) );
+ 234          
+ 235          
+ 236                  intLen = ShortToString( temperature / 2, strTemp );
+ 237                  strTemp[ intLen ] = '.';
+ 238                  strTemp[ intLen + 1 ] = ( temperature & 0x01 ) ? '5' : '0';
+ 239                  strTemp[ intLen + 2 ] = 0;
+ 240          
+ 241                  return 2;
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 5   
+
+ 242          }
+ 243          
+ 244          */
+ 245          
+ 246          
+ 247          #include "DS1820.h"
+ 248          #include "DELAY.h"
+ 249          #include "CONVERT.H"
+ 250          
+ 251          // Функция сброса
+ 252          // Возвращает 1 если на шине 1-Wire присутствует устройство
+ 253          //                        0 если устройств нет
+ 254          unsigned char DS1820_reset()
+ 255          {
+ 256   1              bit presence;
+ 257   1              OW_DATABIT = 0;                         // pull OW_DATABIT line low
+ 258   1              DELAY_MCS(500);
+ 259   1              OW_DATABIT = 1;                         // allow line to return high
+ 260   1              DELAY_MCS(70);                          // wait for presence 55 uS
+ 261   1              presence = OW_DATABIT;          // get presence signal
+ 262   1              DELAY_MCS(320);                                 // wait for end of timeslot 316 uS 
+ 263   1              return !presence;                       // presence signal returned
+ 264   1      }
+ 265          
+ 266          // Функция записи/чтения байта линии 1-Wire
+ 267          // Для чтения необходимо передать в качестве параметра 0xFF
+ 268          unsigned char DS1820_rw( unsigned char byte )
+ 269          {
+ 270   1              register unsigned char i;
+ 271   1      
+ 272   1              OW_DATABIT = 1;
+ 273   1              for ( i = 0; i <= 7; i++ ) 
+ 274   1              {
+ 275   2                      OW_DATABIT = 0;
+ 276   2                      
+ 277   2                      if( byte & 0x01 )
+ 278   2                              OW_DATABIT = 1;
+ 279   2                      else
+ 280   2                              OW_DATABIT = 0;
+ 281   2      
+ 282   2                      DELAY_MCS( 11 );
+ 283   2      
+ 284   2                      byte >>= 1;
+ 285   2      
+ 286   2                      if( OW_DATABIT )
+ 287   2                              byte |= ( 1 << 7 );
+ 288   2                      else
+ 289   2                              byte &= ~( 1 << 7 );
+ 290   2                                      
+ 291   2                      DELAY_MCS( 55 );
+ 292   2                      OW_DATABIT = 1;
+ 293   2              }
+ 294   1      
+ 295   1              return byte; 
+ 296   1      }
+ 297          
+ 298          // Функция старта преобразования температуры
+ 299          unsigned char DS1820_startconverttemp()
+ 300          {
+ 301   1              if( !DS1820_reset() )           // Если на шине никого нет
+ 302   1                      return 0;                       
+ 303   1      
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 6   
+
+ 304   1          DS1820_rw( 0xcc );                  // Пропускаем ROM
+ 305   1          DS1820_rw( 0x44 );                  // Выводим команду преобразования температуры
+ 306   1              
+ 307   1              return 1;
+ 308   1      }
+ 309          
+ 310          // Функция проверки статуса преобразования температуры
+ 311          unsigned char DS1820_getconvertstatus()
+ 312          {
+ 313   1              if( DS1820_rw( 0xFF ) != 0x00 ) // Проверяем состояние линии
+ 314   1                      return 1;
+ 315   1              else
+ 316   1                      return 0;
+ 317   1      }
+ 318          
+ 319          // Функция чтения данных из памяти микросхемы DS1820
+ 320          // Размер буфера должен быть равен 9
+ 321          unsigned char DS1820_readdata(unsigned char * buff)
+ 322          {
+ 323   1              unsigned char n;
+ 324   1      
+ 325   1              if( !DS1820_reset() )
+ 326   1                      return 0;
+ 327   1      
+ 328   1          DS1820_rw( 0xcc );                          // Пропускаем ROM
+ 329   1          DS1820_rw( 0xbe );                          // Выводим функцию чтения данных памяти
+ 330   1          
+ 331   1          for (n = 0; n < 9; n++)             // Читаем 9 байт памяти
+ 332   1             buff[ n ] = DS1820_rw( 0xFF ); 
+ 333   1      
+ 334   1              return 1;
+ 335   1      }
+ 336          
+ 337          // Функция получения значения температуры
+ 338          // Возвращает 0 если сенсор не подключен
+ 339          // Возвращает 1 если данные не готовы(преобразование не завершилось)
+ 340          // Возвращает 2 если операция успешна
+ 341          unsigned char DS1820_gettemperature( char strTemp[] )
+ 342          {
+ 343   1              unsigned char buff[ 9 ];
+ 344   1              unsigned short temperature;
+ 345   1              unsigned char intLen;
+ 346   1      
+ 347   1              if( !DS1820_getconvertstatus() )
+ 348   1                      return 1;
+ 349   1      
+ 350   1              if( !DS1820_readdata( buff ) )
+ 351   1                      return 0;
+ 352   1              
+ 353   1              temperature = buff[ 1 ];
+ 354   1              temperature <<= 8;
+ 355   1              temperature = buff[ 0 ];
+ 356   1      
+ 357   1              intLen = ShortToString( temperature / 2, strTemp );
+ 358   1              strTemp[ intLen ] = '.';
+ 359   1              strTemp[ intLen + 1 ] = ( temperature & 0x01 ) ? '5' : '0';
+ 360   1              strTemp[ intLen + 2 ] = 0;
+ 361   1      
+ 362   1              return 2;
+ 363   1      }
+ 364          
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 7   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION DS1820_reset (BEGIN)
+                                           ; SOURCE LINE # 254
+                                           ; SOURCE LINE # 255
+                                           ; SOURCE LINE # 257
+0000 C282              CLR     OW_DATABIT
+                                           ; SOURCE LINE # 258
+0002 7F38              MOV     R7,#038H
+0004 7E00              MOV     R6,#00H
+0006 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 259
+0009 D282              SETB    OW_DATABIT
+                                           ; SOURCE LINE # 260
+000B 7F06              MOV     R7,#06H
+000D 7E00              MOV     R6,#00H
+000F 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 261
+0012 A282              MOV     C,OW_DATABIT
+0014 9200        R     MOV     presence,C
+                                           ; SOURCE LINE # 262
+0016 7F23              MOV     R7,#023H
+0018 7E00              MOV     R6,#00H
+001A 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 263
+001D 200004      R     JB      presence,?C0001
+0020 7F01              MOV     R7,#01H
+0022 8002              SJMP    ?C0002
+0024         ?C0001:
+0024 7F00              MOV     R7,#00H
+0026         ?C0002:
+                                           ; SOURCE LINE # 264
+0026         ?C0003:
+0026 22                RET     
+             ; FUNCTION DS1820_reset (END)
+
+             ; FUNCTION _DS1820_rw (BEGIN)
+                                           ; SOURCE LINE # 268
+0000 8F00        R     MOV     byte,R7
+                                           ; SOURCE LINE # 269
+                                           ; SOURCE LINE # 272
+0002 D282              SETB    OW_DATABIT
+                                           ; SOURCE LINE # 273
+0004 E4                CLR     A
+0005 F500        R     MOV     i,A
+0007         ?C0004:
+                                           ; SOURCE LINE # 274
+                                           ; SOURCE LINE # 275
+0007 C282              CLR     OW_DATABIT
+                                           ; SOURCE LINE # 277
+0009 E500        R     MOV     A,byte
+000B 30E004            JNB     ACC.0,?C0007
+                                           ; SOURCE LINE # 278
+000E D282              SETB    OW_DATABIT
+0010 8002              SJMP    ?C0008
+0012         ?C0007:
+                                           ; SOURCE LINE # 280
+0012 C282              CLR     OW_DATABIT
+0014         ?C0008:
+                                           ; SOURCE LINE # 282
+0014 E4                CLR     A
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 8   
+
+0015 FF                MOV     R7,A
+0016 FE                MOV     R6,A
+0017 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 284
+001A E500        R     MOV     A,byte
+001C C3                CLR     C
+001D 13                RRC     A
+001E F500        R     MOV     byte,A
+                                           ; SOURCE LINE # 286
+0020 308205            JNB     OW_DATABIT,?C0009
+                                           ; SOURCE LINE # 287
+0023 430080      R     ORL     byte,#080H
+0026 8003              SJMP    ?C0010
+0028         ?C0009:
+                                           ; SOURCE LINE # 289
+0028 53007F      R     ANL     byte,#07FH
+002B         ?C0010:
+                                           ; SOURCE LINE # 291
+002B 7F05              MOV     R7,#05H
+002D 7E00              MOV     R6,#00H
+002F 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 292
+0032 D282              SETB    OW_DATABIT
+                                           ; SOURCE LINE # 293
+0034 0500        R     INC     i
+0036 E500        R     MOV     A,i
+0038 D3                SETB    C
+0039 9407              SUBB    A,#07H
+003B 40CA              JC      ?C0004
+003D         ?C0005:
+                                           ; SOURCE LINE # 295
+003D AF00        R     MOV     R7,byte
+                                           ; SOURCE LINE # 296
+003F         ?C0011:
+003F 22                RET     
+             ; FUNCTION _DS1820_rw (END)
+
+             ; FUNCTION DS1820_startconverttemp (BEGIN)
+                                           ; SOURCE LINE # 299
+                                           ; SOURCE LINE # 300
+                                           ; SOURCE LINE # 301
+0000 120000      R     LCALL   DS1820_reset
+0003 EF                MOV     A,R7
+0004 7002              JNZ     ?C0012
+                                           ; SOURCE LINE # 302
+0006 FF                MOV     R7,A
+0007 22                RET     
+0008         ?C0012:
+                                           ; SOURCE LINE # 304
+0008 7FCC              MOV     R7,#0CCH
+000A 120000      R     LCALL   _DS1820_rw
+                                           ; SOURCE LINE # 305
+000D 7F44              MOV     R7,#044H
+000F 120000      R     LCALL   _DS1820_rw
+                                           ; SOURCE LINE # 307
+0012 7F01              MOV     R7,#01H
+                                           ; SOURCE LINE # 308
+0014         ?C0013:
+0014 22                RET     
+             ; FUNCTION DS1820_startconverttemp (END)
+
+             ; FUNCTION DS1820_getconvertstatus (BEGIN)
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 9   
+
+                                           ; SOURCE LINE # 311
+                                           ; SOURCE LINE # 312
+                                           ; SOURCE LINE # 313
+0000 7FFF              MOV     R7,#0FFH
+0002 120000      R     LCALL   _DS1820_rw
+0005 EF                MOV     A,R7
+0006 6003              JZ      ?C0014
+                                           ; SOURCE LINE # 314
+0008 7F01              MOV     R7,#01H
+000A 22                RET     
+000B         ?C0014:
+                                           ; SOURCE LINE # 316
+000B 7F00              MOV     R7,#00H
+                                           ; SOURCE LINE # 317
+000D         ?C0015:
+000D 22                RET     
+             ; FUNCTION DS1820_getconvertstatus (END)
+
+             ; FUNCTION _DS1820_readdata (BEGIN)
+                                           ; SOURCE LINE # 321
+0000 8B00        R     MOV     buff,R3
+0002 8A00        R     MOV     buff+01H,R2
+0004 8900        R     MOV     buff+02H,R1
+                                           ; SOURCE LINE # 322
+                                           ; SOURCE LINE # 325
+0006 120000      R     LCALL   DS1820_reset
+0009 EF                MOV     A,R7
+000A 7002              JNZ     ?C0017
+                                           ; SOURCE LINE # 326
+000C FF                MOV     R7,A
+000D 22                RET     
+000E         ?C0017:
+                                           ; SOURCE LINE # 328
+000E 7FCC              MOV     R7,#0CCH
+0010 120000      R     LCALL   _DS1820_rw
+                                           ; SOURCE LINE # 329
+0013 7FBE              MOV     R7,#0BEH
+0015 120000      R     LCALL   _DS1820_rw
+                                           ; SOURCE LINE # 331
+0018 E4                CLR     A
+0019 F500        R     MOV     n,A
+001B         ?C0019:
+                                           ; SOURCE LINE # 332
+001B 7FFF              MOV     R7,#0FFH
+001D 120000      R     LCALL   _DS1820_rw
+0020 AB00        R     MOV     R3,buff
+0022 AA00        R     MOV     R2,buff+01H
+0024 A900        R     MOV     R1,buff+02H
+0026 850082      R     MOV     DPL,n
+0029 758300            MOV     DPH,#00H
+002C EF                MOV     A,R7
+002D 120000      E     LCALL   ?C?CSTOPTR
+0030 0500        R     INC     n
+0032 E500        R     MOV     A,n
+0034 C3                CLR     C
+0035 9409              SUBB    A,#09H
+0037 40E2              JC      ?C0019
+0039         ?C0020:
+                                           ; SOURCE LINE # 334
+0039 7F01              MOV     R7,#01H
+                                           ; SOURCE LINE # 335
+003B         ?C0018:
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 10  
+
+003B 22                RET     
+             ; FUNCTION _DS1820_readdata (END)
+
+             ; FUNCTION _DS1820_gettemperature (BEGIN)
+                                           ; SOURCE LINE # 341
+0000 8B00        R     MOV     strTemp,R3
+0002 8A00        R     MOV     strTemp+01H,R2
+0004 8900        R     MOV     strTemp+02H,R1
+                                           ; SOURCE LINE # 342
+                                           ; SOURCE LINE # 347
+0006 120000      R     LCALL   DS1820_getconvertstatus
+0009 EF                MOV     A,R7
+000A 7003              JNZ     ?C0022
+                                           ; SOURCE LINE # 348
+000C 7F01              MOV     R7,#01H
+000E 22                RET     
+000F         ?C0022:
+                                           ; SOURCE LINE # 350
+000F 7B00              MOV     R3,#00H
+0011 7A00        R     MOV     R2,#HIGH buff
+0013 7900        R     MOV     R1,#LOW buff
+0015 120000      R     LCALL   _DS1820_readdata
+0018 EF                MOV     A,R7
+0019 7002              JNZ     ?C0024
+                                           ; SOURCE LINE # 351
+001B FF                MOV     R7,A
+001C 22                RET     
+001D         ?C0024:
+                                           ; SOURCE LINE # 353
+001D 750000      R     MOV     temperature,#00H
+0020 850000      R     MOV     temperature+01H,buff+01H
+                                           ; SOURCE LINE # 354
+0023 E500        R     MOV     A,temperature+01H
+0025 750000      R     MOV     temperature+01H,#00H
+0028 F500        R     MOV     temperature,A
+                                           ; SOURCE LINE # 355
+002A 750000      R     MOV     temperature,#00H
+002D 850000      R     MOV     temperature+01H,buff
+                                           ; SOURCE LINE # 357
+0030 E500        R     MOV     A,temperature
+0032 C3                CLR     C
+0033 13                RRC     A
+0034 FE                MOV     R6,A
+0035 E500        R     MOV     A,temperature+01H
+0037 13                RRC     A
+0038 FF                MOV     R7,A
+0039 AB00        R     MOV     R3,strTemp
+003B AA00        R     MOV     R2,strTemp+01H
+003D A900        R     MOV     R1,strTemp+02H
+003F 120000      E     LCALL   _ShortToString
+;---- Variable 'intLen' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 358
+0042 AB00        R     MOV     R3,strTemp
+0044 AA00        R     MOV     R2,strTemp+01H
+0046 A900        R     MOV     R1,strTemp+02H
+0048 8F82              MOV     DPL,R7
+004A 758300            MOV     DPH,#00H
+004D 742E              MOV     A,#02EH
+004F 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 359
+0052 E500        R     MOV     A,temperature+01H
+0054 30E004            JNB     ACC.0,?C0025
+C51 COMPILER V7.20   DS1820                                                                05/08/2007 12:58:49 PAGE 11  
+
+0057 7E35              MOV     R6,#035H
+0059 8002              SJMP    ?C0026
+005B         ?C0025:
+005B 7E30              MOV     R6,#030H
+005D         ?C0026:
+005D EF                MOV     A,R7
+005E F582              MOV     DPL,A
+0060 758300            MOV     DPH,#00H
+0063 A3                INC     DPTR
+0064 AB00        R     MOV     R3,strTemp
+0066 AA00        R     MOV     R2,strTemp+01H
+0068 A900        R     MOV     R1,strTemp+02H
+006A EE                MOV     A,R6
+006B 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 360
+006E 8F82              MOV     DPL,R7
+0070 758300            MOV     DPH,#00H
+0073 A3                INC     DPTR
+0074 A3                INC     DPTR
+0075 E4                CLR     A
+0076 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 362
+0079 7F02              MOV     R7,#02H
+                                           ; SOURCE LINE # 363
+007B         ?C0023:
+007B 22                RET     
+             ; FUNCTION _DS1820_gettemperature (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    322    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      20
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

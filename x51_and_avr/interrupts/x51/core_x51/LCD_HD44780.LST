@@ -1,0 +1,262 @@
+C51 COMPILER V7.20   LCD_HD44780                                                           05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE LCD_HD44780
+OBJECT MODULE PLACED IN LCD_HD44780.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE LCD_HD44780.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include <intrins.h>
+   2          #include "LCD_HD44780.h"
+   3          #include "SHIFT.h"
+   4          #include "DELAY.h"
+   5          
+   6          void LCD_write(unsigned char w_byte, unsigned char rs)
+   7          {
+   8   1              if(rs == 0)
+   9   1                      LCD_RS = 0;                             // Режим записи команд
+  10   1              else
+  11   1                      LCD_RS = 1;                             // Режим записи данных
+  12   1              
+  13   1              LCD_E = 1;                                      // Выставляем строб для записи данных
+  14   1              
+  15   1              SHIFT_write(w_byte);            // Выводим данные в SPI порт
+  16   1      
+  17   1              _nop_();                                        // Ждем такт
+  18   1              LCD_E = 0;                                      // Сбрасываем строб
+  19   1      
+  20   1              DELAY_MCS(500);                         // Ждем пока данные будут обработаны
+  21   1      }                               
+  22          
+  23          void LCD_init()
+  24          {
+  25   1              LCD_E = 0;
+  26   1              LCD_RS = 0;
+  27   1              DELAY_MCS(41000);                       // Выдерживаем паузу после подачи питания на LCD
+  28   1              
+  29   1              LCD_write(0x30, 0);             // Необходимые действия для инициализации LCD
+  30   1              DELAY_MCS(5000);
+  31   1              LCD_write(0x30, 0);
+  32   1              DELAY_MCS(700);
+  33   1              LCD_write(0x30, 0);
+  34   1              DELAY_MCS(700);
+  35   1              LCD_write(0x38, 0);             // Инциализируем LCD: 2 строки, символы 5*7, 8-битный интерфейс
+  36   1              LCD_write(0x01, 0);             // Очищаем экран
+  37   1              DELAY_MCS(3000);
+  38   1              LCD_write(0x06, 0);     // Задаем направление движения курсора - направо
+  39   1              LCD_write(0x0C, 0);             // Включаем дисплей, выключаем курсор, выключаем мерцание
+  40   1      }
+  41          
+  42          void LCD_clrscr()                       // Эта функция очищает экран
+  43          {
+  44   1              LCD_write(0x01, 0);
+  45   1              DELAY_MCS(5000);
+  46   1      }
+  47          
+  48          void LCD_gotoxy(unsigned char x, unsigned char y)       // Эта функция перемещает курсор на LCD в точку (x, y)
+  49          {
+  50   1              if(y != 0)
+  51   1                      x += 0x40;
+  52   1              x |= 0x80;                                                                                                      
+  53   1              LCD_write(x, 0);
+  54   1      }
+  55          
+C51 COMPILER V7.20   LCD_HD44780                                                           05/08/2007 12:58:49 PAGE 2   
+
+  56          void LCD_printchar( unsigned char ch )
+  57          {
+  58   1              LCD_write( ch, 1 );
+  59   1      }
+  60          
+  61          void LCD_print( unsigned char string[] )                                // Эта функция выводит строку на LCD дисплей
+  62          {                                                                                                                                       // Если count < 0, то выводится вся строка
+  63   1              while((*string) != 0)
+  64   1                      LCD_printchar(*(string++));
+  65   1      }
+C51 COMPILER V7.20   LCD_HD44780                                                           05/08/2007 12:58:49 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION L?0013 (BEGIN)
+0000         L?0014:
+0000 E4                CLR     A
+0001 FD                MOV     R5,A
+0002 7F30              MOV     R7,#030H
+             ; FUNCTION _LCD_write (BEGIN)
+                                           ; SOURCE LINE # 6
+;---- Variable 'rs' assigned to Register 'R5' ----
+;---- Variable 'w_byte' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 7
+                                           ; SOURCE LINE # 8
+0004 ED                MOV     A,R5
+0005 7004              JNZ     ?C0001
+                                           ; SOURCE LINE # 9
+0007 C2B3              CLR     LCD_RS
+0009 8002              SJMP    ?C0002
+000B         ?C0001:
+                                           ; SOURCE LINE # 11
+000B D2B3              SETB    LCD_RS
+000D         ?C0002:
+                                           ; SOURCE LINE # 13
+000D D2B2              SETB    LCD_E
+                                           ; SOURCE LINE # 15
+000F 120000      E     LCALL   _SHIFT_write
+                                           ; SOURCE LINE # 17
+0012 00                NOP     
+                                           ; SOURCE LINE # 18
+0013 C2B2              CLR     LCD_E
+                                           ; SOURCE LINE # 20
+0015 7F38              MOV     R7,#038H
+0017 7E00              MOV     R6,#00H
+0019 020000      E     LJMP    _delay_func_mcs
+             ; FUNCTION _LCD_write (END)
+
+             ; FUNCTION LCD_init (BEGIN)
+                                           ; SOURCE LINE # 23
+                                           ; SOURCE LINE # 24
+                                           ; SOURCE LINE # 25
+0000 C2B2              CLR     LCD_E
+                                           ; SOURCE LINE # 26
+0002 C2B3              CLR     LCD_RS
+                                           ; SOURCE LINE # 27
+0004 7F71              MOV     R7,#071H
+0006 7E12              MOV     R6,#012H
+0008 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 29
+000B 120000      R     LCALL   L?0013
+                                           ; SOURCE LINE # 30
+000E 7F3E              MOV     R7,#03EH
+0010 7E02              MOV     R6,#02H
+0012 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 31
+0015 120000      R     LCALL   L?0013
+                                           ; SOURCE LINE # 32
+0018 7F4F              MOV     R7,#04FH
+001A 7E00              MOV     R6,#00H
+001C 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 33
+001F 120000      R     LCALL   L?0014
+C51 COMPILER V7.20   LCD_HD44780                                                           05/08/2007 12:58:49 PAGE 4   
+
+                                           ; SOURCE LINE # 34
+0022 7F4F              MOV     R7,#04FH
+0024 7E00              MOV     R6,#00H
+0026 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 35
+0029 E4                CLR     A
+002A FD                MOV     R5,A
+002B 7F38              MOV     R7,#038H
+002D 120000      R     LCALL   _LCD_write
+                                           ; SOURCE LINE # 36
+0030 E4                CLR     A
+0031 FD                MOV     R5,A
+0032 7F01              MOV     R7,#01H
+0034 120000      R     LCALL   _LCD_write
+                                           ; SOURCE LINE # 37
+0037 7F58              MOV     R7,#058H
+0039 7E01              MOV     R6,#01H
+003B 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 38
+003E E4                CLR     A
+003F FD                MOV     R5,A
+0040 7F06              MOV     R7,#06H
+0042 120000      R     LCALL   _LCD_write
+                                           ; SOURCE LINE # 39
+0045 E4                CLR     A
+0046 FD                MOV     R5,A
+0047 7F0C              MOV     R7,#0CH
+0049 020000      R     LJMP    _LCD_write
+             ; FUNCTION LCD_init (END)
+
+             ; FUNCTION LCD_clrscr (BEGIN)
+                                           ; SOURCE LINE # 42
+                                           ; SOURCE LINE # 43
+                                           ; SOURCE LINE # 44
+0000 E4                CLR     A
+0001 FD                MOV     R5,A
+0002 7F01              MOV     R7,#01H
+0004 120000      R     LCALL   _LCD_write
+                                           ; SOURCE LINE # 45
+0007 7F3E              MOV     R7,#03EH
+0009 7E02              MOV     R6,#02H
+000B 020000      E     LJMP    _delay_func_mcs
+             ; FUNCTION LCD_clrscr (END)
+
+             ; FUNCTION _LCD_gotoxy (BEGIN)
+                                           ; SOURCE LINE # 48
+;---- Variable 'x' assigned to Register 'R7' ----
+;---- Variable 'y' assigned to Register 'R5' ----
+                                           ; SOURCE LINE # 49
+                                           ; SOURCE LINE # 50
+0000 ED                MOV     A,R5
+0001 6004              JZ      ?C0006
+                                           ; SOURCE LINE # 51
+0003 7440              MOV     A,#040H
+0005 2F                ADD     A,R7
+0006 FF                MOV     R7,A
+0007         ?C0006:
+                                           ; SOURCE LINE # 52
+0007 430780            ORL     AR7,#080H
+                                           ; SOURCE LINE # 53
+000A E4                CLR     A
+000B FD                MOV     R5,A
+C51 COMPILER V7.20   LCD_HD44780                                                           05/08/2007 12:58:49 PAGE 5   
+
+000C 020000      R     LJMP    _LCD_write
+             ; FUNCTION _LCD_gotoxy (END)
+
+             ; FUNCTION _LCD_printchar (BEGIN)
+                                           ; SOURCE LINE # 56
+;---- Variable 'ch' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 57
+                                           ; SOURCE LINE # 58
+0000 7D01              MOV     R5,#01H
+0002 020000      R     LJMP    _LCD_write
+             ; FUNCTION _LCD_printchar (END)
+
+             ; FUNCTION _LCD_print (BEGIN)
+                                           ; SOURCE LINE # 61
+0000 8B00        R     MOV     string,R3
+0002 8A00        R     MOV     string+01H,R2
+0004 8900        R     MOV     string+02H,R1
+                                           ; SOURCE LINE # 62
+0006         ?C0009:
+                                           ; SOURCE LINE # 63
+0006 AB00        R     MOV     R3,string
+0008 AA00        R     MOV     R2,string+01H
+000A A900        R     MOV     R1,string+02H
+000C 120000      E     LCALL   ?C?CLDPTR
+000F 6013              JZ      ?C0011
+                                           ; SOURCE LINE # 64
+0011 0500        R     INC     string+02H
+0013 E500        R     MOV     A,string+02H
+0015 7002              JNZ     ?C0012
+0017 0500        R     INC     string+01H
+0019         ?C0012:
+0019 14                DEC     A
+001A F9                MOV     R1,A
+001B 120000      E     LCALL   ?C?CLDPTR
+001E FF                MOV     R7,A
+001F 120000      R     LCALL   _LCD_printchar
+0022 80E2              SJMP    ?C0009
+                                           ; SOURCE LINE # 65
+0024         ?C0011:
+0024 22                RET     
+             ; FUNCTION _LCD_print (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    175    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

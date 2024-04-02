@@ -1,0 +1,93 @@
+##############################################################################
+#                                                                            #
+#                                                      28/Jun/2007  00:57:49 #
+# IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  D:\stend\src\m162\AT24CXX.c                             #
+#    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D     #
+#                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb         #
+#                    D:\stend\src\m162\Release\List\ -y                      #
+#                    --initializers_in_flash -z9 -e -I "D:\Program           #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program     #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"               #
+#                    --eeprom_size 512 D:\stend\src\m162\AT24CXX.c           #
+#    List file    =  D:\stend\src\m162\Release\List\AT24CXX.lst              #
+#    Object file  =  D:\stend\src\m162\Release\Obj\AT24CXX.r90               #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+D:\stend\src\m162\AT24CXX.c
+      1          #include "AT24CXX.h"
+      2          #include "I2C.h"
+      3          #include "DELAY.H"
+      4          
+      5          // Функция записи значения ячейки памяти EEPROM AT24CXX
+      6          void AT24CXX_write(unsigned char addr, unsigned char value)
+      7          {
+      8          	I2C_start();
+      9          	I2C_write(0xA0);			// Команда записи
+     10          	I2C_write(addr);			// Установка адреса
+     11          	I2C_write(value);         	// Запись данных
+     12          	I2C_stop();
+     13          	DELAY_MS( 15 );				// Ждем окончания записи
+     14          }
+     15          
+     16          // Функция чтения значения ячейки памяти EEPROM AT24CXX
+     17          unsigned char AT24CXX_read(unsigned char addr)
+     18          {
+     19          	unsigned char value;
+     20          	I2C_start();
+     21          	I2C_write(0xA0);	    	// Команда записи
+     22          	I2C_write(addr);   	 		// Установка адреса
+     23          	I2C_stop();
+     24          	DELAY_MCS(68);
+     25          	I2C_start(); 
+     26          	I2C_write(0xA1);         	// Уоманда чтения
+     27          	value = I2C_read();
+     28          	I2C_stop();
+     29          	
+     30          	return value;
+     31          }
+
+   Maximum stack usage in bytes:
+
+     Function            CSTACK RSTACK
+     --------            ------ ------
+     AT24CXX_read            1      2
+       -> I2C_start          1      2
+       -> I2C_write          1      2
+       -> I2C_write          1      2
+       -> I2C_stop           1      2
+       -> delay_func_mcs     1      2
+       -> I2C_start          1      2
+       -> I2C_write          1      2
+       -> I2C_read           1      2
+       -> I2C_stop           1      2
+     AT24CXX_write           2      2
+       -> I2C_start          2      2
+       -> I2C_write          2      2
+       -> I2C_write          2      2
+       -> I2C_write          2      2
+       -> I2C_stop           2      2
+       -> delay_func_ms      2      2
+
+
+   Segment part sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     AT24CXX_write    32
+     ?Subroutine2      4
+     ?Subroutine1      4
+     ?Subroutine0     10
+     AT24CXX_read     40
+
+ 
+ 90 bytes in segment CODE
+ 
+ 90 bytes of CODE memory
+
+Errors: none
+Warnings: none

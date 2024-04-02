@@ -1,0 +1,180 @@
+C51 COMPILER V7.20   LED7                                                                  05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE LED7
+OBJECT MODULE PLACED IN LED7.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE LED7.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include "LED7.h"
+   2          #include "SHIFT.h"
+   3          
+   4          // Коды цифр для 7-сегментного индикатора (при условии что первым передается MSB слова данных)
+   5          #define CODE_0  0xC0
+   6          #define CODE_1  0xF9
+   7          #define CODE_2  0xA4
+   8          #define CODE_3  0xB0
+   9          #define CODE_4  0x99
+  10          #define CODE_5  0x92
+  11          #define CODE_6  0x82
+  12          #define CODE_7  0xf8
+  13          #define CODE_8  0x80
+  14          #define CODE_9  0x90
+  15          
+  16          void LED7_setdigit(unsigned char digit)
+  17          {
+  18   1              switch(digit) {
+  19   2              case 0:
+  20   2                      SHIFT_write(CODE_0);
+  21   2                      break;
+  22   2              case 1:
+  23   2                      SHIFT_write(CODE_1);
+  24   2                      break;
+  25   2              case 2:
+  26   2                      SHIFT_write(CODE_2);
+  27   2                      break;
+  28   2              case 3:
+  29   2                      SHIFT_write(CODE_3);
+  30   2                      break;
+  31   2              case 4:
+  32   2                      SHIFT_write(CODE_4);
+  33   2                      break;
+  34   2              case 5:
+  35   2                      SHIFT_write(CODE_5);
+  36   2                      break;
+  37   2              case 6:
+  38   2                      SHIFT_write(CODE_6);
+  39   2                      break;
+  40   2              case 7:
+  41   2                      SHIFT_write(CODE_7);
+  42   2                      break;
+  43   2              case 8:
+  44   2                      SHIFT_write(CODE_8);
+  45   2                      break;
+  46   2              case 9:
+  47   2                      SHIFT_write(CODE_9);
+  48   2                      break;
+  49   2              }
+  50   1      }
+C51 COMPILER V7.20   LED7                                                                  05/08/2007 12:58:49 PAGE 2   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _LED7_setdigit (BEGIN)
+                                           ; SOURCE LINE # 16
+;---- Variable 'digit' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 17
+                                           ; SOURCE LINE # 18
+0000 EF                MOV     A,R7
+0001 B40A00            CJNE    A,#0AH,?C0013
+0004         ?C0013:
+0004 504E              JNC     ?C0012
+0006 900000      R     MOV     DPTR,#?C0014
+0009 F8                MOV     R0,A
+000A 28                ADD     A,R0
+000B 28                ADD     A,R0
+000C 73                JMP     @A+DPTR
+000D         ?C0014:
+000D 020000      R     LJMP    ?C0002
+0010 020000      R     LJMP    ?C0003
+0013 020000      R     LJMP    ?C0004
+0016 020000      R     LJMP    ?C0005
+0019 020000      R     LJMP    ?C0006
+001C 020000      R     LJMP    ?C0007
+001F 020000      R     LJMP    ?C0008
+0022 020000      R     LJMP    ?C0009
+0025 020000      R     LJMP    ?C0010
+0028 020000      R     LJMP    ?C0011
+                                           ; SOURCE LINE # 19
+002B         ?C0002:
+                                           ; SOURCE LINE # 20
+002B 7FC0              MOV     R7,#0C0H
+                                           ; SOURCE LINE # 21
+002D 8022              SJMP    ?C0023
+                                           ; SOURCE LINE # 22
+002F         ?C0003:
+                                           ; SOURCE LINE # 23
+002F 7FF9              MOV     R7,#0F9H
+0031         ?C0015:
+                                           ; SOURCE LINE # 24
+0031 801E              SJMP    ?C0023
+                                           ; SOURCE LINE # 25
+0033         ?C0004:
+                                           ; SOURCE LINE # 26
+0033 7FA4              MOV     R7,#0A4H
+0035         ?C0016:
+                                           ; SOURCE LINE # 27
+0035 801A              SJMP    ?C0023
+                                           ; SOURCE LINE # 28
+0037         ?C0005:
+                                           ; SOURCE LINE # 29
+0037 7FB0              MOV     R7,#0B0H
+0039         ?C0017:
+                                           ; SOURCE LINE # 30
+0039 8016              SJMP    ?C0023
+                                           ; SOURCE LINE # 31
+003B         ?C0006:
+                                           ; SOURCE LINE # 32
+003B 7F99              MOV     R7,#099H
+003D         ?C0018:
+                                           ; SOURCE LINE # 33
+003D 8012              SJMP    ?C0023
+C51 COMPILER V7.20   LED7                                                                  05/08/2007 12:58:49 PAGE 3   
+
+                                           ; SOURCE LINE # 34
+003F         ?C0007:
+                                           ; SOURCE LINE # 35
+003F 7F92              MOV     R7,#092H
+0041         ?C0019:
+                                           ; SOURCE LINE # 36
+0041 800E              SJMP    ?C0023
+                                           ; SOURCE LINE # 37
+0043         ?C0008:
+                                           ; SOURCE LINE # 38
+0043 7F82              MOV     R7,#082H
+0045         ?C0020:
+                                           ; SOURCE LINE # 39
+0045 800A              SJMP    ?C0023
+                                           ; SOURCE LINE # 40
+0047         ?C0009:
+                                           ; SOURCE LINE # 41
+0047 7FF8              MOV     R7,#0F8H
+0049         ?C0021:
+                                           ; SOURCE LINE # 42
+0049 8006              SJMP    ?C0023
+                                           ; SOURCE LINE # 43
+004B         ?C0010:
+                                           ; SOURCE LINE # 44
+004B 7F80              MOV     R7,#080H
+004D         ?C0022:
+                                           ; SOURCE LINE # 45
+004D 8002              SJMP    ?C0023
+                                           ; SOURCE LINE # 46
+004F         ?C0011:
+                                           ; SOURCE LINE # 47
+004F 7F90              MOV     R7,#090H
+0051         ?C0023:
+0051 120000      E     LCALL   _SHIFT_write
+                                           ; SOURCE LINE # 48
+                                           ; SOURCE LINE # 49
+                                           ; SOURCE LINE # 50
+0054         ?C0012:
+0054 22                RET     
+             ; FUNCTION _LED7_setdigit (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     85    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

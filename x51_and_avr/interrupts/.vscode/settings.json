@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "ds1307.h": "c",
+        "convert.h": "c",
+        "pindef.h": "c"
+    }
+}

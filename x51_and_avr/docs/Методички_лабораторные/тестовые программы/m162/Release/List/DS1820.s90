@@ -1,0 +1,286 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     28/Jun/2007  00:57:51 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m162\DS1820.c                             /
+//    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D    /
+//                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb        /
+//                    D:\stend\src\m162\Release\List\ -y                     /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m162\DS1820.c           /
+//    List file    =  D:\stend\src\m162\Release\List\DS1820.s90              /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME DS1820
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        EXTERN ?EPILOGUE_B4_L09
+        EXTERN ?EPILOGUE_B6_L09
+        EXTERN ?PROLOGUE4_L09
+        EXTERN ?PROLOGUE6_L09
+        EXTERN ?Register_R4_is_cg_reg
+        EXTERN ?Register_R5_is_cg_reg
+        EXTERN ?SS_DIVMOD_L02
+
+        PUBLIC DS1820_getconvertstatus
+        PUBLIC DS1820_gettemperature
+        PUBLIC DS1820_readdata
+        PUBLIC DS1820_reset
+        PUBLIC DS1820_rw
+        PUBLIC DS1820_startconverttemp
+        PUBWEAK _A_DDRA
+        PUBWEAK _A_PINA
+        PUBWEAK _A_PORTA
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN delay_func_mcs
+        EXTERN ShortToString
+
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1820_reset:
+        CBI	0x1B, 0x02
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_6:
+        SBI	0x1A, 0x02
+        LDI	R16, 19
+        LDI	R17, 5
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_13:
+        CBI	0x1A, 0x02
+        LDI	R16, 193
+        RCALL	??Subroutine0_0
+??CrossCallReturnLabel_8:
+        SBIC	0x19, 0x02
+        RJMP	?Subroutine4
+??DS1820_reset_0:
+        LDI	R16, 5
+        LDI	R17, 4
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_12:
+        REQUIRE ?Subroutine3
+        ;		// Fall through to label ?Subroutine3
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine3:
+        LDI	R16, 1
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1820_rw:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R25, R16
+        CBI	0x1B, 0x02
+        CBI	0x1A, 0x02
+        LDI	R24, 8
+??DS1820_rw_0:
+        SBI	0x1A, 0x02
+        LDI	R16, 2
+        RCALL	??Subroutine0_0
+??CrossCallReturnLabel_9:
+        BST	R25, 0
+        BRTC	??DS1820_rw_1
+        CBI	0x1A, 0x02
+        RJMP	??DS1820_rw_2
+??DS1820_rw_1:
+        SBI	0x1A, 0x02
+??DS1820_rw_2:
+        LDI	R16, 16
+        RCALL	??Subroutine0_0
+??CrossCallReturnLabel_10:
+        LSR	R25
+        SBIC	0x19, 0x02
+        ORI	R25, 0x80
+??DS1820_rw_3:
+        LDI	R16, 132
+        RCALL	??Subroutine0_0
+??CrossCallReturnLabel_11:
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_7:
+        DEC	R24
+        BRNE	??DS1820_rw_0
+        MOV	R16, R25
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine0:
+        CBI	0x1A, 0x02
+        LDI	R16, 11
+??Subroutine0_0:
+        LDI	R17, 0
+        REQUIRE ?Subroutine2
+        ;		// Fall through to label ?Subroutine2
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine2:
+        JMP	delay_func_mcs
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1820_startconverttemp:
+        RCALL	DS1820_reset
+        TST	R16
+        BRNE	??DS1820_startconverttemp_0
+        RJMP	?Subroutine4
+??DS1820_startconverttemp_0:
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_5:
+        LDI	R16, 68
+        RCALL	??Subroutine1_0
+??CrossCallReturnLabel_3:
+        RJMP	?Subroutine3
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1820_getconvertstatus:
+        LDI	R16, 255
+        RCALL	??Subroutine1_0
+??CrossCallReturnLabel_2:
+        TST	R16
+        BREQ	??DS1820_getconvertstatus_0
+        RJMP	?Subroutine3
+??DS1820_getconvertstatus_0:
+        REQUIRE ?Subroutine4
+        ;		// Fall through to label ?Subroutine4
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine4:
+        LDI	R16, 0
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine1:
+        LDI	R16, 204
+??Subroutine1_0:
+        RJMP	DS1820_rw
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1820_readdata:
+        CALL	?PROLOGUE4_L09
+        MOVW	R25:R24, R17:R16
+        RCALL	DS1820_reset
+        TST	R16
+        BRNE	??DS1820_readdata_0
+        LDI	R16, 0
+        RJMP	??DS1820_readdata_1
+??DS1820_readdata_0:
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_4:
+        LDI	R16, 190
+        RCALL	??Subroutine1_0
+??CrossCallReturnLabel_1:
+        LDI	R26, 0
+??DS1820_readdata_2:
+        LDI	R16, 255
+        RCALL	??Subroutine1_0
+??CrossCallReturnLabel_0:
+        LDI	R27, 0
+        MOVW	R31:R30, R25:R24
+        ADD	R30, R26
+        ADC	R31, R27
+        ST	Z, R16
+        INC	R26
+        CPI	R26, 9
+        BRCS	??DS1820_readdata_2
+        LDI	R16, 1
+??DS1820_readdata_1:
+        LDI	R30, 4
+        JMP	?EPILOGUE_B4_L09
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1820_gettemperature:
+        CALL	?PROLOGUE6_L09
+        REQUIRE	?Register_R4_is_cg_reg
+        REQUIRE	?Register_R5_is_cg_reg
+        SBIW	R29:R28, 9
+        MOVW	R27:R26, R17:R16
+        RCALL	DS1820_getconvertstatus
+        TST	R16
+        BRNE	??DS1820_gettemperature_0
+        LDI	R16, 1
+        RJMP	??DS1820_gettemperature_1
+??DS1820_gettemperature_0:
+        MOVW	R17:R16, R29:R28
+        RCALL	DS1820_readdata
+        TST	R16
+        BRNE	??DS1820_gettemperature_2
+        LDI	R16, 0
+        RJMP	??DS1820_gettemperature_1
+??DS1820_gettemperature_2:
+        LD	R4, Y
+        CLR	R5
+        MOVW	R19:R18, R27:R26
+        MOVW	R17:R16, R5:R4
+        LDI	R20, 2
+        LDI	R21, 0
+        CALL	?SS_DIVMOD_L02
+        CALL	ShortToString
+        ADD	R26, R16
+        ADC	R27, R5
+        LDI	R16, 46
+        ST	X, R16
+        SBRS	R4, 0
+        RJMP	??DS1820_gettemperature_3
+        LDI	R16, 53
+        RJMP	??DS1820_gettemperature_4
+??DS1820_gettemperature_3:
+        LDI	R16, 48
+??DS1820_gettemperature_4:
+        MOVW	R31:R30, R27:R26
+        STD	Z+1, R16
+        STD	Z+2, R5
+        LDI	R16, 2
+??DS1820_gettemperature_1:
+        ADIW	R29:R28, 9
+        LDI	R30, 6
+        JMP	?EPILOGUE_B6_L09
+
+        ASEGN ABSOLUTE:DATA:NOROOT,03bH
+// union <unnamed> volatile __io _A_PORTA
+_A_PORTA:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,03aH
+// union <unnamed> volatile __io _A_DDRA
+_A_DDRA:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,039H
+// union <unnamed> volatile __io _A_PINA
+_A_PINA:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+//   3 bytes in segment ABSOLUTE
+// 268 bytes in segment CODE
+// 
+// 268 bytes of CODE memory
+//   0 bytes of DATA memory (+ 3 bytes shared)
+//
+//Errors: none
+//Warnings: none

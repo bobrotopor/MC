@@ -1,0 +1,332 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     21/May/2007  11:44:14 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m16\DS1307.c                              /
+//    Command line =  --cpu=m16 -mt -o D:\stend\src\m16\Debug\Obj\ -lb       /
+//                    D:\stend\src\m16\Debug\List\ --initializers_in_flash   /
+//                    -z3 --no_cse --no_inline --no_code_motion              /
+//                    --no_cross_call --no_clustering --no_tbaa --debug -e   /
+//                    -I "D:\Program Files\IAR Systems\AVR4.10A\avr\INC\"    /
+//                    -I "D:\Program Files\IAR Systems\AVR4.10A\avr\INC\CLIB /
+//                    \" --eeprom_size 512 D:\stend\src\m16\DS1307.c         /
+//    List file    =  D:\stend\src\m16\Debug\List\DS1307.s90                 /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME DS1307
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        EXTERN ?UC_DIVMOD_L01
+        EXTERN ?need_segment_init
+
+        PUBWEAK `?<Segment init: TINY_I>`
+        PUBLIC ByteToBCD
+        PUBLIC Clock_Init
+        PUBLIC DS1307_getdate
+        PUBLIC DS1307_gettime
+        PUBLIC DS1307_read
+        PUBLIC DS1307_setdate
+        PUBLIC DS1307_settime
+        PUBLIC DS1307_write
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN I2C_start
+        EXTERN I2C_write
+        EXTERN I2C_stop
+        EXTERN delay_func_mcs
+        EXTERN I2C_read
+
+
+        RSEG TINY_I:DATA:NOROOT(0)
+        REQUIRE `?<Segment init: TINY_I>`
+Clock_Init:
+        DS 7
+        REQUIRE `?<Initializer for Clock_Init>`
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_write:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R25, R16
+        MOV	R24, R17
+        CALL	I2C_start
+        LDI	R16, 208
+        CALL	I2C_write
+        MOV	R16, R25
+        CALL	I2C_write
+        MOV	R16, R24
+        CALL	I2C_write
+        CALL	I2C_stop
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_read:
+        ST	-Y, R24
+        MOV	R24, R16
+        CALL	I2C_start
+        LDI	R16, 208
+        CALL	I2C_write
+        MOV	R16, R24
+        CALL	I2C_write
+        CALL	I2C_stop
+        LDI	R16, 141
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        CALL	I2C_start
+        LDI	R16, 209
+        CALL	I2C_write
+        CALL	I2C_read
+        MOV	R24, R16
+        CALL	I2C_stop
+        MOV	R16, R24
+        LD	R24, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_gettime:
+        ST	-Y, R26
+        ST	-Y, R24
+        MOV	R26, R16
+        LDI	R16, 2
+        RCALL	DS1307_read
+        MOV	R24, R16
+        MOV	R16, R24
+        SWAP	R16
+        ANDI	R16, 0x0F
+        SUBI	R16, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        ST	Z, R16
+        ANDI	R24, 0x0F
+        SUBI	R24, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+1, R24
+        LDI	R16, 58
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+2, R16
+        LDI	R16, 1
+        RCALL	DS1307_read
+        MOV	R24, R16
+        MOV	R16, R24
+        SWAP	R16
+        ANDI	R16, 0x0F
+        SUBI	R16, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+3, R16
+        ANDI	R24, 0x0F
+        SUBI	R24, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+4, R24
+        LDI	R16, 58
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+5, R16
+        LDI	R16, 0
+        RCALL	DS1307_read
+        MOV	R24, R16
+        BST	R24, 7
+        BRTC	??DS1307_gettime_0
+        LDI	R17, 0
+        LDI	R16, 0
+        RCALL	DS1307_write
+??DS1307_gettime_0:
+        MOV	R16, R24
+        SWAP	R16
+        ANDI	R16, 0x0F
+        SUBI	R16, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+6, R16
+        ANDI	R24, 0x0F
+        SUBI	R24, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+7, R24
+        LDI	R16, 0
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+8, R16
+        LD	R24, Y+
+        LD	R26, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+ByteToBCD:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R25, R16
+        MOV	R16, R25
+        LDI	R20, 10
+        CALL	?UC_DIVMOD_L01
+        MOV	R24, R16
+        SWAP	R24
+        ANDI	R24, 0xF0
+        MOV	R16, R25
+        LDI	R20, 10
+        CALL	?UC_DIVMOD_L01
+        MOV	R16, R20
+        ADD	R16, R24
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_settime:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R25, R17
+        MOV	R24, R18
+        RCALL	ByteToBCD
+        MOV	R17, R16
+        LDI	R16, 2
+        RCALL	DS1307_write
+        MOV	R16, R25
+        RCALL	ByteToBCD
+        MOV	R17, R16
+        LDI	R16, 1
+        RCALL	DS1307_write
+        MOV	R16, R24
+        RCALL	ByteToBCD
+        MOV	R17, R16
+        LDI	R16, 0
+        RCALL	DS1307_write
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_getdate:
+        ST	-Y, R26
+        MOV	R26, R16
+        LDI	R16, 4
+        RCALL	DS1307_read
+        MOV	R17, R16
+        SWAP	R17
+        ANDI	R17, 0x0F
+        SUBI	R17, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        ST	Z, R17
+        ANDI	R16, 0x0F
+        SUBI	R16, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+1, R16
+        LDI	R16, 46
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+2, R16
+        LDI	R16, 5
+        RCALL	DS1307_read
+        MOV	R17, R16
+        SWAP	R17
+        ANDI	R17, 0x0F
+        SUBI	R17, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+3, R17
+        ANDI	R16, 0x0F
+        SUBI	R16, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+4, R16
+        LDI	R16, 46
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+5, R16
+        LDI	R16, 6
+        RCALL	DS1307_read
+        MOV	R17, R16
+        SWAP	R17
+        ANDI	R17, 0x0F
+        SUBI	R17, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+6, R17
+        ANDI	R16, 0x0F
+        SUBI	R16, 208
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+7, R16
+        LDI	R16, 0
+        MOV	R30, R26
+        LDI	R31, 0
+        STD	Z+8, R16
+        LD	R26, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_setdate:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R24, R16
+        MOV	R25, R17
+        MOV	R16, R18
+        RCALL	ByteToBCD
+        MOV	R17, R16
+        LDI	R16, 6
+        RCALL	DS1307_write
+        MOV	R16, R25
+        RCALL	ByteToBCD
+        MOV	R17, R16
+        LDI	R16, 5
+        RCALL	DS1307_write
+        MOV	R16, R24
+        RCALL	ByteToBCD
+        MOV	R17, R16
+        LDI	R16, 4
+        RCALL	DS1307_write
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        RSEG TINY_ID:CODE:NOROOT(0)
+`?<Initializer for Clock_Init>`:
+        DB 0, 0, 35, 2, 25, 4, 5
+
+        RSEG INITTAB:CODE:NOROOT(0)
+`?<Segment init: TINY_I>`:
+        DW	SFE(TINY_I) - SFB(TINY_I)
+        DW	SFB(TINY_I)
+        DW	SFB(TINY_ID)
+        REQUIRE ?need_segment_init
+
+        END
+// 
+// 474 bytes in segment CODE
+//   6 bytes in segment INITTAB
+//   7 bytes in segment TINY_I
+//   7 bytes in segment TINY_ID
+// 
+// 481 bytes of CODE memory (+ 6 bytes shared)
+//   7 bytes of DATA memory
+//
+//Errors: none
+//Warnings: none

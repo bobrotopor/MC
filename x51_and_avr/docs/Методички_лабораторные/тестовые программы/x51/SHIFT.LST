@@ -1,0 +1,51 @@
+C51 COMPILER V7.20   SHIFT                                                                 05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE SHIFT
+OBJECT MODULE PLACED IN SHIFT.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE SHIFT.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include "SHIFT.h"
+   2          #include "SPI.h"
+   3          
+   4          void SHIFT_write(const unsigned char w_data)
+   5          {
+   6   1              SPI_rw(w_data);
+   7   1              ST = 1;
+   8   1              ST = 0;
+   9   1      }
+C51 COMPILER V7.20   SHIFT                                                                 05/08/2007 12:58:49 PAGE 2   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _SHIFT_write (BEGIN)
+                                           ; SOURCE LINE # 4
+;---- Variable 'w_data' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 5
+                                           ; SOURCE LINE # 6
+0000 120000      E     LCALL   _SPI_rw
+                                           ; SOURCE LINE # 7
+0003 D2B4              SETB    ST
+                                           ; SOURCE LINE # 8
+0005 C2B4              CLR     ST
+                                           ; SOURCE LINE # 9
+0007 22                RET     
+             ; FUNCTION _SHIFT_write (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =      8    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,111 @@
+C51 COMPILER V7.20   DELAY                                                                 05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE DELAY
+OBJECT MODULE PLACED IN DELAY.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE DELAY.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include "DELAY.H"
+   2          #include <intrins.h>
+   3          
+   4          void delay_func_mcs( int count )
+   5          {
+   6   1              int i;
+   7   1              for ( i = 0; i < count; i++ );
+   8   1      }
+   9          
+  10          void delay_ms( int count )
+  11          {
+  12   1              unsigned char i;
+  13   1              while (count != 0) 
+  14   1              {
+  15   2                      count--; 
+  16   2                      for ( i = 0; i < 250; i++);
+  17   2              }
+  18   1      }
+C51 COMPILER V7.20   DELAY                                                                 05/08/2007 12:58:49 PAGE 2   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _delay_func_mcs (BEGIN)
+                                           ; SOURCE LINE # 4
+;---- Variable 'count' assigned to Register 'R6/R7' ----
+                                           ; SOURCE LINE # 5
+                                           ; SOURCE LINE # 7
+;---- Variable 'i' assigned to Register 'R4/R5' ----
+0000 E4                CLR     A
+0001 FD                MOV     R5,A
+0002 FC                MOV     R4,A
+0003         ?C0001:
+0003 C3                CLR     C
+0004 ED                MOV     A,R5
+0005 9F                SUBB    A,R7
+0006 EE                MOV     A,R6
+0007 6480              XRL     A,#080H
+0009 F8                MOV     R0,A
+000A EC                MOV     A,R4
+000B 6480              XRL     A,#080H
+000D 98                SUBB    A,R0
+000E 5007              JNC     ?C0004
+0010 0D                INC     R5
+0011 BD0001            CJNE    R5,#00H,?C0011
+0014 0C                INC     R4
+0015         ?C0011:
+0015 80EC              SJMP    ?C0001
+                                           ; SOURCE LINE # 8
+0017         ?C0004:
+0017 22                RET     
+             ; FUNCTION _delay_func_mcs (END)
+
+             ; FUNCTION _delay_ms (BEGIN)
+                                           ; SOURCE LINE # 10
+;---- Variable 'i' assigned to Register 'R5' ----
+;---- Variable 'count' assigned to Register 'R6/R7' ----
+                                           ; SOURCE LINE # 11
+0000         ?C0005:
+                                           ; SOURCE LINE # 13
+0000 EF                MOV     A,R7
+0001 4E                ORL     A,R6
+0002 6010              JZ      ?C0010
+                                           ; SOURCE LINE # 14
+                                           ; SOURCE LINE # 15
+0004 EF                MOV     A,R7
+0005 1F                DEC     R7
+0006 7001              JNZ     ?C0012
+0008 1E                DEC     R6
+0009         ?C0012:
+                                           ; SOURCE LINE # 16
+0009 E4                CLR     A
+000A FD                MOV     R5,A
+000B         ?C0007:
+000B ED                MOV     A,R5
+000C C3                CLR     C
+000D 94FA              SUBB    A,#0FAH
+000F 50EF              JNC     ?C0005
+0011 0D                INC     R5
+0012 80F7              SJMP    ?C0007
+                                           ; SOURCE LINE # 17
+                                           ; SOURCE LINE # 18
+C51 COMPILER V7.20   DELAY                                                                 05/08/2007 12:58:49 PAGE 3   
+
+0014         ?C0010:
+0014 22                RET     
+             ; FUNCTION _delay_ms (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     45    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

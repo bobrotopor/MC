@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0059)http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html -->
+<HTML><HEAD><TITLE>НТУУ-КПИ</TITLE>
+<META content="text/html; charset=windows-1251" http-equiv=Content-Type>
+<META content="Denis Y. Lebedev" name=Author><LINK 
+href="Редактирование.files/style.css" rel=stylesheet type=text/css>
+<META content="MSHTML 5.00.2920.0" name=GENERATOR></HEAD>
+<BODY aLink=#0099cc bgColor=#cccccc leftMargin=0 link=#006699 text=#000000 
+topMargin=0 vLink=#996600 marginheight="0" marginwidth="0">
+<TABLE background=Редактирование.files/topline.gif border=0 cellPadding=0 
+cellSpacing=0 width="100%">
+  <TBODY>
+  <TR>
+    <TD align=middle bgColor=#cccccc vAlign=top>
+      <TABLE border=0 cellPadding=0 cellSpacing=0 height=145 width="100%">
+        <TBODY>
+        <TR>
+          <TD background=Редактирование.files/topline.gif 
+          width="100%">&nbsp;</TD></TR></TBODY></TABLE></TD>
+    <TD align=middle bgColor=#cccccc height=40 vAlign=top width=678>
+      <TABLE border=0 cellPadding=0 cellSpacing=0 width=686>
+        <TBODY>
+        <TR>
+          <TD width=179><A name=top></A><IMG alt=КПИ height=145 
+            src="Редактирование.files/kpi.gif" width=179></TD>
+          <TD width=318><IMG alt="Лаборатория Диагностических средств" 
+            height=145 src="Редактирование.files/pson1.gif" width=318></TD>
+          <TD width=189><IMG alt=ПСОН height=145 
+            src="Редактирование.files/pson2.gif" 
+    width=189></TD></TR></TBODY></TABLE></TD>
+    <TD align=middle height=40 vAlign=top>
+      <TABLE background=Редактирование.files/topline.gif border=0 cellPadding=0 
+      cellSpacing=0 height=40 width="100%">
+        <TBODY>
+        <TR>
+          <TD width="100%">&nbsp;</TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<TABLE border=0 cellPadding=0 cellSpacing=0 height=400 width=775>
+  <TBODY>
+  <TR>
+    <TD bgColor=#cccccc vAlign=top>
+      <TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
+        <TBODY>
+        <TR>
+          <TD vAlign=top width=141>
+            <CENTER><!--            Menu v inc file           -->
+            <SCRIPT language=JavaScript>
+<!--
+nMaxItem = 4;
+NameIndex = 0;
+OriginalState = 1;
+MouseOverState = 2;
+MouseClickState = 3;
+MouseDownState = 4;
+imgCounter = 0;
+ImageList = new Array();
+function AddImageToList(name, Original, MouseOver, MouseClick, MouseDown)
+{
+	ImageList[imgCounter] = new Array(nMaxItem);
+	ImageList[imgCounter][NameIndex] = name;
+	ImageList[imgCounter][OriginalState] = new Image();
+	ImageList[imgCounter][OriginalState].src = Original;
+	if (MouseOver != "")
+	{
+		ImageList[imgCounter][MouseOverState] = new Image();
+		ImageList[imgCounter][MouseOverState].src = MouseOver;
+	}
+	if (MouseClick != "")
+	{
+		ImageList[imgCounter][MouseClickState] = new Image();
+		ImageList[imgCounter][MouseClickState].src = MouseClick;
+	}
+	if (MouseDown != "")
+	{
+		ImageList[imgCounter][MouseDownState] = new Image();
+		ImageList[imgCounter][MouseDownState].src = MouseDown;
+	}
+	imgCounter++;
+}
+function ReplaceImage(nameFrom, nameTo, state)
+{
+	for (i = 0; i < imgCounter; i++)
+	{
+		if (document.images[ImageList[i][NameIndex]] != null)
+		{
+			if ((nameFrom == ImageList[i][NameIndex]) && (ImageList[i][state] != null))
+				document.images[nameTo].src = ImageList[i][state].src;
+}}}
+AddImageToList("JS0", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS1", "immenu/men-2x3.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS2", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS3", "immenu/men-4x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS4", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS5", "immenu/men-6x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS6", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS7", "immenu/men-8x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS8", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS9", "immenu/men-10x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS10", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS11", "immenu/soft.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS12", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS13", "immenu/men-14x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS14", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS15", "immenu/men-16x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS16", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS17", "immenu/men-12x2.gif", "immenu/v-8x1.gif", "", "");
+//-->
+</SCRIPT>
+
+            <TABLE border=0 cellPadding=0 cellSpacing=0 height=293 width=141>
+              <TBODY>
+              <TR>
+                <TD colSpan=3 height=35 width=141><IMG border=0 height=35 
+                  src="Редактирование.files/men-1x1.gif" width=141></TD></TR>
+              <TR>
+                <TD height=218 rowSpan=17 width=15><IMG border=0 height=218 
+                  src="Редактирование.files/lin.gif" width=15></TD>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#" 
+                  onmouseout="ReplaceImage('JS0', 'JS0', OriginalState);" 
+                  onmouseover="ReplaceImage('JS0', 'JS0', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS0 
+                  src="Редактирование.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/news.htm" 
+                  onmouseout="ReplaceImage('JS0', 'JS0', OriginalState);" 
+                  onmouseover="ReplaceImage('JS1', 'JS0', MouseOverState);" 
+                  target=_top><IMG alt=Новости border=0 height=16 name=JS1 
+                  src="Редактирование.files/men-2x3.gif" width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Редактирование.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#" 
+                  onmouseout="ReplaceImage('JS2', 'JS2', OriginalState);" 
+                  onmouseover="ReplaceImage('JS2', 'JS2', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS2 
+                  src="Редактирование.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/work.htm" 
+                  onmouseout="ReplaceImage('JS2', 'JS2', OriginalState);" 
+                  onmouseover="ReplaceImage('JS3', 'JS2', MouseOverState);" 
+                  target=_top><IMG alt=Разработки border=0 height=16 name=JS3 
+                  src="Редактирование.files/men-4x2.gif" width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=10 width=126><IMG border=0 height=10 
+                  src="Редактирование.files/men-5x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#" 
+                  onmouseout="ReplaceImage('JS4', 'JS4', OriginalState);" 
+                  onmouseover="ReplaceImage('JS4', 'JS4', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS4 
+                  src="Редактирование.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/texas.htm" 
+                  onmouseout="ReplaceImage('JS4', 'JS4', OriginalState);" 
+                  onmouseover="ReplaceImage('JS5', 'JS4', MouseOverState);" 
+                  target=_top><IMG alt="Texas Instruments" border=0 height=16 
+                  name=JS5 src="Редактирование.files/men-6x2.gif" 
+                width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Редактирование.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#" 
+                  onmouseout="ReplaceImage('JS6', 'JS6', OriginalState);" 
+                  onmouseover="ReplaceImage('JS6', 'JS6', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS6 
+                  src="Редактирование.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/atmel.htm" 
+                  onmouseout="ReplaceImage('JS6', 'JS6', OriginalState);" 
+                  onmouseover="ReplaceImage('JS7', 'JS6', MouseOverState);" 
+                  target=_top><IMG alt=Atmel border=0 height=16 name=JS7 
+                  src="Редактирование.files/men-8x2.gif" width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=10 width=126><IMG border=0 height=10 
+                  src="Редактирование.files/men-5x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#" 
+                  onmouseout="ReplaceImage('JS8', 'JS8', OriginalState);" 
+                  onmouseover="ReplaceImage('JS8', 'JS8', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS8 
+                  src="Редактирование.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/altera.htm" 
+                  onmouseout="ReplaceImage('JS8', 'JS8', OriginalState);" 
+                  onmouseover="ReplaceImage('JS9', 'JS8', MouseOverState);" 
+                  target=_top><IMG alt="Analog Devices" border=0 height=16 
+                  name=JS9 src="Редактирование.files/men-10x2.gif" 
+                width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Редактирование.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#" 
+                  onmouseout="ReplaceImage('JS10', 'JS10', OriginalState);" 
+                  onmouseover="ReplaceImage('JS10', 'JS10', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS10 
+                  src="Редактирование.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/prog.htm" 
+                  onmouseout="ReplaceImage('JS10', 'JS10', OriginalState);" 
+                  onmouseover="ReplaceImage('JS11', 'JS10', MouseOverState);" 
+                  target=_top><IMG alt="Прогаммы, оболочки..." border=0 
+                  height=16 name=JS11 src="Редактирование.files/soft.gif" 
+                  width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Редактирование.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#" 
+                  onmouseout="ReplaceImage('JS12', 'JS12', OriginalState);" 
+                  onmouseover="ReplaceImage('JS12', 'JS12', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS12 
+                  src="Редактирование.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/we.htm" 
+                  onmouseout="ReplaceImage('JS12', 'JS12', OriginalState);" 
+                  onmouseover="ReplaceImage('JS13', 'JS12', MouseOverState);" 
+                  target=_top><IMG alt="Немного о нас" border=0 height=16 
+                  name=JS13 src="Редактирование.files/men-14x2.gif" 
+                  width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Редактирование.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#" 
+                  onmouseout="ReplaceImage('JS14', 'JS14', OriginalState);" 
+                  onmouseover="ReplaceImage('JS14', 'JS14', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS14 
+                  src="Редактирование.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/contacts.htm" 
+                  onmouseout="ReplaceImage('JS14', 'JS14', OriginalState);" 
+                  onmouseover="ReplaceImage('JS15', 'JS14', MouseOverState);" 
+                  target=_top><IMG alt="Связь с нами" border=0 height=16 
+                  name=JS15 src="Редактирование.files/men-16x2.gif" 
+                  width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Редактирование.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#" 
+                  onmouseout="ReplaceImage('JS16', 'JS16', OriginalState);" 
+                  onmouseover="ReplaceImage('JS16', 'JS16', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS16 
+                  src="Редактирование.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/http://avia.vov.ru/kpi/forum.phtml" 
+                  onmouseout="ReplaceImage('JS16', 'JS16', OriginalState);" 
+                  onmouseover="ReplaceImage('JS17', 'JS16', MouseOverState);" 
+                  target=_top><IMG alt=Форум border=0 height=16 name=JS17 
+                  src="Редактирование.files/men-12x2.gif" width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=3 height=65 width=141><IMG border=0 height=65 
+                  src="Редактирование.files/men-17x1.gif" 
+              width=141></TD></TR></TBODY></TABLE></CENTER></TD>
+          <TD align=middle vAlign=top width="100%"><IMG height=30 
+            src="Редактирование.files/texttop.gif" width=572> 
+            <TABLE border=0 cellPadding=0 cellSpacing=0 height=400 
+              width="85%"><TBODY>
+              <TR>
+                <TD vAlign=top>
+                  <H5 class=p1><IMG height=16 
+                  src="Редактирование.files/copy.gif" width=16 NOSAVE> Меню 
+                  редактирования</H5><SPAN class=bigright><IMG height=16 
+                  src="Редактирование.files/copy.gif" width=16 NOSAVE> <B>Copy 
+                  (Копирование) (Ctrl-C)</B> </SPAN><BR><SPAN class=p>Окно 
+                  исходного кода поддерживает Windows Clipboard. Пользователь 
+                  может выбрать часть (или весь) текст находящийся в окне 
+                  исходного кода и скопировать его при помощи Windows Clipboard 
+                  выбрав COPY в меню EDIT. </SPAN>
+                  <P><B class=bigright>Find (Поиск) (Ctrl-S)</B> <BR><SPAN 
+                  class=p>Окно исходного кода поддерживает свободный поиск 
+                  текста в данном или всех модулях. Первое найденое значение 
+                  выделяется. </SPAN>
+                  <P><B class=bigright>Find Next (Искать далее)</B> <BR><SPAN 
+                  class=p>Нажмите искать далее (Нажмите кнопку или клавиши 
+                  Ctrl-N), чтобы найти следующее значение. </SPAN>
+                  <P class=p1>&nbsp;</P>
+                  <H5 class=p1>&nbsp;</H5>
+                  <P class=p1><IMG height=16 src="Редактирование.files/up.gif" 
+                  width=16 NOSAVE> <A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/user_guide.html">Вернуться 
+                  в руководство пользователя AVR 
+            Studio</A></P></TD></TR></TBODY></TABLE>
+            <P><IMG height=31 src="Редактирование.files/textbott.gif" 
+            width=569></P></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE><BR><MAP 
+name=Map><AREA alt="Письмо Web-дизайнеру" coords=343,14,373,26 
+  href="mailto:lebedevden@yahoo.com" shape=RECT 
+  title="Письмо Web-дизайнеру"><AREA coords=32,21,10 
+  href="http://digitallab.kiev.ua/avr-stud/userguide/edit_menu.html#top" 
+  shape=CIRCLE></MAP>
+<TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
+  <TBODY>
+  <TR>
+    <TD align=middle background=Редактирование.files/bottine.gif height=45>
+      <TABLE border=0 cellPadding=0 cellSpacing=0 height=45 width=419>
+        <TBODY>
+        <TR>
+          <TD vAlign=bottom><IMG alt="Web-design -- Denis Y. Lebedev" border=0 
+            height=45 src="Редактирование.files/myname.gif" useMap=#Map 
+            width=419></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<SCRIPT><!-- 
+</SCRIPT>
+</BODY></HTML>

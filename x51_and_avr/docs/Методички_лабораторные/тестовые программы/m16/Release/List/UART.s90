@@ -1,0 +1,256 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     21/May/2007  11:45:21 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m16\UART.c                                /
+//    Command line =  --cpu=m16 -mt -o D:\stend\src\m16\Release\Obj\ -D      /
+//                    NDEBUG -lb D:\stend\src\m16\Release\List\              /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m16\UART.c              /
+//    List file    =  D:\stend\src\m16\Release\List\UART.s90                 /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME UART
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        EXTERN ?EPILOGUE_B4_L09
+        EXTERN ?EPILOGUE_B5_L09
+        EXTERN ?PROLOGUE4_L09
+        EXTERN ?PROLOGUE5_L09
+        EXTERN ?Register_R4_is_cg_reg
+
+        PUBLIC UART_init
+        PUBLIC UART_receivebyte
+        PUBLIC UART_receiveline
+        PUBLIC UART_receivevalue
+        PUBLIC UART_sendbyte
+        PUBLIC UART_sendcrlf
+        PUBLIC UART_sendstring
+        PUBLIC UART_sendstring_flash
+        PUBLIC UART_sendvalue
+        PUBWEAK _A_UBRRH
+        PUBWEAK _A_UBRRL
+        PUBWEAK _A_UCSRA
+        PUBWEAK _A_UCSRB
+        PUBWEAK _A_UDR
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+        PUBLIC crlf
+
+        EXTERN ByteToString
+        EXTERN StringToByte
+
+
+        RSEG NEAR_F:CODE:NOROOT(0)
+crlf:
+        DB "\015\012"
+
+        RSEG CODE:CODE:NOROOT(1)
+UART_init:
+        OUT	0x09, R16
+        OUT	0x20, R17
+        SBI	0x0A, 0x04
+        SBI	0x0A, 0x03
+        SBI	0x0A, 0x07
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+UART_sendbyte:
+??UART_sendbyte_0:
+        SBIS	0x0B, 0x05
+        RJMP	??UART_sendbyte_0
+        OUT	0x0C, R16
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+UART_sendstring:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R25, R16
+        LDI	R24, 0
+        RJMP	??UART_sendstring_0
+??UART_sendstring_1:
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_2:
+        INC	R24
+??UART_sendstring_0:
+        MOV	R30, R25
+        ADD	R30, R24
+        LDI	R31, 0
+        LD	R16, Z
+        TST	R16
+        BRNE	??UART_sendstring_1
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+UART_sendstring_flash:
+        CALL	?PROLOGUE4_L09
+        MOVW	R25:R24, R17:R16
+        LDI	R26, 0
+        RJMP	??UART_sendstring_flash_0
+??UART_sendstring_flash_1:
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_1:
+        INC	R26
+??UART_sendstring_flash_0:
+        LDI	R27, 0
+        MOVW	R31:R30, R25:R24
+        ADD	R30, R26
+        ADC	R31, R27
+        LPM	R16, Z
+        TST	R16
+        BRNE	??UART_sendstring_flash_1
+        LDI	R30, 4
+        JMP	?EPILOGUE_B4_L09
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine0:
+        RJMP	UART_sendbyte
+
+        RSEG CODE:CODE:NOROOT(1)
+UART_sendvalue:
+        SUBI	R28, 4
+        MOV	R17, R28
+        CALL	ByteToString
+        MOV	R16, R28
+        RCALL	UART_sendstring
+        SUBI	R28, 252
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+UART_sendcrlf:
+        LDI	R16, LOW(crlf)
+        LDI	R17, (crlf) >> 8
+        RJMP	UART_sendstring_flash
+
+        RSEG CODE:CODE:NOROOT(1)
+UART_receivebyte:
+??UART_receivebyte_0:
+        SBIS	0x0B, 0x07
+        RJMP	??UART_receivebyte_0
+        IN	R16, 0x0C
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+UART_receiveline:
+        CALL	?PROLOGUE5_L09
+        REQUIRE	?Register_R4_is_cg_reg
+        MOV	R25, R16
+        MOV	R24, R17
+        LDI	R27, 0
+        RJMP	??UART_receiveline_0
+??UART_receiveline_1:
+        INC	R27
+??UART_receiveline_0:
+        RCALL	UART_receivebyte
+        MOV	R4, R16
+        MOV	R26, R25
+        ADD	R26, R27
+        SUBI	R16, 10
+        BREQ	??UART_receiveline_2
+        SUBI	R16, 3
+        BRNE	??UART_receiveline_3
+??UART_receiveline_2:
+        LDI	R16, 0
+        MOV	R30, R26
+        LDI	R31, 0
+        ST	Z, R16
+        LDI	R16, LOW(crlf)
+        LDI	R17, (crlf) >> 8
+        RCALL	UART_sendstring_flash
+        RJMP	??UART_receiveline_4
+??UART_receiveline_3:
+        MOV	R16, R4
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_0:
+        MOV	R18, R27
+        LDI	R19, 0
+        MOV	R16, R24
+        LDI	R17, 0
+        SUBI	R16, 1
+        SBCI	R17, 0
+        CP	R18, R16
+        CPC	R19, R17
+        MOV	R30, R26
+        LDI	R31, 0
+        ST	Z, R4
+        BRLT	??UART_receiveline_1
+        INC	R27
+        ADD	R25, R27
+        MOV	R30, R25
+        ST	Z, R19
+??UART_receiveline_4:
+        LDI	R30, 5
+        JMP	?EPILOGUE_B5_L09
+
+        RSEG CODE:CODE:NOROOT(1)
+UART_receivevalue:
+        SUBI	R28, 20
+        LDI	R17, 20
+        MOV	R16, R28
+        RCALL	UART_receiveline
+        MOV	R16, R28
+        CALL	StringToByte
+        SUBI	R28, 236
+        RET
+
+        ASEGN ABSOLUTE:DATA:NOROOT,040H
+// union <unnamed> volatile __io _A_UBRRH
+_A_UBRRH:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,02cH
+// union <unnamed> volatile __io _A_UDR
+_A_UDR:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,02bH
+// union <unnamed> volatile __io _A_UCSRA
+_A_UCSRA:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,02aH
+// union <unnamed> volatile __io _A_UCSRB
+_A_UCSRB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,029H
+// union <unnamed> volatile __io _A_UBRRL
+_A_UBRRL:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+//   5 bytes in segment ABSOLUTE
+// 224 bytes in segment CODE
+//   3 bytes in segment NEAR_F
+// 
+// 227 bytes of CODE memory
+//   0 bytes of DATA memory (+ 5 bytes shared)
+//
+//Errors: none
+//Warnings: none

@@ -1,0 +1,240 @@
+C51 COMPILER V7.20   CONVERT                                                               05/08/2007 12:58:50 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE CONVERT
+OBJECT MODULE PLACED IN CONVERT.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE CONVERT.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include "Convert.h"
+   2          #include <string.h>
+   3          
+   4          /*unsigned char StringToByte( char* str )
+   5          {
+   6                  unsigned char value = 0, coeff = 1;
+   7                  int len = strlen( str );
+   8                  
+   9                  for( signed char i = len - 1; i >= 0 && i >= len - 3; i-- )
+  10                  {
+  11                          value += ( str[ i ] - '0' ) * coeff;
+  12                          coeff *= 10;
+  13                  }
+  14                  
+  15                  return value;
+  16          }
+  17          
+  18          unsigned char ByteToString( unsigned char value, char str[] )
+  19          {
+  20                  unsigned char nIndex = 0, digit, startFlag = 0;
+  21          
+  22                  if( value != 0 )
+  23                          for( unsigned char d = 100; d > 0; d /= 10 )
+  24                          {
+  25                                  if( startFlag || value >= d )
+  26                                  {
+  27                                          digit = value / d;
+  28                                          str[ nIndex++ ] = digit + '0';
+  29                                          value -= digit * d;
+  30                                          startFlag = 1;
+  31                                  }
+  32                          }
+  33                  else
+  34                          str[ nIndex++ ] = '0';
+  35                                  
+  36                  str[ nIndex ] = 0;
+  37                  
+  38                  return nIndex;
+  39          }
+  40          */
+  41          
+  42          unsigned char ShortToString( signed short value, char str[] )
+  43          {
+  44   1              unsigned char nIndex = 0, digit, startFlag = 0;
+  45   1              signed short d;
+  46   1      
+  47   1              if( value < 0 )
+  48   1              {
+  49   2                      str[ nIndex++ ] = '-';
+  50   2                      value *= -1;
+  51   2              }
+  52   1      
+  53   1              if( value != 0 )
+  54   1                      for( d = 10000; d > 0; d /= 10 )
+  55   1                      {
+C51 COMPILER V7.20   CONVERT                                                               05/08/2007 12:58:50 PAGE 2   
+
+  56   2                              if( startFlag || value >= d )
+  57   2                              {
+  58   3                                      digit = value / d;
+  59   3                                      str[ nIndex++ ] = digit + '0';
+  60   3                                      value -= digit * d;
+  61   3                                      startFlag = 1;
+  62   3                              }
+  63   2                      }
+  64   1              else
+  65   1                      str[ nIndex++ ] = '0';
+  66   1                              
+  67   1              str[ nIndex ] = 0;
+  68   1              
+  69   1              return nIndex;
+  70   1      }
+C51 COMPILER V7.20   CONVERT                                                               05/08/2007 12:58:50 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _ShortToString (BEGIN)
+                                           ; SOURCE LINE # 42
+0000 8E00        R     MOV     value,R6
+0002 8F00        R     MOV     value+01H,R7
+0004 8B00        R     MOV     str,R3
+0006 8A00        R     MOV     str+01H,R2
+0008 8900        R     MOV     str+02H,R1
+                                           ; SOURCE LINE # 43
+                                           ; SOURCE LINE # 44
+000A E4                CLR     A
+000B F500        R     MOV     nIndex,A
+000D F500        R     MOV     startFlag,A
+                                           ; SOURCE LINE # 47
+000F C3                CLR     C
+0010 E500        R     MOV     A,value
+0012 6480              XRL     A,#080H
+0014 9480              SUBB    A,#080H
+0016 501D              JNC     ?C0001
+                                           ; SOURCE LINE # 48
+                                           ; SOURCE LINE # 49
+0018 AF00        R     MOV     R7,nIndex
+001A 0500        R     INC     nIndex
+001C 8F82              MOV     DPL,R7
+001E 758300            MOV     DPH,#00H
+0021 742D              MOV     A,#02DH
+0023 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 50
+0026 AE00        R     MOV     R6,value
+0028 AF00        R     MOV     R7,value+01H
+002A 7CFF              MOV     R4,#0FFH
+002C 7DFF              MOV     R5,#0FFH
+002E 120000      E     LCALL   ?C?IMUL
+0031 8E00        R     MOV     value,R6
+0033 8F00        R     MOV     value+01H,R7
+                                           ; SOURCE LINE # 51
+0035         ?C0001:
+                                           ; SOURCE LINE # 53
+0035 E500        R     MOV     A,value+01H
+0037 4500        R     ORL     A,value
+0039 606F              JZ      ?C0002
+                                           ; SOURCE LINE # 54
+003B 750027      R     MOV     d,#027H
+003E 750010      R     MOV     d+01H,#010H
+0041         ?C0003:
+0041 D3                SETB    C
+0042 E500        R     MOV     A,d+01H
+0044 9400              SUBB    A,#00H
+0046 E500        R     MOV     A,d
+0048 6480              XRL     A,#080H
+004A 9480              SUBB    A,#080H
+004C 4070              JC      ?C0008
+                                           ; SOURCE LINE # 55
+                                           ; SOURCE LINE # 56
+004E E500        R     MOV     A,startFlag
+0050 7010              JNZ     ?C0007
+0052 E500        R     MOV     A,value+01H
+0054 9500        R     SUBB    A,d+01H
+0056 E500        R     MOV     A,d
+0058 6480              XRL     A,#080H
+C51 COMPILER V7.20   CONVERT                                                               05/08/2007 12:58:50 PAGE 4   
+
+005A F8                MOV     R0,A
+005B E500        R     MOV     A,value
+005D 6480              XRL     A,#080H
+005F 98                SUBB    A,R0
+0060 4037              JC      ?C0005
+0062         ?C0007:
+                                           ; SOURCE LINE # 57
+                                           ; SOURCE LINE # 58
+0062 AC00        R     MOV     R4,d
+0064 AD00        R     MOV     R5,d+01H
+0066 AE00        R     MOV     R6,value
+0068 AF00        R     MOV     R7,value+01H
+006A 120000      E     LCALL   ?C?SIDIV
+;---- Variable 'digit' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 59
+006D EF                MOV     A,R7
+006E 2430              ADD     A,#030H
+0070 AB00        R     MOV     R3,str
+0072 AA00        R     MOV     R2,str+01H
+0074 A900        R     MOV     R1,str+02H
+0076 AD00        R     MOV     R5,nIndex
+0078 0500        R     INC     nIndex
+007A 8D82              MOV     DPL,R5
+007C 758300            MOV     DPH,#00H
+007F 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 60
+0082 7E00              MOV     R6,#00H
+0084 AC00        R     MOV     R4,d
+0086 AD00        R     MOV     R5,d+01H
+0088 120000      E     LCALL   ?C?IMUL
+008B C3                CLR     C
+008C E500        R     MOV     A,value+01H
+008E 9F                SUBB    A,R7
+008F F500        R     MOV     value+01H,A
+0091 E500        R     MOV     A,value
+0093 9E                SUBB    A,R6
+0094 F500        R     MOV     value,A
+                                           ; SOURCE LINE # 61
+0096 750001      R     MOV     startFlag,#01H
+                                           ; SOURCE LINE # 62
+                                           ; SOURCE LINE # 63
+0099         ?C0005:
+0099 AE00        R     MOV     R6,d
+009B AF00        R     MOV     R7,d+01H
+009D 7C00              MOV     R4,#00H
+009F 7D0A              MOV     R5,#0AH
+00A1 120000      E     LCALL   ?C?SIDIV
+00A4 8E00        R     MOV     d,R6
+00A6 8F00        R     MOV     d+01H,R7
+00A8 8097              SJMP    ?C0003
+00AA         ?C0002:
+                                           ; SOURCE LINE # 65
+00AA AB00        R     MOV     R3,str
+00AC AA00        R     MOV     R2,str+01H
+00AE A900        R     MOV     R1,str+02H
+00B0 AF00        R     MOV     R7,nIndex
+00B2 0500        R     INC     nIndex
+00B4 8F82              MOV     DPL,R7
+00B6 758300            MOV     DPH,#00H
+00B9 7430              MOV     A,#030H
+00BB 120000      E     LCALL   ?C?CSTOPTR
+00BE         ?C0008:
+C51 COMPILER V7.20   CONVERT                                                               05/08/2007 12:58:50 PAGE 5   
+
+                                           ; SOURCE LINE # 67
+00BE AB00        R     MOV     R3,str
+00C0 AA00        R     MOV     R2,str+01H
+00C2 A900        R     MOV     R1,str+02H
+00C4 850082      R     MOV     DPL,nIndex
+00C7 758300            MOV     DPH,#00H
+00CA E4                CLR     A
+00CB 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 69
+00CE AF00        R     MOV     R7,nIndex
+                                           ; SOURCE LINE # 70
+00D0         ?C0009:
+00D0 22                RET     
+             ; FUNCTION _ShortToString (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    209    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       9
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

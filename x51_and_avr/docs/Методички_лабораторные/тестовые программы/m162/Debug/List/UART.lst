@@ -1,0 +1,382 @@
+##############################################################################
+#                                                                            #
+#                                                      23/Apr/2006  02:52:26 #
+# IAR Atmel AVR C/C++ Compiler V4.12A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\UART.c      #
+#    Command line =  F:\Projects\VitalyIgorevich\Packet\src\m162\UART.c      #
+#                    --cpu=m162 -ms -o F:\Projects\VitalyIgorevich\Packet\sr #
+#                    c\m162\Debug\Obj\ -lCN F:\Projects\VitalyIgorevich\Pack #
+#                    et\src\m162\Debug\List\ -y --initializers_in_flash -z9  #
+#                    --cross_call_passes=2 --debug -e -I "E:\Program         #
+#                    Files\IAR Systems\Embedded Workbench 4.0                #
+#                    Evaluation\avr\INC\" -I "E:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 4.0                          #
+#                    Evaluation\avr\INC\CLIB\" --eeprom_size 512             #
+#    List file    =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\List\ #
+#                    UART.lst                                                #
+#    Object file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\Obj\U #
+#                    ART.r90                                                 #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+F:\Projects\VitalyIgorevich\Packet\src\m162\UART.c
+      1          #include "UART.h"
+
+   \                                 In segment ABSOLUTE, at 0x40
+   \   union <unnamed> volatile __io _A_UBRR0H
+   \                     _A_UBRR0H:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x2c
+   \   union <unnamed> volatile __io _A_UDR0
+   \                     _A_UDR0:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x2b
+   \   union <unnamed> volatile __io _A_UCSR0A
+   \                     _A_UCSR0A:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x2a
+   \   union <unnamed> volatile __io _A_UCSR0B
+   \                     _A_UCSR0B:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x29
+   \   union <unnamed> volatile __io _A_UBRR0L
+   \                     _A_UBRR0L:
+   \   00000000                      DS 1
+      2          #include "CONVERT.H"
+      3          
+      4          // Константное значение строки перевода каретки
+
+   \                                 In segment NEAR_F, align 1, keep-with-next
+      5          flash char crlf[] = "\r\n";
+   \                     crlf:
+   \   00000000   0A0D00             DB "\015\012"
+      6          
+      7          // Функция инициализации UART
+
+   \                                 In segment CODE, align 2, keep-with-next
+      8          void UART_init( unsigned short UBRR_value )
+   \                     UART_init:
+      9          {
+     10          	UART_UBRRL = ( unsigned char ) UBRR_value;
+   \   00000000   B909               OUT     0x09, R16
+     11          	UART_UBRRH = ( unsigned char ) ( UBRR_value >> 8 );
+   \   00000002   BD10               OUT     0x20, R17
+     12          	
+     13          	UART_UCSRB_RXEN = 1;
+   \   00000004   9A54               SBI     0x0A, 0x04
+     14          	UART_UCSRB_TXEN = 1;
+   \   00000006   9A53               SBI     0x0A, 0x03
+     15          	UART_UCSRB_RXCIE = 1;
+   \   00000008   9A57               SBI     0x0A, 0x07
+     16          }
+   \   0000000A   9508               RET
+     17          
+     18          // Функция вывода байт в порт UART
+
+   \                                 In segment CODE, align 2, keep-with-next
+     19          void UART_sendbyte( unsigned char data )
+   \                     UART_sendbyte:
+   \                     ??UART_sendbyte_0:
+     20          {
+     21          	while( !UART_UCSRA_UDRE );
+   \   00000000   9B5D               SBIS    0x0B, 0x05
+   \   00000002   CFFE               RJMP    ??UART_sendbyte_0
+     22          	
+     23          	UART_UDR = data;
+   \   00000004   B90C               OUT     0x0C, R16
+     24          }
+   \   00000006   9508               RET
+     25          
+     26          // Функция вывода строки из памяти
+
+   \                                 In segment CODE, align 2, keep-with-next
+     27          void UART_sendstring( char str[] )
+   \                     UART_sendstring:
+     28          {
+   \   00000000   ....               RCALL   ?Subroutine0
+     29          	unsigned char i = 0;
+   \                     ??CrossCallReturnLabel_0:
+   \   00000002   C002               RJMP    ??UART_sendstring_0
+     30          	while( str[ i ] != 0 )
+     31          		UART_sendbyte( str[ i++ ] ); 
+   \                     ??UART_sendstring_1:
+   \   00000004   ....               RCALL   ?Subroutine1
+   \                     ??CrossCallReturnLabel_4:
+   \   00000006   95A3               INC     R26
+   \                     ??UART_sendstring_0:
+   \   00000008   ....               RCALL   ?Subroutine2
+   \                     ??CrossCallReturnLabel_5:
+   \   0000000A   8100               LD      R16, Z
+   \   0000000C   2300               TST     R16
+   \   0000000E   F7D1               BRNE    ??UART_sendstring_1
+     32          }
+   \   00000010                      REQUIRE ?Subroutine3
+   \   00000010                      ;               // Fall through to label ?Subroutine3
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine3:
+   \   00000000   E0E4               LDI     R30, 4
+   \   00000002   ........           JMP     ?EPILOGUE_B4_L09
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine2:
+   \   00000000   E0B0               LDI     R27, 0
+   \   00000002   01FC               MOVW    R31:R30, R25:R24
+   \   00000004   0FEA               ADD     R30, R26
+   \   00000006   1FFB               ADC     R31, R27
+   \   00000008   9508               RET
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine1:
+   \   00000000   ....               RJMP    UART_sendbyte
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine0:
+   \   00000000   ........           CALL    ?PROLOGUE4_L09
+   \   00000004   01C8               MOVW    R25:R24, R17:R16
+   \   00000006   E0A0               LDI     R26, 0
+   \   00000008   9508               RET
+     33          
+     34          // Функция вывода строки из flash
+
+   \                                 In segment CODE, align 2, keep-with-next
+     35          void UART_sendstring_flash( flash char str[] )
+   \                     UART_sendstring_flash:
+     36          {
+   \   00000000   ....               RCALL   ?Subroutine0
+     37          	unsigned char i = 0;
+   \                     ??CrossCallReturnLabel_1:
+   \   00000002   C002               RJMP    ??UART_sendstring_flash_0
+     38          	while( str[ i ] != 0 )
+     39          		UART_sendbyte( str[ i++ ] ); 
+   \                     ??UART_sendstring_flash_1:
+   \   00000004   ....               RCALL   ?Subroutine1
+   \                     ??CrossCallReturnLabel_3:
+   \   00000006   95A3               INC     R26
+   \                     ??UART_sendstring_flash_0:
+   \   00000008   ....               RCALL   ?Subroutine2
+   \                     ??CrossCallReturnLabel_6:
+   \   0000000A   9104               LPM     R16, Z
+   \   0000000C   2300               TST     R16
+   \   0000000E   F7D1               BRNE    ??UART_sendstring_flash_1
+     40          }
+   \   00000010   ....               RJMP    ?Subroutine3
+     41          
+     42          // Функция вывода числового значения
+
+   \                                 In segment CODE, align 2, keep-with-next
+     43          void UART_sendvalue( unsigned char value )
+   \                     UART_sendvalue:
+     44          {
+   \   00000000   9724               SBIW    R29:R28, 4
+     45          	char str[ 4 ];
+     46          	ByteToString( value, str );
+   \   00000002   019E               MOVW    R19:R18, R29:R28
+   \   00000004   ........           CALL    ByteToString
+     47          	UART_sendstring( str );
+   \   00000008   018E               MOVW    R17:R16, R29:R28
+   \   0000000A   ....               RCALL   UART_sendstring
+     48          }
+   \   0000000C   9624               ADIW    R29:R28, 4
+   \   0000000E   9508               RET
+     49          
+     50          // Функция вывода символа(ов) перевода каретки
+
+   \                                 In segment CODE, align 2, keep-with-next
+     51          void UART_sendcrlf()
+   \                     UART_sendcrlf:
+     52          {
+     53          	UART_sendstring_flash( crlf );
+   \   00000000   ....               LDI     R16, LOW(crlf)
+   \   00000002   ....               LDI     R17, (crlf) >> 8
+   \   00000004   ....               RJMP    UART_sendstring_flash
+     54          }
+     55          
+     56          // Функция получения байта
+
+   \                                 In segment CODE, align 2, keep-with-next
+     57          unsigned char UART_receivebyte()
+   \                     UART_receivebyte:
+   \                     ??UART_receivebyte_0:
+     58          {
+     59          	while( !UART_UCSRA_RXC );
+   \   00000000   9B5F               SBIS    0x0B, 0x07
+   \   00000002   CFFE               RJMP    ??UART_receivebyte_0
+     60          	
+     61          	return UART_UDR;
+   \   00000004   B10C               IN      R16, 0x0C
+   \   00000006   9508               RET
+     62          }
+     63          
+     64          // Функция получения линии
+
+   \                                 In segment CODE, align 2, keep-with-next
+     65          void UART_receiveline( char* pStr, unsigned char maxsize )
+   \                     UART_receiveline:
+     66          {
+   \   00000000   ........           CALL    ?PROLOGUE10_L09
+   \   00000004                      REQUIRE ?Register_R4_is_cg_reg
+   \   00000004                      REQUIRE ?Register_R5_is_cg_reg
+   \   00000004                      REQUIRE ?Register_R6_is_cg_reg
+   \   00000004                      REQUIRE ?Register_R8_is_cg_reg
+   \   00000004                      REQUIRE ?Register_R9_is_cg_reg
+   \   00000004   01C8               MOVW    R25:R24, R17:R16
+   \   00000006   2E42               MOV     R4, R18
+     67          	unsigned char byte, nIndex = 0;
+   \   00000008   2466               CLR     R6
+     68          	unsigned char flag = 0;
+   \   0000000A   C003               RJMP    ??UART_receiveline_0
+     69          
+     70          	while( !flag )
+     71          	{
+     72          		byte = UART_receivebyte();
+     73          		switch( byte ) {
+     74          		case '\r':
+     75          		case '\n':
+     76          			pStr[ nIndex ] = 0;
+     77          			flag = 1;
+     78          			UART_sendcrlf();
+     79          			break;
+     80          		default:
+     81          			UART_sendbyte( byte );
+     82          			if( nIndex < maxsize - 1 )
+     83          				pStr[ nIndex++ ] = byte;
+   \                     ??UART_receiveline_1:
+   \   0000000C   01FD               MOVW    R31:R30, R27:R26
+   \   0000000E   8250               ST      Z, R5
+   \   00000010   9463               INC     R6
+   \                     ??UART_receiveline_0:
+   \   00000012   ....               RCALL   UART_receivebyte
+   \   00000014   2E50               MOV     R5, R16
+   \   00000016   2C86               MOV     R8, R6
+   \   00000018   2499               CLR     R9
+   \   0000001A   01DC               MOVW    R27:R26, R25:R24
+   \   0000001C   0DA6               ADD     R26, R6
+   \   0000001E   1DB9               ADC     R27, R9
+   \   00000020   500A               SUBI    R16, 10
+   \   00000022   F011               BREQ    ??UART_receiveline_2
+   \   00000024   5003               SUBI    R16, 3
+   \   00000026   F429               BRNE    ??UART_receiveline_3
+   \                     ??UART_receiveline_2:
+   \   00000028   929C               ST      X, R9
+   \   0000002A   ....               LDI     R16, LOW(crlf)
+   \   0000002C   ....               LDI     R17, (crlf) >> 8
+   \   0000002E   ....               RCALL   UART_sendstring_flash
+   \   00000030   C00E               RJMP    ??UART_receiveline_4
+   \                     ??UART_receiveline_3:
+   \   00000032   2D05               MOV     R16, R5
+   \   00000034   ....               RCALL   ?Subroutine1
+   \                     ??CrossCallReturnLabel_2:
+   \   00000036   2DE4               MOV     R30, R4
+   \   00000038   E0F0               LDI     R31, 0
+   \   0000003A   9731               SBIW    R31:R30, 1
+   \   0000003C   168E               CP      R8, R30
+   \   0000003E   069F               CPC     R9, R31
+   \   00000040   F32C               BRLT    ??UART_receiveline_1
+     84          			else
+     85          			{
+     86          				pStr[ nIndex++ ] = byte;
+   \   00000042   925C               ST      X, R5
+     87          				pStr[ nIndex ] = 0;
+   \   00000044   9463               INC     R6
+   \   00000046   0D86               ADD     R24, R6
+   \   00000048   1D99               ADC     R25, R9
+   \   0000004A   01FC               MOVW    R31:R30, R25:R24
+   \   0000004C   8290               ST      Z, R9
+     88          				flag = 1;
+     89          			}
+     90          			break;
+     91          		}
+     92          	}
+     93          }
+   \                     ??UART_receiveline_4:
+   \   0000004E   E0EA               LDI     R30, 10
+   \   00000050   ........           JMP     ?EPILOGUE_B10_L09
+     94          
+     95          // Функция получения числового значения
+
+   \                                 In segment CODE, align 2, keep-with-next
+     96          unsigned char UART_receivevalue()
+   \                     UART_receivevalue:
+     97          {
+   \   00000000   9764               SBIW    R29:R28, 20
+     98          	char line[ 20 ];
+     99          	
+    100          	UART_receiveline( line, sizeof( line ) );
+   \   00000002   E124               LDI     R18, 20
+   \   00000004   018E               MOVW    R17:R16, R29:R28
+   \   00000006   ....               RCALL   UART_receiveline
+    101          	
+    102          	return StringToByte( line );
+   \   00000008   018E               MOVW    R17:R16, R29:R28
+   \   0000000A   ........           CALL    StringToByte
+   \   0000000E   9664               ADIW    R29:R28, 20
+   \   00000010   9508               RET
+    103          }
+
+   Maximum stack usage in bytes:
+
+     Function                   CSTACK RSTACK
+     --------                   ------ ------
+     UART_init                      0      2
+     UART_receivebyte               0      2
+     UART_receiveline              10      2
+       -> UART_receivebyte         10      2
+       -> UART_sendstring_flash    10      2
+       -> UART_sendbyte            10      2
+     UART_receivevalue             20      2
+       -> UART_receiveline         20      2
+       -> StringToByte             20      2
+     UART_sendbyte                  0      2
+     UART_sendcrlf                  0      2
+       -> UART_sendstring_flash     0      2
+     UART_sendstring                4      2
+       -> UART_sendbyte             4      2
+     UART_sendstring_flash          4      2
+       -> UART_sendbyte             4      2
+     UART_sendvalue                 4      2
+       -> ByteToString              4      2
+       -> UART_sendstring           4      2
+
+
+   Segment part sizes:
+
+     Function/Label        Bytes
+     --------------        -----
+     _A_UBRR0H                1
+     _A_UDR0                  1
+     _A_UCSR0A                1
+     _A_UCSR0B                1
+     _A_UBRR0L                1
+     crlf                     3
+     UART_init               12
+     ??UART_sendbyte_0        8
+     UART_sendstring         16
+     ?Subroutine3             6
+     ?Subroutine2            10
+     ?Subroutine1             2
+     ?Subroutine0            10
+     UART_sendstring_flash   18
+     UART_sendvalue          16
+     UART_sendcrlf            6
+     ??UART_receivebyte_0     8
+     UART_receiveline        84
+     UART_receivevalue       18
+
+ 
+   5 bytes in segment ABSOLUTE
+ 214 bytes in segment CODE
+   3 bytes in segment NEAR_F
+ 
+ 217 bytes of CODE memory
+   0 bytes of DATA memory (+ 5 bytes shared)
+
+Errors: none
+Warnings: none

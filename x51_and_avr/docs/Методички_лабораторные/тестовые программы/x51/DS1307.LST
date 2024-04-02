@@ -1,0 +1,492 @@
+C51 COMPILER V7.20   DS1307                                                                05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE DS1307
+OBJECT MODULE PLACED IN DS1307.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE DS1307.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include "DS1307.h"
+   2          #include "I2C.h"
+   3          #include "DELAY.h"
+   4          
+   5          unsigned char Clock_Init[] = {0x00, 0x00, 0x23, 0x02, 0x19, 0x04, 0x05};
+   6          
+   7          void DS1307_write(unsigned char addr, unsigned char value)
+   8          {
+   9   1              I2C_start();
+  10   1              I2C_write(0xd0);
+  11   1              I2C_write(addr);
+  12   1              I2C_write(value);
+  13   1              I2C_stop();
+  14   1      }
+  15          
+  16          unsigned char DS1307_read(unsigned char addr)
+  17          {
+  18   1              unsigned char value;  
+  19   1              I2C_start();
+  20   1              I2C_write(0xd0);        // команда записи
+  21   1              I2C_write(addr);        // установка адреса
+  22   1              I2C_stop();
+  23   1      
+  24   1              DELAY_MCS(68);
+  25   1      
+  26   1              I2C_start(); 
+  27   1              I2C_write(0xd1);         // запись данных
+  28   1              value = I2C_read();
+  29   1              I2C_stop();
+  30   1      
+  31   1              return value;
+  32   1      }
+  33          
+  34          void DS1307_init()
+  35          {
+  36   1              unsigned char i;
+  37   1              if(DS1307_read(0x08) != 0x44)           // Если часы не инициализированы
+  38   1              {
+  39   2                      for(i = 7; i != 0; i--) 
+  40   2                              DS1307_write(i - 1, Clock_Init[i - 1]);
+  41   2                      DS1307_write(0x00, 0x00);
+  42   2      
+  43   2                      DS1307_write(0x08, 0x44);               // Чтобы больше сюда не входить
+  44   2              }
+  45   1      }
+  46          
+  47          void DS1307_gettime(char* timestr)
+  48          {
+  49   1              unsigned char value;
+  50   1      
+  51   1              value = DS1307_read(2);                                 // Читаем часы
+  52   1              timestr[0] = (value >> 4) + '0';
+  53   1              timestr[1] = (value & 0x0F) + '0';
+  54   1              timestr[2] = ':';
+  55   1      
+C51 COMPILER V7.20   DS1307                                                                05/08/2007 12:58:49 PAGE 2   
+
+  56   1              value = DS1307_read(1);                                 // Читаем минуты
+  57   1              timestr[3] = (value >> 4) + '0';
+  58   1              timestr[4] = (value & 0x0F) + '0';
+  59   1              timestr[5] = ':';
+  60   1      
+  61   1              value = DS1307_read(0);                                 // Читаем секунды
+  62   1              if(value & 0x80)
+  63   1                      DS1307_write(0, 0);                                     // Чтобы не зависали часы       
+  64   1              timestr[6] = (value >> 4) + '0';
+  65   1              timestr[7] = (value & 0x0F) + '0';
+  66   1              timestr[8] = 0;
+  67   1      }
+  68          
+  69          void DS1307_getdate(char* datestr)
+  70          {
+  71   1              unsigned char value;
+  72   1      
+  73   1              value = DS1307_read(4);                                 // Читаем день(число)
+  74   1              datestr[0] = (value >> 4) + '0';
+  75   1              datestr[1] = (value & 0x0F) + '0';
+  76   1              datestr[2] = '.';
+  77   1      
+  78   1              value = DS1307_read(5);                                 // Читаем месяц
+  79   1              datestr[3] = (value >> 4) + '0';
+  80   1              datestr[4] = (value & 0x0F) + '0';
+  81   1              datestr[5] = '.';
+  82   1      
+  83   1              value = DS1307_read(6);                                 // Читаем год
+  84   1              datestr[6] = (value >> 4) + '0';
+  85   1              datestr[7] = (value & 0x0F) + '0';
+  86   1              datestr[8] = 0;
+  87   1      }
+  88          
+  89          unsigned char ByteToBCD( unsigned char value )
+  90          {
+  91   1              return ( ( value / 10 ) << 4 ) + ( value % 10 );
+  92   1      }
+  93          
+  94          // Функция задания значения времени
+  95          void DS1307_settime( unsigned char hour, unsigned char minute, unsigned char second )
+  96          {
+  97   1              DS1307_write( 2, ByteToBCD( hour ) );
+  98   1              DS1307_write( 1, ByteToBCD( minute ) );
+  99   1              DS1307_write( 0, ByteToBCD( second ) );
+ 100   1      }
+ 101          
+ 102          
+ 103          // Функция задания значения даты
+ 104          void DS1307_setdate( unsigned char day, unsigned char month, unsigned char year )
+ 105          {
+ 106   1              DS1307_write( 6, ByteToBCD( year ) );
+ 107   1              DS1307_write( 5, ByteToBCD( month ) );
+ 108   1              DS1307_write( 4, ByteToBCD( day ) );
+ 109   1      }
+ 110          
+ 111          
+C51 COMPILER V7.20   DS1307                                                                05/08/2007 12:58:49 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _DS1307_write (BEGIN)
+                                           ; SOURCE LINE # 7
+0000 8F00        R     MOV     addr,R7
+0002 8D00        R     MOV     value,R5
+                                           ; SOURCE LINE # 8
+                                           ; SOURCE LINE # 9
+0004 120000      E     LCALL   I2C_start
+                                           ; SOURCE LINE # 10
+0007 7FD0              MOV     R7,#0D0H
+0009 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 11
+000C AF00        R     MOV     R7,addr
+000E 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 12
+0011 AF00        R     MOV     R7,value
+0013 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 13
+0016 020000      E     LJMP    I2C_stop
+             ; FUNCTION _DS1307_write (END)
+
+             ; FUNCTION _DS1307_read (BEGIN)
+                                           ; SOURCE LINE # 16
+0000 8F00        R     MOV     addr,R7
+                                           ; SOURCE LINE # 17
+                                           ; SOURCE LINE # 19
+0002 120000      E     LCALL   I2C_start
+                                           ; SOURCE LINE # 20
+0005 7FD0              MOV     R7,#0D0H
+0007 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 21
+000A AF00        R     MOV     R7,addr
+000C 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 22
+000F 120000      E     LCALL   I2C_stop
+                                           ; SOURCE LINE # 24
+0012 7F06              MOV     R7,#06H
+0014 7E00              MOV     R6,#00H
+0016 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 26
+0019 120000      E     LCALL   I2C_start
+                                           ; SOURCE LINE # 27
+001C 7FD1              MOV     R7,#0D1H
+001E 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 28
+0021 120000      E     LCALL   I2C_read
+0024 8F00        R     MOV     value,R7
+                                           ; SOURCE LINE # 29
+0026 120000      E     LCALL   I2C_stop
+                                           ; SOURCE LINE # 31
+0029 AF00        R     MOV     R7,value
+                                           ; SOURCE LINE # 32
+002B         ?C0002:
+002B 22                RET     
+             ; FUNCTION _DS1307_read (END)
+
+             ; FUNCTION DS1307_init (BEGIN)
+                                           ; SOURCE LINE # 34
+                                           ; SOURCE LINE # 35
+                                           ; SOURCE LINE # 37
+C51 COMPILER V7.20   DS1307                                                                05/08/2007 12:58:49 PAGE 4   
+
+0000 7F08              MOV     R7,#08H
+0002 120000      R     LCALL   _DS1307_read
+0005 EF                MOV     A,R7
+0006 6444              XRL     A,#044H
+0008 6021              JZ      ?C0007
+                                           ; SOURCE LINE # 38
+                                           ; SOURCE LINE # 39
+000A 750007      R     MOV     i,#07H
+000D         ?C0004:
+                                           ; SOURCE LINE # 40
+000D E500        R     MOV     A,i
+000F 14                DEC     A
+0010 FF                MOV     R7,A
+0011 7400        R     MOV     A,#LOW Clock_Init+0FFFFH
+0013 2500        R     ADD     A,i
+0015 F8                MOV     R0,A
+0016 E6                MOV     A,@R0
+0017 FD                MOV     R5,A
+0018 120000      R     LCALL   _DS1307_write
+001B D500EF      R     DJNZ    i,?C0004
+001E         ?C0005:
+                                           ; SOURCE LINE # 41
+001E E4                CLR     A
+001F FD                MOV     R5,A
+0020 FF                MOV     R7,A
+0021 120000      R     LCALL   _DS1307_write
+                                           ; SOURCE LINE # 43
+0024 7D44              MOV     R5,#044H
+0026 7F08              MOV     R7,#08H
+0028 120000      R     LCALL   _DS1307_write
+                                           ; SOURCE LINE # 44
+                                           ; SOURCE LINE # 45
+002B         ?C0007:
+002B 22                RET     
+             ; FUNCTION DS1307_init (END)
+
+             ; FUNCTION _DS1307_gettime (BEGIN)
+                                           ; SOURCE LINE # 47
+0000 8B00        R     MOV     timestr,R3
+0002 8A00        R     MOV     timestr+01H,R2
+0004 8900        R     MOV     timestr+02H,R1
+                                           ; SOURCE LINE # 48
+                                           ; SOURCE LINE # 51
+0006 7F02              MOV     R7,#02H
+0008 120000      R     LCALL   _DS1307_read
+000B 8F00        R     MOV     value,R7
+                                           ; SOURCE LINE # 52
+000D E500        R     MOV     A,value
+000F C4                SWAP    A
+0010 540F              ANL     A,#0FH
+0012 2430              ADD     A,#030H
+0014 AB00        R     MOV     R3,timestr
+0016 AA00        R     MOV     R2,timestr+01H
+0018 A900        R     MOV     R1,timestr+02H
+001A 120000      E     LCALL   ?C?CSTPTR
+                                           ; SOURCE LINE # 53
+001D E500        R     MOV     A,value
+001F 540F              ANL     A,#0FH
+0021 2430              ADD     A,#030H
+0023 AB00        R     MOV     R3,timestr
+0025 AA00        R     MOV     R2,timestr+01H
+0027 A900        R     MOV     R1,timestr+02H
+C51 COMPILER V7.20   DS1307                                                                05/08/2007 12:58:49 PAGE 5   
+
+0029 900001            MOV     DPTR,#01H
+002C 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 54
+002F 900002            MOV     DPTR,#02H
+0032 743A              MOV     A,#03AH
+0034 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 56
+0037 7F01              MOV     R7,#01H
+0039 120000      R     LCALL   _DS1307_read
+003C 8F00        R     MOV     value,R7
+                                           ; SOURCE LINE # 57
+003E E500        R     MOV     A,value
+0040 C4                SWAP    A
+0041 540F              ANL     A,#0FH
+0043 2430              ADD     A,#030H
+0045 AB00        R     MOV     R3,timestr
+0047 AA00        R     MOV     R2,timestr+01H
+0049 A900        R     MOV     R1,timestr+02H
+004B 900003            MOV     DPTR,#03H
+004E 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 58
+0051 E500        R     MOV     A,value
+0053 540F              ANL     A,#0FH
+0055 2430              ADD     A,#030H
+0057 900004            MOV     DPTR,#04H
+005A 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 59
+005D 900005            MOV     DPTR,#05H
+0060 743A              MOV     A,#03AH
+0062 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 61
+0065 E4                CLR     A
+0066 FF                MOV     R7,A
+0067 120000      R     LCALL   _DS1307_read
+006A 8F00        R     MOV     value,R7
+                                           ; SOURCE LINE # 62
+006C E500        R     MOV     A,value
+006E 30E706            JNB     ACC.7,?C0008
+                                           ; SOURCE LINE # 63
+0071 E4                CLR     A
+0072 FD                MOV     R5,A
+0073 FF                MOV     R7,A
+0074 120000      R     LCALL   _DS1307_write
+0077         ?C0008:
+                                           ; SOURCE LINE # 64
+0077 E500        R     MOV     A,value
+0079 C4                SWAP    A
+007A 540F              ANL     A,#0FH
+007C 2430              ADD     A,#030H
+007E AB00        R     MOV     R3,timestr
+0080 AA00        R     MOV     R2,timestr+01H
+0082 A900        R     MOV     R1,timestr+02H
+0084 900006            MOV     DPTR,#06H
+0087 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 65
+008A E500        R     MOV     A,value
+008C 540F              ANL     A,#0FH
+008E 2430              ADD     A,#030H
+0090 900007            MOV     DPTR,#07H
+0093 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 66
+0096 900008            MOV     DPTR,#08H
+C51 COMPILER V7.20   DS1307                                                                05/08/2007 12:58:49 PAGE 6   
+
+0099 E4                CLR     A
+009A 020000      E     LJMP    ?C?CSTOPTR
+             ; FUNCTION _DS1307_gettime (END)
+
+             ; FUNCTION _DS1307_getdate (BEGIN)
+                                           ; SOURCE LINE # 69
+0000 8B00        R     MOV     datestr,R3
+0002 8A00        R     MOV     datestr+01H,R2
+0004 8900        R     MOV     datestr+02H,R1
+                                           ; SOURCE LINE # 70
+                                           ; SOURCE LINE # 73
+0006 7F04              MOV     R7,#04H
+0008 120000      R     LCALL   _DS1307_read
+;---- Variable 'value' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 74
+000B EF                MOV     A,R7
+000C C4                SWAP    A
+000D 540F              ANL     A,#0FH
+000F 2430              ADD     A,#030H
+0011 AB00        R     MOV     R3,datestr
+0013 AA00        R     MOV     R2,datestr+01H
+0015 A900        R     MOV     R1,datestr+02H
+0017 120000      E     LCALL   ?C?CSTPTR
+                                           ; SOURCE LINE # 75
+001A EF                MOV     A,R7
+001B 540F              ANL     A,#0FH
+001D 2430              ADD     A,#030H
+001F AB00        R     MOV     R3,datestr
+0021 AA00        R     MOV     R2,datestr+01H
+0023 A900        R     MOV     R1,datestr+02H
+0025 900001            MOV     DPTR,#01H
+0028 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 76
+002B 900002            MOV     DPTR,#02H
+002E 742E              MOV     A,#02EH
+0030 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 78
+0033 7F05              MOV     R7,#05H
+0035 120000      R     LCALL   _DS1307_read
+                                           ; SOURCE LINE # 79
+0038 EF                MOV     A,R7
+0039 C4                SWAP    A
+003A 540F              ANL     A,#0FH
+003C 2430              ADD     A,#030H
+003E AB00        R     MOV     R3,datestr
+0040 AA00        R     MOV     R2,datestr+01H
+0042 A900        R     MOV     R1,datestr+02H
+0044 900003            MOV     DPTR,#03H
+0047 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 80
+004A EF                MOV     A,R7
+004B 540F              ANL     A,#0FH
+004D 2430              ADD     A,#030H
+004F 900004            MOV     DPTR,#04H
+0052 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 81
+0055 900005            MOV     DPTR,#05H
+0058 742E              MOV     A,#02EH
+005A 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 83
+005D 7F06              MOV     R7,#06H
+005F 120000      R     LCALL   _DS1307_read
+C51 COMPILER V7.20   DS1307                                                                05/08/2007 12:58:49 PAGE 7   
+
+                                           ; SOURCE LINE # 84
+0062 EF                MOV     A,R7
+0063 C4                SWAP    A
+0064 540F              ANL     A,#0FH
+0066 2430              ADD     A,#030H
+0068 AB00        R     MOV     R3,datestr
+006A AA00        R     MOV     R2,datestr+01H
+006C A900        R     MOV     R1,datestr+02H
+006E 900006            MOV     DPTR,#06H
+0071 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 85
+0074 EF                MOV     A,R7
+0075 540F              ANL     A,#0FH
+0077 2430              ADD     A,#030H
+0079 900007            MOV     DPTR,#07H
+007C 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 86
+007F 900008            MOV     DPTR,#08H
+0082 E4                CLR     A
+0083 020000      E     LJMP    ?C?CSTOPTR
+             ; FUNCTION _DS1307_getdate (END)
+
+             ; FUNCTION _ByteToBCD (BEGIN)
+                                           ; SOURCE LINE # 89
+;---- Variable 'value' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 90
+                                           ; SOURCE LINE # 91
+0000 EF                MOV     A,R7
+0001 75F00A            MOV     B,#0AH
+0004 84                DIV     AB
+0005 C4                SWAP    A
+0006 54F0              ANL     A,#0F0H
+0008 FE                MOV     R6,A
+0009 EF                MOV     A,R7
+000A 75F00A            MOV     B,#0AH
+000D 84                DIV     AB
+000E E5F0              MOV     A,B
+0010 2E                ADD     A,R6
+0011 FF                MOV     R7,A
+                                           ; SOURCE LINE # 92
+0012         ?C0011:
+0012 22                RET     
+             ; FUNCTION _ByteToBCD (END)
+
+             ; FUNCTION _DS1307_settime (BEGIN)
+                                           ; SOURCE LINE # 95
+0000 8D00        R     MOV     minute,R5
+0002 8B00        R     MOV     second,R3
+;---- Variable 'hour' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 96
+                                           ; SOURCE LINE # 97
+0004 120000      R     LCALL   _ByteToBCD
+0007 AD07              MOV     R5,AR7
+0009 7F02              MOV     R7,#02H
+000B 120000      R     LCALL   _DS1307_write
+                                           ; SOURCE LINE # 98
+000E AF00        R     MOV     R7,minute
+0010 120000      R     LCALL   _ByteToBCD
+0013 AD07              MOV     R5,AR7
+0015 7F01              MOV     R7,#01H
+0017 120000      R     LCALL   _DS1307_write
+                                           ; SOURCE LINE # 99
+C51 COMPILER V7.20   DS1307                                                                05/08/2007 12:58:49 PAGE 8   
+
+001A AF00        R     MOV     R7,second
+001C 120000      R     LCALL   _ByteToBCD
+001F AD07              MOV     R5,AR7
+0021 E4                CLR     A
+0022 FF                MOV     R7,A
+0023 020000      R     LJMP    _DS1307_write
+             ; FUNCTION _DS1307_settime (END)
+
+             ; FUNCTION _DS1307_setdate (BEGIN)
+                                           ; SOURCE LINE # 104
+0000 8F00        R     MOV     day,R7
+0002 8D00        R     MOV     month,R5
+;---- Variable 'year' assigned to Register 'R7' ----
+0004 AF03              MOV     R7,AR3
+                                           ; SOURCE LINE # 105
+                                           ; SOURCE LINE # 106
+0006 120000      R     LCALL   _ByteToBCD
+0009 AD07              MOV     R5,AR7
+000B 7F06              MOV     R7,#06H
+000D 120000      R     LCALL   _DS1307_write
+                                           ; SOURCE LINE # 107
+0010 AF00        R     MOV     R7,month
+0012 120000      R     LCALL   _ByteToBCD
+0015 AD07              MOV     R5,AR7
+0017 7F05              MOV     R7,#05H
+0019 120000      R     LCALL   _DS1307_write
+                                           ; SOURCE LINE # 108
+001C AF00        R     MOV     R7,day
+001E 120000      R     LCALL   _ByteToBCD
+0021 AD07              MOV     R5,AR7
+0023 7F04              MOV     R7,#04H
+0025 020000      R     LJMP    _DS1307_write
+             ; FUNCTION _DS1307_setdate (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    501    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      7      16
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

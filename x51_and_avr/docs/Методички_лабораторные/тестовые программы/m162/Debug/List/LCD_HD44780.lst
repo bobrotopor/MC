@@ -1,0 +1,331 @@
+##############################################################################
+#                                                                            #
+#                                                      23/Apr/2006  03:05:41 #
+# IAR Atmel AVR C/C++ Compiler V4.12A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\LCD_HD44780 #
+#                    .c                                                      #
+#    Command line =  F:\Projects\VitalyIgorevich\Packet\src\m162\LCD_HD44780 #
+#                    .c --cpu=m162 -ms -o F:\Projects\VitalyIgorevich\Packet #
+#                    \src\m162\Debug\Obj\ -lCN F:\Projects\VitalyIgorevich\P #
+#                    acket\src\m162\Debug\List\ -y --initializers_in_flash   #
+#                    -z9 --cross_call_passes=2 --debug -e -I "E:\Program     #
+#                    Files\IAR Systems\Embedded Workbench 4.0                #
+#                    Evaluation\avr\INC\" -I "E:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 4.0                          #
+#                    Evaluation\avr\INC\CLIB\" --eeprom_size 512             #
+#    List file    =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\List\ #
+#                    LCD_HD44780.lst                                         #
+#    Object file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\Obj\L #
+#                    CD_HD44780.r90                                          #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+F:\Projects\VitalyIgorevich\Packet\src\m162\LCD_HD44780.c
+      1          #include "LCD_HD44780.h"
+
+   \                                 In segment ABSOLUTE, at 0x32
+   \   union <unnamed> volatile __io _A_PORTD
+   \                     _A_PORTD:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x31
+   \   union <unnamed> volatile __io _A_DDRD
+   \                     _A_DDRD:
+   \   00000000                      DS 1
+      2          #include "SHIFT.h"
+      3          #include "DELAY.h"
+      4          
+      5          // Функция записи байта в LCD
+      6          // Если rs == 0 - режим записи комманд
+      7          // Если rs == 1 - режим записи данных
+
+   \                                 In segment CODE, align 2, keep-with-next
+      8          void LCD_write(unsigned char w_byte, unsigned char rs)
+   \                     LCD_write:
+      9          {
+     10          	if(rs == 0)
+   \   00000000   2311               TST     R17
+   \   00000002   F411               BRNE    ??LCD_write_0
+     11          		LCD_RS_PORT = 0;	// Режим записи команд
+   \   00000004   9893               CBI     0x12, 0x03
+   \   00000006   C001               RJMP    ??LCD_write_1
+     12          	else
+     13          		LCD_RS_PORT = 1;	// Режим записи данных
+   \                     ??LCD_write_0:
+   \   00000008   9A93               SBI     0x12, 0x03
+     14          	
+     15          	LCD_E_PORT = 1;			// Выставляем строб для записи данных
+   \                     ??LCD_write_1:
+   \   0000000A   9A92               SBI     0x12, 0x02
+     16          	
+     17          	SHIFT_write(w_byte);	// Выводим данные в SPI порт
+   \   0000000C   ........           CALL    SHIFT_write
+     18          
+     19          	__no_operation();		// Ждем такт
+   \   00000010   0000               NOP
+     20          	LCD_E_PORT = 0;			// Сбрасываем строб
+   \   00000012   9892               CBI     0x12, 0x02
+     21          
+     22          	DELAY_MCS(500);			// Ждем пока данные будут обработаны
+   \   00000014   EC09               LDI     R16, 201
+   \   00000016   E014               LDI     R17, 4
+   \   00000018                      REQUIRE ?Subroutine5
+   \   00000018                      ;               // Fall through to label ?Subroutine5
+     23          }                          	
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine5:
+   \   00000000   ........           JMP     delay_func_mcs
+     24          
+     25          // Функция инициализации LCD
+
+   \                                 In segment CODE, align 2, keep-with-next
+     26          void LCD_init()
+   \                     LCD_init:
+     27          {
+     28          	LCD_E_DDR = 1;
+   \   00000000   9A8A               SBI     0x11, 0x02
+     29          	LCD_RS_DDR = 1;
+   \   00000002   9A8B               SBI     0x11, 0x03
+     30          	
+     31          	LCD_E_PORT = 0;
+   \   00000004   9892               CBI     0x12, 0x02
+     32          	LCD_RS_PORT = 0;
+   \   00000006   9893               CBI     0x12, 0x03
+     33          	DELAY_MS(41);			// Выдерживаем паузу после подачи питания на LCD
+   \   00000008   E90A               LDI     R16, 154
+   \   0000000A   E011               LDI     R17, 1
+   \   0000000C   ....               RCALL   ?Subroutine7
+     34          	
+     35          	LCD_write(0x30, 0);		// Необходимые действия для инициализации LCD
+   \                     ??CrossCallReturnLabel_8:
+   \   0000000E   E010               LDI     R17, 0
+   \   00000010   E300               LDI     R16, 48
+   \   00000012   ....               RCALL   ?Subroutine6
+     36          	DELAY_MS(5);
+   \                     ??CrossCallReturnLabel_5:
+   \   00000014   E302               LDI     R16, 50
+   \   00000016   ....               RCALL   ?Subroutine2
+     37          	LCD_write(0x30, 0);
+   \                     ??CrossCallReturnLabel_10:
+   \   00000018   ....               RCALL   ?Subroutine0
+     38          	DELAY_MCS(700);
+     39          	LCD_write(0x30, 0);
+   \                     ??CrossCallReturnLabel_1:
+   \   0000001A   ....               RCALL   ?Subroutine0
+     40          	DELAY_MCS(700);
+     41          	LCD_write(0x38, 0);		// Инциализируем LCD: 2 строки, символы 5*7, 8-битный интерфейс
+   \                     ??CrossCallReturnLabel_0:
+   \   0000001C   E010               LDI     R17, 0
+   \   0000001E   E308               LDI     R16, 56
+   \   00000020   ....               RCALL   ?Subroutine6
+     42          	LCD_write(0x01, 0);		// Очищаем экран
+   \                     ??CrossCallReturnLabel_6:
+   \   00000022   ....               RCALL   ?Subroutine1
+     43          	DELAY_MS(3);
+   \                     ??CrossCallReturnLabel_2:
+   \   00000024   E10E               LDI     R16, 30
+   \   00000026   ....               RCALL   ?Subroutine2
+     44          	LCD_write(0x06, 0);     // Задаем направление движения курсора - направо
+   \                     ??CrossCallReturnLabel_9:
+   \   00000028   E010               LDI     R17, 0
+   \   0000002A   E006               LDI     R16, 6
+   \   0000002C   ....               RCALL   ?Subroutine6
+     45          	LCD_write(0x0C, 0);		// Включаем дисплей, выключаем курсор, выключаем мерцание
+   \                     ??CrossCallReturnLabel_7:
+   \   0000002E   E010               LDI     R17, 0
+   \   00000030   E00C               LDI     R16, 12
+   \   00000032   ....               RJMP    ?Subroutine6
+     46          }
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine2:
+   \   00000000   E010               LDI     R17, 0
+   \   00000002                      REQUIRE ?Subroutine7
+   \   00000002                      ;               // Fall through to label ?Subroutine7
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine7:
+   \   00000000   ........           JMP     delay_func_ms
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine0:
+   \   00000000   E010               LDI     R17, 0
+   \   00000002   E300               LDI     R16, 48
+   \   00000004   ....               RCALL   ?Subroutine6
+   \                     ??CrossCallReturnLabel_4:
+   \   00000006   EB05               LDI     R16, 181
+   \   00000008   E016               LDI     R17, 6
+   \   0000000A   ....               RJMP    ?Subroutine5
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine1:
+   \   00000000   E010               LDI     R17, 0
+   \   00000002   E001               LDI     R16, 1
+   \   00000004   ....               RJMP    ?Subroutine6
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine6:
+   \   00000000   ....               RJMP    LCD_write
+     47          
+     48          // Функция очистки экрана LCD
+
+   \                                 In segment CODE, align 2, keep-with-next
+     49          void LCD_clrscr()
+   \                     LCD_clrscr:
+     50          {
+     51          	LCD_write(0x01, 0);
+   \   00000000   ....               RCALL   ?Subroutine1
+     52          	DELAY_MS(5);
+   \                     ??CrossCallReturnLabel_3:
+   \   00000002   E302               LDI     R16, 50
+   \   00000004   E010               LDI     R17, 0
+   \   00000006   ....               RJMP    ?Subroutine7
+     53          }
+     54          
+     55          // Функция установки позиция курсора
+
+   \                                 In segment CODE, align 2, keep-with-next
+     56          void LCD_gotoxy(unsigned char x, unsigned char y)
+   \                     LCD_gotoxy:
+     57          {
+     58          	if(y != 0)
+   \   00000000   2311               TST     R17
+   \   00000002   F009               BREQ    ??LCD_gotoxy_0
+     59          		x += 0x40;
+   \   00000004   5C00               SUBI    R16, 192
+     60          	x |= 0x80;													
+     61          	LCD_write(x, 0);
+   \                     ??LCD_gotoxy_0:
+   \   00000006   E010               LDI     R17, 0
+   \   00000008   6800               ORI     R16, 0x80
+   \   0000000A                      REQUIRE ?Subroutine6
+   \   0000000A                      ;               // Fall through to label ?Subroutine6
+     62          }
+     63          
+     64          // Функия вывода символа на экран
+
+   \                                 In segment CODE, align 2, keep-with-next
+     65          void LCD_printchar( char ch )
+   \                     LCD_printchar:
+     66          {
+     67          	LCD_write( ch, 1 );
+   \   00000000   E011               LDI     R17, 1
+   \   00000002   ....               RJMP    ?Subroutine6
+     68          }
+     69          
+     70          // Функция вывода строки из памяти
+
+   \                                 In segment CODE, align 2, keep-with-next
+     71          void LCD_print( char string[] )				
+   \                     LCD_print:
+     72          {									
+   \   00000000   93BA               ST      -Y, R27
+   \   00000002   93AA               ST      -Y, R26
+   \   00000004   01D8               MOVW    R27:R26, R17:R16
+   \   00000006   C002               RJMP    ??LCD_print_0
+     73          	while((*string) != 0)
+     74          		LCD_printchar(*(string++));
+   \                     ??LCD_print_1:
+   \   00000008   9611               ADIW    R27:R26, 1
+   \   0000000A   ....               RCALL   LCD_printchar
+   \                     ??LCD_print_0:
+   \   0000000C   910C               LD      R16, X
+   \   0000000E   2300               TST     R16
+   \   00000010   F7D9               BRNE    ??LCD_print_1
+     75          }
+   \   00000012   91A9               LD      R26, Y+
+   \   00000014   91B9               LD      R27, Y+
+   \   00000016   9508               RET
+     76          
+     77          // Функция вывода строки из flash
+
+   \                                 In segment CODE, align 2, keep-with-next
+     78          void LCD_print_flash(flash unsigned char string[])
+   \                     LCD_print_flash:
+     79          {
+   \   00000000   939A               ST      -Y, R25
+   \   00000002   938A               ST      -Y, R24
+   \   00000004   01C8               MOVW    R25:R24, R17:R16
+   \   00000006   C003               RJMP    ??LCD_print_flash_0
+     80          		while((*string) != 0)
+     81          		LCD_printchar(*(string++));
+   \                     ??LCD_print_flash_1:
+   \   00000008   9105               LPM     R16, Z+
+   \   0000000A   01CF               MOVW    R25:R24, R31:R30
+   \   0000000C   ....               RCALL   LCD_printchar
+   \                     ??LCD_print_flash_0:
+   \   0000000E   01FC               MOVW    R31:R30, R25:R24
+   \   00000010   9104               LPM     R16, Z
+   \   00000012   2300               TST     R16
+   \   00000014   F7C9               BRNE    ??LCD_print_flash_1
+     82          }
+   \   00000016   9189               LD      R24, Y+
+   \   00000018   9199               LD      R25, Y+
+   \   0000001A   9508               RET
+
+   Maximum stack usage in bytes:
+
+     Function            CSTACK RSTACK
+     --------            ------ ------
+     LCD_clrscr              0      2
+       -> LCD_write          0      2
+       -> delay_func_ms      0      2
+     LCD_gotoxy              0      2
+       -> LCD_write          0      2
+     LCD_init                0      2
+       -> delay_func_ms      0      2
+       -> LCD_write          0      2
+       -> delay_func_ms      0      2
+       -> LCD_write          0      2
+       -> delay_func_mcs     0      2
+       -> LCD_write          0      2
+       -> delay_func_mcs     0      2
+       -> LCD_write          0      2
+       -> LCD_write          0      2
+       -> delay_func_ms      0      2
+       -> LCD_write          0      2
+       -> LCD_write          0      2
+     LCD_print               2      2
+       -> LCD_printchar      2      2
+     LCD_print_flash         2      2
+       -> LCD_printchar      2      2
+     LCD_printchar           0      2
+       -> LCD_write          0      2
+     LCD_write               0      2
+       -> SHIFT_write        0      2
+       -> delay_func_mcs     0      2
+
+
+   Segment part sizes:
+
+     Function/Label  Bytes
+     --------------  -----
+     _A_PORTD           1
+     _A_DDRD            1
+     LCD_write         24
+     ?Subroutine5       4
+     LCD_init          52
+     ?Subroutine2       2
+     ?Subroutine7       4
+     ?Subroutine0      12
+     ?Subroutine1       6
+     ?Subroutine6       2
+     LCD_clrscr         8
+     LCD_gotoxy        10
+     LCD_printchar      4
+     LCD_print         24
+     LCD_print_flash   28
+
+ 
+   2 bytes in segment ABSOLUTE
+ 180 bytes in segment CODE
+ 
+ 180 bytes of CODE memory
+   0 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none

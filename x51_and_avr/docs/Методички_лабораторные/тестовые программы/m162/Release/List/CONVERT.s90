@@ -1,0 +1,247 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     28/Jun/2007  00:57:50 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m162\CONVERT.c                            /
+//    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D    /
+//                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb        /
+//                    D:\stend\src\m162\Release\List\ -y                     /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m162\CONVERT.c          /
+//    List file    =  D:\stend\src\m162\Release\List\CONVERT.s90             /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME CONVERT
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        EXTERN ?EPILOGUE_B4_L09
+        EXTERN ?EPILOGUE_B6_L09
+        EXTERN ?EPILOGUE_B8_L09
+        EXTERN ?PROLOGUE4_L09
+        EXTERN ?PROLOGUE6_L09
+        EXTERN ?PROLOGUE8_L09
+        EXTERN ?Register_R4_is_cg_reg
+        EXTERN ?Register_R5_is_cg_reg
+        EXTERN ?Register_R6_is_cg_reg
+        EXTERN ?Register_R7_is_cg_reg
+        EXTERN ?SS_DIVMOD_L02
+        EXTERN ?S_EC_MUL_L02
+        EXTERN ?UC_DIVMOD_L01
+
+        PUBLIC ByteToString
+        PUBLIC ShortToString
+        PUBLIC StringToByte
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN strlen
+
+
+        RSEG CODE:CODE:NOROOT(1)
+StringToByte:
+        CALL	?PROLOGUE4_L09
+        MOVW	R25:R24, R17:R16
+        LDI	R27, 0
+        LDI	R26, 1
+        CALL	strlen
+        MOV	R18, R16
+        RJMP	??StringToByte_0
+??StringToByte_1:
+        MOVW	R31:R30, R25:R24
+        ADD	R30, R18
+        ADC	R31, R21
+        LD	R19, Z
+        SUBI	R19, 48
+        MUL	R19, R26
+        ADD	R27, R0
+        LDI	R19, 10
+        MUL	R26, R19
+        MOV	R26, R0
+??StringToByte_0:
+        DEC	R18
+        TST	R18
+        BRMI	??StringToByte_2
+        MOV	R20, R18
+        MOV	R21, R18
+        LSL	R21
+        SBC	R21, R21
+        MOVW	R31:R30, R17:R16
+        SBIW	R31:R30, 3
+        CP	R20, R30
+        CPC	R21, R31
+        BRGE	??StringToByte_1
+??StringToByte_2:
+        MOV	R16, R27
+        LDI	R30, 4
+        JMP	?EPILOGUE_B4_L09
+
+        RSEG CODE:CODE:NOROOT(1)
+ByteToString:
+        CALL	?PROLOGUE6_L09
+        REQUIRE	?Register_R4_is_cg_reg
+        REQUIRE	?Register_R5_is_cg_reg
+        MOV	R5, R16
+        MOVW	R27:R26, R19:R18
+        LDI	R24, 0
+        CLR	R4
+        TST	R16
+        BREQ	??ByteToString_0
+        LDI	R25, 100
+        RJMP	??ByteToString_1
+??ByteToString_2:
+        TST	R4
+        BRNE	??ByteToString_3
+??ByteToString_1:
+        CP	R5, R25
+        BRCS	??ByteToString_4
+??ByteToString_3:
+        MOV	R16, R5
+        MOV	R20, R25
+        CALL	?UC_DIVMOD_L01
+        MOV	R17, R16
+        SUBI	R17, 208
+        LDI	R19, 0
+        MOVW	R31:R30, R27:R26
+        ADD	R30, R24
+        ADC	R31, R19
+        ST	Z, R17
+        INC	R24
+        MUL	R16, R25
+        SUB	R5, R0
+        CLR	R4
+        INC	R4
+??ByteToString_4:
+        MOV	R16, R25
+        LDI	R20, 10
+        CALL	?UC_DIVMOD_L01
+        MOV	R25, R16
+        TST	R16
+        BREQ	??ByteToString_5
+        RJMP	??ByteToString_2
+??ByteToString_0:
+        LDI	R16, 48
+        ST	X, R16
+        LDI	R24, 1
+??ByteToString_5:
+        LDI	R16, 0
+        ADD	R26, R24
+        ADC	R27, R16
+        MOVW	R31:R30, R27:R26
+        ST	Z, R16
+        MOV	R16, R24
+        LDI	R30, 6
+        JMP	?EPILOGUE_B6_L09
+
+        RSEG CODE:CODE:NOROOT(1)
+ShortToString:
+        CALL	?PROLOGUE8_L09
+        REQUIRE	?Register_R4_is_cg_reg
+        REQUIRE	?Register_R5_is_cg_reg
+        REQUIRE	?Register_R6_is_cg_reg
+        REQUIRE	?Register_R7_is_cg_reg
+        MOVW	R5:R4, R17:R16
+        MOVW	R27:R26, R19:R18
+        LDI	R24, 0
+        LDI	R25, 0
+        TST	R17
+        BRPL	??ShortToString_0
+        LDI	R16, 45
+        MOVW	R31:R30, R19:R18
+        ST	Z, R16
+        LDI	R24, 1
+        NEG	R5
+        NEG	R4
+        SBC	R5, R25
+??ShortToString_0:
+        MOV	R16, R4
+        OR	R16, R5
+        BREQ	??ShortToString_1
+        LDI	R16, 16
+        MOV	R6, R16
+        LDI	R16, 39
+        MOV	R7, R16
+        RJMP	??ShortToString_2
+??ShortToString_3:
+        TST	R25
+        BRNE	??ShortToString_4
+??ShortToString_2:
+        CP	R4, R6
+        CPC	R5, R7
+        BRLT	??ShortToString_5
+??ShortToString_4:
+        MOVW	R17:R16, R5:R4
+        MOVW	R21:R20, R7:R6
+        CALL	?SS_DIVMOD_L02
+        MOV	R17, R16
+        SUBI	R17, 208
+        LDI	R25, 0
+        MOVW	R31:R30, R19:R18
+        ADD	R30, R24
+        ADC	R31, R25
+        ST	Z, R17
+        INC	R24
+        MOV	R20, R16
+        LDI	R21, 0
+        MOVW	R17:R16, R7:R6
+        CALL	?S_EC_MUL_L02
+        SUB	R4, R16
+        SBC	R5, R17
+        LDI	R25, 1
+??ShortToString_5:
+        MOVW	R17:R16, R7:R6
+        LDI	R20, 10
+        LDI	R21, 0
+        CALL	?SS_DIVMOD_L02
+        MOVW	R7:R6, R17:R16
+        LDI	R16, 1
+        CP	R6, R16
+        LDI	R16, 0
+        CPC	R7, R16
+        BRLT	??ShortToString_6
+        RJMP	??ShortToString_3
+??ShortToString_1:
+        LDI	R16, 48
+        MOVW	R31:R30, R19:R18
+        ADD	R30, R24
+        ADC	R31, R25
+        ST	Z, R16
+        INC	R24
+??ShortToString_6:
+        LDI	R16, 0
+        ADD	R26, R24
+        ADC	R27, R16
+        ST	X, R16
+        MOV	R16, R24
+        LDI	R30, 8
+        JMP	?EPILOGUE_B8_L09
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+// 318 bytes in segment CODE
+// 
+// 318 bytes of CODE memory
+//
+//Errors: none
+//Warnings: none

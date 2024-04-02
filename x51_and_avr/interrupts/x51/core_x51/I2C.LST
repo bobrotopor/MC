@@ -1,0 +1,312 @@
+C51 COMPILER V7.20   I2C                                                                   05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE I2C
+OBJECT MODULE PLACED IN I2C.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE I2C.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include "I2C.h"
+   2          #include "DELAY.h"
+   3          
+   4          void I2C_init()
+   5          {
+   6   1              SDA = 1;
+   7   1              SCL = 1;
+   8   1      
+   9   1      //      SDA = 1;
+  10   1      //      SCL = 1;
+  11   1      }
+  12          
+  13          void I2C_start()
+  14          {
+  15   1              SCL = 1;
+  16   1              SDA = 1;
+  17   1              DELAY_MCS(20);
+  18   1              SDA = 0;
+  19   1              DELAY_MCS(20);
+  20   1              SCL = 0;
+  21   1      }
+  22          
+  23          void I2C_stop()
+  24          {
+  25   1              SDA = 0;
+  26   1              DELAY_MCS(20);
+  27   1              SCL = 1;
+  28   1              DELAY_MCS(20);
+  29   1              SDA = 1;        
+  30   1      }
+  31          
+  32          unsigned char I2C_write(unsigned char value)
+  33          {
+  34   1              unsigned char i=8;
+  35   1              while(i--)
+  36   1              {
+  37   2                      if (value & 0x80)
+  38   2                              SDA = 1;
+  39   2                      else
+  40   2                              SDA = 0;
+  41   2                      value <<= 1;
+  42   2                      SCL = 1;
+  43   2                      DELAY_MCS(20);
+  44   2                      SCL = 0;
+  45   2                      DELAY_MCS(20);
+  46   2              }
+  47   1              SDA = 1;
+  48   1              SCL = 1;
+  49   1              DELAY_MCS(20);
+  50   1      
+  51   1              if(SDA)
+  52   1                      value = 255;                            // Если не получен acknowledge
+  53   1              else
+  54   1                      value = 0;
+  55   1      
+C51 COMPILER V7.20   I2C                                                                   05/08/2007 12:58:49 PAGE 2   
+
+  56   1              DELAY_MCS(20);
+  57   1              SCL = 0;
+  58   1              return value;
+  59   1      }
+  60          
+  61          unsigned char I2C_read()
+  62          {
+  63   1              unsigned char value = 0, i = 8;
+  64   1      
+  65   1              SDA = 1;
+  66   1              while(i--)
+  67   1              {
+  68   2                      SCL = 1;
+  69   2                      DELAY_MCS(20);
+  70   2                      value <<= 1;
+  71   2                      if(SDA)
+  72   2                              value |= 1;
+  73   2                      else 
+  74   2                              value &= ~1;
+  75   2                      DELAY_MCS(20);
+  76   2                      SCL = 0;
+  77   2                      DELAY_MCS(20);
+  78   2              }
+  79   1              SCL = 1;
+  80   1              DELAY_MCS(20);
+  81   1              SCL = 0;
+  82   1      
+  83   1              return value;
+  84   1      }                 
+  85          
+C51 COMPILER V7.20   I2C                                                                   05/08/2007 12:58:49 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION I2C_init (BEGIN)
+                                           ; SOURCE LINE # 4
+                                           ; SOURCE LINE # 5
+                                           ; SOURCE LINE # 6
+0000 D281              SETB    SDA
+                                           ; SOURCE LINE # 7
+0002 D280              SETB    SCL
+                                           ; SOURCE LINE # 11
+0004 22                RET     
+             ; FUNCTION I2C_init (END)
+
+             ; FUNCTION I2C_start (BEGIN)
+                                           ; SOURCE LINE # 13
+                                           ; SOURCE LINE # 14
+                                           ; SOURCE LINE # 15
+0000 D280              SETB    SCL
+                                           ; SOURCE LINE # 16
+0002 D281              SETB    SDA
+                                           ; SOURCE LINE # 17
+0004 7F01              MOV     R7,#01H
+0006 7E00              MOV     R6,#00H
+0008 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 18
+000B C281              CLR     SDA
+                                           ; SOURCE LINE # 19
+000D 7F01              MOV     R7,#01H
+000F 7E00              MOV     R6,#00H
+0011 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 20
+0014 C280              CLR     SCL
+                                           ; SOURCE LINE # 21
+0016 22                RET     
+             ; FUNCTION I2C_start (END)
+
+             ; FUNCTION I2C_stop (BEGIN)
+                                           ; SOURCE LINE # 23
+                                           ; SOURCE LINE # 24
+                                           ; SOURCE LINE # 25
+0000 C281              CLR     SDA
+                                           ; SOURCE LINE # 26
+0002 7F01              MOV     R7,#01H
+0004 7E00              MOV     R6,#00H
+0006 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 27
+0009 D280              SETB    SCL
+                                           ; SOURCE LINE # 28
+000B 7F01              MOV     R7,#01H
+000D 7E00              MOV     R6,#00H
+000F 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 29
+0012 D281              SETB    SDA
+                                           ; SOURCE LINE # 30
+0014 22                RET     
+             ; FUNCTION I2C_stop (END)
+
+             ; FUNCTION _I2C_write (BEGIN)
+                                           ; SOURCE LINE # 32
+0000 8F00        R     MOV     value,R7
+                                           ; SOURCE LINE # 33
+C51 COMPILER V7.20   I2C                                                                   05/08/2007 12:58:49 PAGE 4   
+
+                                           ; SOURCE LINE # 34
+0002 750008      R     MOV     i,#08H
+0005         ?C0004:
+                                           ; SOURCE LINE # 35
+0005 AF00        R     MOV     R7,i
+0007 1500        R     DEC     i
+0009 EF                MOV     A,R7
+000A 6025              JZ      ?C0005
+                                           ; SOURCE LINE # 36
+                                           ; SOURCE LINE # 37
+000C E500        R     MOV     A,value
+000E 30E704            JNB     ACC.7,?C0006
+                                           ; SOURCE LINE # 38
+0011 D281              SETB    SDA
+0013 8002              SJMP    ?C0007
+0015         ?C0006:
+                                           ; SOURCE LINE # 40
+0015 C281              CLR     SDA
+0017         ?C0007:
+                                           ; SOURCE LINE # 41
+0017 E500        R     MOV     A,value
+0019 25E0              ADD     A,ACC
+001B F500        R     MOV     value,A
+                                           ; SOURCE LINE # 42
+001D D280              SETB    SCL
+                                           ; SOURCE LINE # 43
+001F 7F01              MOV     R7,#01H
+0021 7E00              MOV     R6,#00H
+0023 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 44
+0026 C280              CLR     SCL
+                                           ; SOURCE LINE # 45
+0028 7F01              MOV     R7,#01H
+002A 7E00              MOV     R6,#00H
+002C 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 46
+002F 80D4              SJMP    ?C0004
+0031         ?C0005:
+                                           ; SOURCE LINE # 47
+0031 D281              SETB    SDA
+                                           ; SOURCE LINE # 48
+0033 D280              SETB    SCL
+                                           ; SOURCE LINE # 49
+0035 7F01              MOV     R7,#01H
+0037 7E00              MOV     R6,#00H
+0039 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 51
+003C 308105            JNB     SDA,?C0008
+                                           ; SOURCE LINE # 52
+003F 7500FF      R     MOV     value,#0FFH
+0042 8003              SJMP    ?C0009
+0044         ?C0008:
+                                           ; SOURCE LINE # 54
+0044 E4                CLR     A
+0045 F500        R     MOV     value,A
+0047         ?C0009:
+                                           ; SOURCE LINE # 56
+0047 7F01              MOV     R7,#01H
+0049 7E00              MOV     R6,#00H
+004B 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 57
+004E C280              CLR     SCL
+C51 COMPILER V7.20   I2C                                                                   05/08/2007 12:58:49 PAGE 5   
+
+                                           ; SOURCE LINE # 58
+0050 AF00        R     MOV     R7,value
+                                           ; SOURCE LINE # 59
+0052         ?C0010:
+0052 22                RET     
+             ; FUNCTION _I2C_write (END)
+
+             ; FUNCTION I2C_read (BEGIN)
+                                           ; SOURCE LINE # 61
+                                           ; SOURCE LINE # 62
+                                           ; SOURCE LINE # 63
+0000 E4                CLR     A
+0001 F500        R     MOV     value,A
+0003 750008      R     MOV     i,#08H
+                                           ; SOURCE LINE # 65
+0006 D281              SETB    SDA
+0008         ?C0011:
+                                           ; SOURCE LINE # 66
+0008 AF00        R     MOV     R7,i
+000A 1500        R     DEC     i
+000C EF                MOV     A,R7
+000D 602C              JZ      ?C0012
+                                           ; SOURCE LINE # 67
+                                           ; SOURCE LINE # 68
+000F D280              SETB    SCL
+                                           ; SOURCE LINE # 69
+0011 7F01              MOV     R7,#01H
+0013 7E00              MOV     R6,#00H
+0015 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 70
+0018 E500        R     MOV     A,value
+001A 25E0              ADD     A,ACC
+001C F500        R     MOV     value,A
+                                           ; SOURCE LINE # 71
+001E 308105            JNB     SDA,?C0013
+                                           ; SOURCE LINE # 72
+0021 430001      R     ORL     value,#01H
+0024 8003              SJMP    ?C0014
+0026         ?C0013:
+                                           ; SOURCE LINE # 74
+0026 5300FE      R     ANL     value,#0FEH
+0029         ?C0014:
+                                           ; SOURCE LINE # 75
+0029 7F01              MOV     R7,#01H
+002B 7E00              MOV     R6,#00H
+002D 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 76
+0030 C280              CLR     SCL
+                                           ; SOURCE LINE # 77
+0032 7F01              MOV     R7,#01H
+0034 7E00              MOV     R6,#00H
+0036 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 78
+0039 80CD              SJMP    ?C0011
+003B         ?C0012:
+                                           ; SOURCE LINE # 79
+003B D280              SETB    SCL
+                                           ; SOURCE LINE # 80
+003D 7F01              MOV     R7,#01H
+003F 7E00              MOV     R6,#00H
+0041 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 81
+C51 COMPILER V7.20   I2C                                                                   05/08/2007 12:58:49 PAGE 6   
+
+0044 C280              CLR     SCL
+                                           ; SOURCE LINE # 83
+0046 AF00        R     MOV     R7,value
+                                           ; SOURCE LINE # 84
+0048         ?C0015:
+0048 22                RET     
+             ; FUNCTION I2C_read (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    205    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

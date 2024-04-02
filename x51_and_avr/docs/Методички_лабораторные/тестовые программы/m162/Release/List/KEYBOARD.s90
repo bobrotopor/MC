@@ -1,0 +1,236 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     28/Jun/2007  00:57:49 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m162\KEYBOARD.c                           /
+//    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D    /
+//                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb        /
+//                    D:\stend\src\m162\Release\List\ -y                     /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m162\KEYBOARD.c         /
+//    List file    =  D:\stend\src\m162\Release\List\KEYBOARD.s90            /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME KEYBOARD
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        EXTERN ?CV_SWITCH_L06
+
+        PUBLIC KEY_getkey
+        PUBLIC KEY_getkeyname
+        PUBLIC KEY_waitforkeyrelease
+        PUBWEAK _A_DDRC
+        PUBWEAK _A_PINC
+        PUBWEAK _A_PORTC
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN delay_func_mcs
+
+
+        RSEG CODE:CODE:NOROOT(1)
+KEY_getkey:
+        LDI	R16, 15
+        OUT	0x14, R16
+        LDI	R16, 240
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_0:
+        CPI	R16, 240
+        BRNE	??KEY_getkey_0
+        RJMP	?Subroutine2
+??KEY_getkey_0:
+        LDI	R16, 254
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_1:
+        CPI	R16, 254
+        BRNE	??KEY_getkey_1
+        LDI	R16, 253
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_2:
+        CPI	R16, 253
+        BREQ	??KEY_getkey_2
+??KEY_getkey_1:
+        IN	R16, 0x13
+        COM	R16
+        RET
+??KEY_getkey_2:
+        LDI	R16, 251
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_3:
+        CPI	R16, 251
+        BRNE	??KEY_getkey_1
+        LDI	R16, 247
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_5:
+        RJMP	??KEY_getkey_1
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine0:
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_4:
+        IN	R16, 0x13
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine1:
+        OUT	0x15, R16
+        LDI	R16, 95
+        LDI	R17, 0
+        JMP	delay_func_mcs
+
+        RSEG CODE:CODE:NOROOT(1)
+KEY_waitforkeyrelease:
+??KEY_waitforkeyrelease_0:
+        RCALL	KEY_getkey
+        TST	R16
+        BRNE	??KEY_waitforkeyrelease_0
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+KEY_getkeyname:
+        LDI	R30, LOW(`?<Jumptable for KEY_getkeyname>_0`)
+        LDI	R31, (`?<Jumptable for KEY_getkeyname>_0`) >> 8
+        JMP	?CV_SWITCH_L06
+??KEY_getkeyname_0:
+        LDI	R16, 48
+        RET
+??KEY_getkeyname_1:
+        LDI	R16, 49
+        RET
+??KEY_getkeyname_2:
+        LDI	R16, 50
+        RET
+??KEY_getkeyname_3:
+        LDI	R16, 51
+        RET
+??KEY_getkeyname_4:
+        LDI	R16, 52
+        RET
+??KEY_getkeyname_5:
+        LDI	R16, 53
+        RET
+??KEY_getkeyname_6:
+        LDI	R16, 54
+        RET
+??KEY_getkeyname_7:
+        LDI	R16, 55
+        RET
+??KEY_getkeyname_8:
+        LDI	R16, 56
+        RET
+??KEY_getkeyname_9:
+        LDI	R16, 57
+        RET
+??KEY_getkeyname_10:
+        LDI	R16, 65
+        RET
+??KEY_getkeyname_11:
+        LDI	R16, 66
+        RET
+??KEY_getkeyname_12:
+        LDI	R16, 67
+        RET
+??KEY_getkeyname_13:
+        LDI	R16, 68
+        RET
+??KEY_getkeyname_14:
+        LDI	R16, 42
+        RET
+??KEY_getkeyname_15:
+        LDI	R16, 35
+        RET
+??KEY_getkeyname_16:
+        REQUIRE ?Subroutine2
+        ;		// Fall through to label ?Subroutine2
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine2:
+        LDI	R16, 0
+        RET
+
+        RSEG SWITCH:CODE:NOROOT(1)
+`?<Jumptable for KEY_getkeyname>_0`:
+        DB	17
+        DB	1
+        DW	(??KEY_getkeyname_16) /2
+        DW	(??KEY_getkeyname_1) /2
+        DB	0x1
+        DW	(??KEY_getkeyname_4) /2
+        DB	0x2
+        DW	(??KEY_getkeyname_7) /2
+        DB	0x4
+        DW	(??KEY_getkeyname_14) /2
+        DB	0x9
+        DW	(??KEY_getkeyname_2) /2
+        DB	0x1
+        DW	(??KEY_getkeyname_5) /2
+        DB	0x2
+        DW	(??KEY_getkeyname_8) /2
+        DB	0x4
+        DW	(??KEY_getkeyname_0) /2
+        DB	0x19
+        DW	(??KEY_getkeyname_3) /2
+        DB	0x1
+        DW	(??KEY_getkeyname_6) /2
+        DB	0x2
+        DW	(??KEY_getkeyname_9) /2
+        DB	0x4
+        DW	(??KEY_getkeyname_15) /2
+        DB	0x39
+        DW	(??KEY_getkeyname_10) /2
+        DB	0x1
+        DW	(??KEY_getkeyname_11) /2
+        DB	0x2
+        DW	(??KEY_getkeyname_12) /2
+        DB	0x4
+        DW	(??KEY_getkeyname_13) /2
+        DB	251
+
+        ASEGN ABSOLUTE:DATA:NOROOT,035H
+// union <unnamed> volatile __io _A_PORTC
+_A_PORTC:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,034H
+// union <unnamed> volatile __io _A_DDRC
+_A_DDRC:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,033H
+// union <unnamed> volatile __io _A_PINC
+_A_PINC:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+//   3 bytes in segment ABSOLUTE
+// 150 bytes in segment CODE
+//  52 bytes in segment SWITCH
+// 
+// 202 bytes of CODE memory
+//   0 bytes of DATA memory (+ 3 bytes shared)
+//
+//Errors: none
+//Warnings: none

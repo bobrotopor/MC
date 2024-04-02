@@ -1,0 +1,420 @@
+##############################################################################
+#                                                                            #
+#                                                      23/Apr/2006  03:05:39 #
+# IAR Atmel AVR C/C++ Compiler V4.12A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\DS1820.c    #
+#    Command line =  F:\Projects\VitalyIgorevich\Packet\src\m162\DS1820.c    #
+#                    --cpu=m162 -ms -o F:\Projects\VitalyIgorevich\Packet\sr #
+#                    c\m162\Debug\Obj\ -lCN F:\Projects\VitalyIgorevich\Pack #
+#                    et\src\m162\Debug\List\ -y --initializers_in_flash -z9  #
+#                    --cross_call_passes=2 --debug -e -I "E:\Program         #
+#                    Files\IAR Systems\Embedded Workbench 4.0                #
+#                    Evaluation\avr\INC\" -I "E:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 4.0                          #
+#                    Evaluation\avr\INC\CLIB\" --eeprom_size 512             #
+#    List file    =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\List\ #
+#                    DS1820.lst                                              #
+#    Object file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\Obj\D #
+#                    S1820.r90                                               #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+F:\Projects\VitalyIgorevich\Packet\src\m162\DS1820.c
+      1          #include "DS1820.h"
+
+   \                                 In segment ABSOLUTE, at 0x3b
+   \   union <unnamed> volatile __io _A_PORTA
+   \                     _A_PORTA:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x3a
+   \   union <unnamed> volatile __io _A_DDRA
+   \                     _A_DDRA:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x39
+   \   union <unnamed> volatile __io _A_PINA
+   \                     _A_PINA:
+   \   00000000                      DS 1
+      2          #include "DELAY.h"
+      3          #include "CONVERT.H"
+      4          
+      5          // Функция сброса
+      6          // Возвращает 1 если на шине 1-Wire присутствует устройство
+      7          // 			  0 если устройств нет
+
+   \                                 In segment CODE, align 2, keep-with-next
+      8          unsigned char DS1820_reset()				
+   \                     DS1820_reset:
+      9          {
+     10          	DS_BUS_PORT = 0;
+   \   00000000   98DA               CBI     0x1B, 0x02
+     11          	DS_BUS_DDR = 0;
+   \   00000002   ....               RCALL   ?Subroutine0
+     12          	DELAY_MCS( 6 );
+     13          	DS_BUS_DDR = 1;
+   \                     ??CrossCallReturnLabel_6:
+   \   00000004   9AD2               SBI     0x1A, 0x02
+     14          	DELAY_MCS( 530 );
+   \   00000006   E103               LDI     R16, 19
+   \   00000008   E015               LDI     R17, 5
+   \   0000000A   ....               RCALL   ?Subroutine2
+     15          	DS_BUS_DDR = 0;
+   \                     ??CrossCallReturnLabel_13:
+   \   0000000C   98D2               CBI     0x1A, 0x02
+     16          	DELAY_MCS( 80 );
+   \   0000000E   EC01               LDI     R16, 193
+   \   00000010   ....               RCALL   ??Subroutine0_0
+     17          	if( DS_BUS_PIN )
+   \                     ??CrossCallReturnLabel_8:
+   \   00000012   99CA               SBIC    0x19, 0x02
+     18          		return 0;
+   \   00000014   ....               RJMP    ?Subroutine4
+     19          	else
+     20          	{
+     21          		DELAY_MCS( 420 );
+   \                     ??DS1820_reset_0:
+   \   00000016   E005               LDI     R16, 5
+   \   00000018   E014               LDI     R17, 4
+   \   0000001A   ....               RCALL   ?Subroutine2
+     22          		return 1;
+   \                     ??CrossCallReturnLabel_12:
+   \   0000001C                      REQUIRE ?Subroutine3
+   \   0000001C                      ;               // Fall through to label ?Subroutine3
+     23          	}
+     24          } 							
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine3:
+   \   00000000   E001               LDI     R16, 1
+   \   00000002   9508               RET
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine0:
+   \   00000000   98D2               CBI     0x1A, 0x02
+   \   00000002   E00B               LDI     R16, 11
+   \                     ??Subroutine0_0:
+   \   00000004   E010               LDI     R17, 0
+   \   00000006                      REQUIRE ?Subroutine2
+   \   00000006                      ;               // Fall through to label ?Subroutine2
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine2:
+   \   00000000   ........           JMP     delay_func_mcs
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine4:
+   \   00000000   E000               LDI     R16, 0
+   \   00000002   9508               RET
+     25          
+     26          // Функция записи/чтения байта линии 1-Wire
+     27          // Для чтения необходимо передать в качестве параметра 0xFF
+
+   \                                 In segment CODE, align 2, keep-with-next
+     28          unsigned char DS1820_rw( unsigned char data )
+   \                     DS1820_rw:
+     29          {
+   \   00000000   939A               ST      -Y, R25
+   \   00000002   938A               ST      -Y, R24
+   \   00000004   2F90               MOV     R25, R16
+     30          	register unsigned char i;
+     31          
+     32          	DS_BUS_PORT = 0;
+   \   00000006   98DA               CBI     0x1B, 0x02
+     33          	DS_BUS_DDR = 0;	
+   \   00000008   98D2               CBI     0x1A, 0x02
+     34          	for ( i = 0; i <= 7; i++ ) 
+   \   0000000A   E088               LDI     R24, 8
+     35          	{
+     36          		DS_BUS_DDR = 1;
+   \                     ??DS1820_rw_0:
+   \   0000000C   9AD2               SBI     0x1A, 0x02
+     37          		DELAY_MCS( 2 );
+   \   0000000E   E002               LDI     R16, 2
+   \   00000010   ....               RCALL   ??Subroutine0_0
+     38          		
+     39          		if( data & 0x01 )
+   \                     ??CrossCallReturnLabel_9:
+   \   00000012   FB90               BST     R25, 0
+   \   00000014   F416               BRTC    ??DS1820_rw_1
+     40          			DS_BUS_DDR = 0;
+   \   00000016   98D2               CBI     0x1A, 0x02
+   \   00000018   C001               RJMP    ??DS1820_rw_2
+     41          		else
+     42          			DS_BUS_DDR = 1;
+   \                     ??DS1820_rw_1:
+   \   0000001A   9AD2               SBI     0x1A, 0x02
+     43          
+     44          		DELAY_MCS( 8 );
+   \                     ??DS1820_rw_2:
+   \   0000001C   E100               LDI     R16, 16
+   \   0000001E   ....               RCALL   ??Subroutine0_0
+     45          
+     46          		data >>= 1;
+   \                     ??CrossCallReturnLabel_10:
+   \   00000020   9596               LSR     R25
+     47          
+     48          		if( DS_BUS_PIN )
+   \   00000022   99CA               SBIC    0x19, 0x02
+     49          			data |= ( 1 << 7 );
+   \   00000024   6890               ORI     R25, 0x80
+     50          		else
+     51          			data &= ~( 1 << 7 );
+     52          				
+     53          		DELAY_MCS( 55 );
+   \                     ??DS1820_rw_3:
+   \   00000026   E804               LDI     R16, 132
+   \   00000028   ....               RCALL   ??Subroutine0_0
+     54          		DS_BUS_DDR = 0;
+   \                     ??CrossCallReturnLabel_11:
+   \   0000002A   ....               RCALL   ?Subroutine0
+     55          		DELAY_MCS( 6 );
+     56          	}
+   \                     ??CrossCallReturnLabel_7:
+   \   0000002C   958A               DEC     R24
+   \   0000002E   F771               BRNE    ??DS1820_rw_0
+     57          
+     58          	return data; 
+   \   00000030   2F09               MOV     R16, R25
+   \   00000032   9189               LD      R24, Y+
+   \   00000034   9199               LD      R25, Y+
+   \   00000036   9508               RET
+     59          }
+     60          
+     61          // Функция старта преобразования температуры
+
+   \                                 In segment CODE, align 2, keep-with-next
+     62          unsigned char DS1820_startconverttemp()
+   \                     DS1820_startconverttemp:
+     63          {
+     64          	if( !DS1820_reset() )		// Если на шине никого нет
+   \   00000000   ....               RCALL   DS1820_reset
+   \   00000002   2300               TST     R16
+   \   00000004   F409               BRNE    ??DS1820_startconverttemp_0
+     65          		return 0;			
+   \   00000006   ....               RJMP    ?Subroutine4
+     66          
+     67              DS1820_rw( 0xcc );  		// Пропускаем ROM
+   \                     ??DS1820_startconverttemp_0:
+   \   00000008   ....               RCALL   ?Subroutine1
+     68              DS1820_rw( 0x44 );  		// Выводим команду преобразования температуры
+   \                     ??CrossCallReturnLabel_5:
+   \   0000000A   E404               LDI     R16, 68
+   \   0000000C   ....               RCALL   ??Subroutine1_0
+     69          	
+     70          	return 1;
+   \                     ??CrossCallReturnLabel_3:
+   \   0000000E   ....               RJMP    ?Subroutine3
+     71          }
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine1:
+   \   00000000   EC0C               LDI     R16, 204
+   \                     ??Subroutine1_0:
+   \   00000002   ....               RJMP    DS1820_rw
+     72          
+     73          // Функция проверки статуса преобразования температуры
+
+   \                                 In segment CODE, align 2, keep-with-next
+     74          unsigned char DS1820_getconvertstatus()
+   \                     DS1820_getconvertstatus:
+     75          {
+     76          	if( DS1820_rw( 0xFF ) != 0x00 )	// Проверяем состояние линии
+   \   00000000   EF0F               LDI     R16, 255
+   \   00000002   ....               RCALL   ??Subroutine1_0
+   \                     ??CrossCallReturnLabel_2:
+   \   00000004   2300               TST     R16
+   \   00000006   F009               BREQ    ??DS1820_getconvertstatus_0
+     77          		return 1;
+   \   00000008   ....               RJMP    ?Subroutine3
+     78          	else
+     79          		return 0;
+   \                     ??DS1820_getconvertstatus_0:
+   \   0000000A                      REQUIRE ?Subroutine4
+   \   0000000A                      ;               // Fall through to label ?Subroutine4
+     80          }
+     81          
+     82          // Функция чтения данных из памяти микросхемы DS1820
+
+   \                                 In segment CODE, align 2, keep-with-next
+     83          unsigned char DS1820_readdata(unsigned char* buff)
+   \                     DS1820_readdata:
+     84          {
+   \   00000000   ........           CALL    ?PROLOGUE4_L09
+   \   00000004   01C8               MOVW    R25:R24, R17:R16
+     85          	unsigned char n;
+     86          
+     87          	if( !DS1820_reset() )
+   \   00000006   ....               RCALL   DS1820_reset
+   \   00000008   2300               TST     R16
+   \   0000000A   F411               BRNE    ??DS1820_readdata_0
+     88          		return 0;
+   \   0000000C   E000               LDI     R16, 0
+   \   0000000E   C00F               RJMP    ??DS1820_readdata_1
+     89          
+     90              DS1820_rw( 0xcc );  			// Пропускаем ROM
+   \                     ??DS1820_readdata_0:
+   \   00000010   ....               RCALL   ?Subroutine1
+     91              DS1820_rw( 0xbe );  			// Выводим функцию чтения данных памяти
+   \                     ??CrossCallReturnLabel_4:
+   \   00000012   EB0E               LDI     R16, 190
+   \   00000014   ....               RCALL   ??Subroutine1_0
+     92              
+     93              for (n = 0; n < 9; n++)     	// Читаем 9 байт памяти
+   \                     ??CrossCallReturnLabel_1:
+   \   00000016   E0A0               LDI     R26, 0
+     94                 buff[ n ] = DS1820_rw( 0xFF ); 
+   \                     ??DS1820_readdata_2:
+   \   00000018   EF0F               LDI     R16, 255
+   \   0000001A   ....               RCALL   ??Subroutine1_0
+   \                     ??CrossCallReturnLabel_0:
+   \   0000001C   E0B0               LDI     R27, 0
+   \   0000001E   01FC               MOVW    R31:R30, R25:R24
+   \   00000020   0FEA               ADD     R30, R26
+   \   00000022   1FFB               ADC     R31, R27
+   \   00000024   8300               ST      Z, R16
+   \   00000026   95A3               INC     R26
+   \   00000028   30A9               CPI     R26, 9
+   \   0000002A   F3B0               BRCS    ??DS1820_readdata_2
+     95          
+     96          	return 1;
+   \   0000002C   E001               LDI     R16, 1
+   \                     ??DS1820_readdata_1:
+   \   0000002E   E0E4               LDI     R30, 4
+   \   00000030   ........           JMP     ?EPILOGUE_B4_L09
+     97          }
+     98          
+     99          // Функция получения значения температуры
+
+   \                                 In segment CODE, align 2, keep-with-next
+    100          unsigned char DS1820_gettemperature( char strTemp[] )
+   \                     DS1820_gettemperature:
+    101          {
+   \   00000000   ........           CALL    ?PROLOGUE6_L09
+   \   00000004                      REQUIRE ?Register_R4_is_cg_reg
+   \   00000004                      REQUIRE ?Register_R5_is_cg_reg
+   \   00000004   9729               SBIW    R29:R28, 9
+   \   00000006   01D8               MOVW    R27:R26, R17:R16
+    102          	unsigned char buff[ 9 ];
+    103          	signed short temperature;
+    104          
+    105          	if( !DS1820_getconvertstatus() )
+   \   00000008   ....               RCALL   DS1820_getconvertstatus
+   \   0000000A   2300               TST     R16
+   \   0000000C   F411               BRNE    ??DS1820_gettemperature_0
+    106          		return 1;
+   \   0000000E   E001               LDI     R16, 1
+   \   00000010   C01D               RJMP    ??DS1820_gettemperature_1
+    107          
+    108          	if( !DS1820_readdata( buff ) )
+   \                     ??DS1820_gettemperature_0:
+   \   00000012   018E               MOVW    R17:R16, R29:R28
+   \   00000014   ....               RCALL   DS1820_readdata
+   \   00000016   2300               TST     R16
+   \   00000018   F411               BRNE    ??DS1820_gettemperature_2
+    109          		return 0;
+   \   0000001A   E000               LDI     R16, 0
+   \   0000001C   C017               RJMP    ??DS1820_gettemperature_1
+    110          	
+    111          	temperature = buff[ 1 ];
+    112          	temperature <<= 8;
+    113          	temperature = buff[ 0 ];
+   \                     ??DS1820_gettemperature_2:
+   \   0000001E   8048               LD      R4, Y
+   \   00000020   2455               CLR     R5
+    114          
+    115          	unsigned char intLen = ShortToString( temperature / 2, strTemp );
+   \   00000022   019D               MOVW    R19:R18, R27:R26
+   \   00000024   0182               MOVW    R17:R16, R5:R4
+   \   00000026   E042               LDI     R20, 2
+   \   00000028   E050               LDI     R21, 0
+   \   0000002A   ........           CALL    ?SS_DIVMOD_L02
+   \   0000002E   ........           CALL    ShortToString
+    116          	strTemp[ intLen ] = '.';
+   \   00000032   0FA0               ADD     R26, R16
+   \   00000034   1DB5               ADC     R27, R5
+   \   00000036   E20E               LDI     R16, 46
+   \   00000038   930C               ST      X, R16
+    117          	strTemp[ intLen + 1 ] = ( temperature & 0x01 ) ? '5' : '0';
+   \   0000003A   FE40               SBRS    R4, 0
+   \   0000003C   C002               RJMP    ??DS1820_gettemperature_3
+   \   0000003E   E305               LDI     R16, 53
+   \   00000040   C001               RJMP    ??DS1820_gettemperature_4
+   \                     ??DS1820_gettemperature_3:
+   \   00000042   E300               LDI     R16, 48
+   \                     ??DS1820_gettemperature_4:
+   \   00000044   01FD               MOVW    R31:R30, R27:R26
+   \   00000046   8301               STD     Z+1, R16
+    118          	strTemp[ intLen + 2 ] = 0;
+   \   00000048   8252               STD     Z+2, R5
+    119          
+    120          	return 2;
+   \   0000004A   E002               LDI     R16, 2
+   \                     ??DS1820_gettemperature_1:
+   \   0000004C   9629               ADIW    R29:R28, 9
+   \   0000004E   E0E6               LDI     R30, 6
+   \   00000050   ........           JMP     ?EPILOGUE_B6_L09
+    121          }
+
+   Maximum stack usage in bytes:
+
+     Function                     CSTACK RSTACK
+     --------                     ------ ------
+     DS1820_getconvertstatus          0      2
+       -> DS1820_rw                   0      2
+     DS1820_gettemperature           15      4
+       -> DS1820_getconvertstatus    15      2
+       -> DS1820_readdata            15      2
+       -> ShortToString              15      2
+     DS1820_readdata                  4      2
+       -> DS1820_reset                4      2
+       -> DS1820_rw                   4      2
+       -> DS1820_rw                   4      2
+       -> DS1820_rw                   4      2
+     DS1820_reset                     0      2
+       -> delay_func_mcs              0      2
+       -> delay_func_mcs              0      2
+       -> delay_func_mcs              0      2
+       -> delay_func_mcs              0      2
+     DS1820_rw                        2      2
+       -> delay_func_mcs              2      2
+       -> delay_func_mcs              2      2
+       -> delay_func_mcs              2      2
+       -> delay_func_mcs              2      2
+     DS1820_startconverttemp          0      2
+       -> DS1820_reset                0      2
+       -> DS1820_rw                   0      2
+       -> DS1820_rw                   0      2
+
+
+   Segment part sizes:
+
+     Function/Label          Bytes
+     --------------          -----
+     _A_PORTA                   1
+     _A_DDRA                    1
+     _A_PINA                    1
+     DS1820_reset              28
+     ?Subroutine3               4
+     ?Subroutine0               6
+     ?Subroutine2               4
+     ?Subroutine4               4
+     DS1820_rw                 56
+     DS1820_startconverttemp   16
+     ?Subroutine1               4
+     DS1820_getconvertstatus   10
+     DS1820_readdata           52
+     DS1820_gettemperature     84
+
+ 
+   3 bytes in segment ABSOLUTE
+ 268 bytes in segment CODE
+ 
+ 268 bytes of CODE memory
+   0 bytes of DATA memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none

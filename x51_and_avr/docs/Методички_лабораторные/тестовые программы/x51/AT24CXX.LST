@@ -1,0 +1,115 @@
+C51 COMPILER V7.20   AT24CXX                                                               05/08/2007 12:58:49 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE AT24CXX
+OBJECT MODULE PLACED IN AT24CXX.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil\uVision3\C51\BIN\C51.EXE AT24CXX.c BROWSE DEBUG OBJECTEXTEND CODE NOCOND
+
+line level    source
+
+   1          #include "AT24CXX.h"
+   2          #include "I2C.h"
+   3          #include "DELAY.H"
+   4          #include <stdio.h>
+   5          
+   6          void AT24CXX_write(unsigned char addr, unsigned char value)
+   7          {
+   8   1              I2C_start();
+   9   1              I2C_write(0xA0);
+  10   1              I2C_write(addr);                        // Установка адреса
+  11   1              I2C_write(value);               // запись данных
+  12   1              I2C_stop();
+  13   1         
+  14   1      }
+  15          
+  16          unsigned char AT24CXX_read(unsigned char addr)
+  17          {
+  18   1              unsigned char value;
+  19   1              I2C_start();
+  20   1              I2C_write(0xA0);                // команда записи   #10100000b
+  21   1              I2C_write(addr);                        // установка адреса
+  22   1              I2C_stop();
+  23   1              DELAY_MCS(68);
+  24   1              I2C_start(); 
+  25   1              I2C_write(0xA1);                // запись данных
+  26   1              value = I2C_read();
+  27   1              I2C_stop();
+  28   1              
+  29   1              return value;
+  30   1      }
+C51 COMPILER V7.20   AT24CXX                                                               05/08/2007 12:58:49 PAGE 2   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _AT24CXX_write (BEGIN)
+                                           ; SOURCE LINE # 6
+0000 8F00        R     MOV     addr,R7
+0002 8D00        R     MOV     value,R5
+                                           ; SOURCE LINE # 7
+                                           ; SOURCE LINE # 8
+0004 120000      E     LCALL   I2C_start
+                                           ; SOURCE LINE # 9
+0007 7FA0              MOV     R7,#0A0H
+0009 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 10
+000C AF00        R     MOV     R7,addr
+000E 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 11
+0011 AF00        R     MOV     R7,value
+0013 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 12
+0016 020000      E     LJMP    I2C_stop
+             ; FUNCTION _AT24CXX_write (END)
+
+             ; FUNCTION _AT24CXX_read (BEGIN)
+                                           ; SOURCE LINE # 16
+0000 8F00        R     MOV     addr,R7
+                                           ; SOURCE LINE # 17
+                                           ; SOURCE LINE # 19
+0002 120000      E     LCALL   I2C_start
+                                           ; SOURCE LINE # 20
+0005 7FA0              MOV     R7,#0A0H
+0007 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 21
+000A AF00        R     MOV     R7,addr
+000C 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 22
+000F 120000      E     LCALL   I2C_stop
+                                           ; SOURCE LINE # 23
+0012 7F06              MOV     R7,#06H
+0014 7E00              MOV     R6,#00H
+0016 120000      E     LCALL   _delay_func_mcs
+                                           ; SOURCE LINE # 24
+0019 120000      E     LCALL   I2C_start
+                                           ; SOURCE LINE # 25
+001C 7FA1              MOV     R7,#0A1H
+001E 120000      E     LCALL   _I2C_write
+                                           ; SOURCE LINE # 26
+0021 120000      E     LCALL   I2C_read
+0024 8F00        R     MOV     value,R7
+                                           ; SOURCE LINE # 27
+0026 120000      E     LCALL   I2C_stop
+                                           ; SOURCE LINE # 29
+0029 AF00        R     MOV     R7,value
+                                           ; SOURCE LINE # 30
+002B         ?C0002:
+002B 22                RET     
+             ; FUNCTION _AT24CXX_read (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     69    ----
+C51 COMPILER V7.20   AT24CXX                                                               05/08/2007 12:58:49 PAGE 3   
+
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

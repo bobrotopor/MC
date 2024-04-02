@@ -1,0 +1,88 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     21/May/2007  11:45:20 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m16\BEEP.c                                /
+//    Command line =  --cpu=m16 -mt -o D:\stend\src\m16\Release\Obj\ -D      /
+//                    NDEBUG -lb D:\stend\src\m16\Release\List\              /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m16\BEEP.c              /
+//    List file    =  D:\stend\src\m16\Release\List\BEEP.s90                 /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME BEEP
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        PUBLIC Beep
+        PUBWEAK _A_DDRB
+        PUBWEAK _A_PORTB
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN delay_func_ms
+
+
+        RSEG CODE:CODE:NOROOT(1)
+Beep:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOVW	R25:R24, R17:R16
+        SBI	0x17, 0x04
+        CBI	0x18, 0x04
+        RJMP	??Beep_0
+??Beep_1:
+        LDI	R16, 9
+        LDI	R17, 0
+        CALL	delay_func_ms
+??Beep_0:
+        MOVW	R31:R30, R25:R24
+        SBIW	R25:R24, 1
+        OR	R30, R31
+        BRNE	??Beep_1
+        SBI	0x18, 0x04
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        ASEGN ABSOLUTE:DATA:NOROOT,038H
+// union <unnamed> volatile __io _A_PORTB
+_A_PORTB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,037H
+// union <unnamed> volatile __io _A_DDRB
+_A_DDRB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+//  2 bytes in segment ABSOLUTE
+// 36 bytes in segment CODE
+// 
+// 36 bytes of CODE memory
+//  0 bytes of DATA memory (+ 2 bytes shared)
+//
+//Errors: none
+//Warnings: none

@@ -1,0 +1,83 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     21/May/2007  11:44:13 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m16\DELAY.c                               /
+//    Command line =  --cpu=m16 -mt -o D:\stend\src\m16\Debug\Obj\ -lb       /
+//                    D:\stend\src\m16\Debug\List\ --initializers_in_flash   /
+//                    -z3 --no_cse --no_inline --no_code_motion              /
+//                    --no_cross_call --no_clustering --no_tbaa --debug -e   /
+//                    -I "D:\Program Files\IAR Systems\AVR4.10A\avr\INC\"    /
+//                    -I "D:\Program Files\IAR Systems\AVR4.10A\avr\INC\CLIB /
+//                    \" --eeprom_size 512 D:\stend\src\m16\DELAY.c          /
+//    List file    =  D:\stend\src\m16\Debug\List\DELAY.s90                  /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME DELAY
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+        PUBLIC delay_func_mcs
+        PUBLIC delay_func_ms
+
+
+        RSEG CODE:CODE:NOROOT(1)
+delay_func_mcs:
+??delay_func_mcs_0:
+        MOVW	R19:R18, R17:R16
+        MOVW	R17:R16, R19:R18
+        SUBI	R16, 1
+        SBCI	R17, 0
+        OR	R18, R19
+        BRNE	??delay_func_mcs_0
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+delay_func_ms:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOVW	R25:R24, R17:R16
+        RJMP	??delay_func_ms_0
+??delay_func_ms_1:
+        LDI	R16, 208
+        LDI	R17, 0
+        RCALL	delay_func_mcs
+??delay_func_ms_0:
+        MOVW	R31:R30, R25:R24
+        MOVW	R25:R24, R31:R30
+        SBIW	R25:R24, 1
+        OR	R30, R31
+        BRNE	??delay_func_ms_1
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+// 44 bytes in segment CODE
+// 
+// 44 bytes of CODE memory
+//
+//Errors: none
+//Warnings: none

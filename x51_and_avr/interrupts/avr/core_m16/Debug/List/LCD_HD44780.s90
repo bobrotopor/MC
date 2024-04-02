@@ -1,0 +1,204 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     21/May/2007  11:44:14 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m16\LCD_HD44780.c                         /
+//    Command line =  --cpu=m16 -mt -o D:\stend\src\m16\Debug\Obj\ -lb       /
+//                    D:\stend\src\m16\Debug\List\ --initializers_in_flash   /
+//                    -z3 --no_cse --no_inline --no_code_motion              /
+//                    --no_cross_call --no_clustering --no_tbaa --debug -e   /
+//                    -I "D:\Program Files\IAR Systems\AVR4.10A\avr\INC\"    /
+//                    -I "D:\Program Files\IAR Systems\AVR4.10A\avr\INC\CLIB /
+//                    \" --eeprom_size 512 D:\stend\src\m16\LCD_HD44780.c    /
+//    List file    =  D:\stend\src\m16\Debug\List\LCD_HD44780.s90            /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME LCD_HD44780
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        PUBLIC LCD_clrscr
+        PUBLIC LCD_gotoxy
+        PUBLIC LCD_init
+        PUBLIC LCD_print
+        PUBLIC LCD_print_flash
+        PUBLIC LCD_printchar
+        PUBLIC LCD_write
+        PUBWEAK _A_DDRD
+        PUBWEAK _A_PORTD
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN SHIFT_write
+        EXTERN delay_func_mcs
+        EXTERN delay_func_ms
+
+
+        RSEG CODE:CODE:NOROOT(1)
+LCD_write:
+        TST	R17
+        BRNE	??LCD_write_0
+        CBI	0x12, 0x03
+        RJMP	??LCD_write_1
+??LCD_write_0:
+        SBI	0x12, 0x03
+??LCD_write_1:
+        SBI	0x12, 0x02
+        CALL	SHIFT_write
+        NOP
+        CBI	0x12, 0x02
+        LDI	R16, 28
+        LDI	R17, 4
+        CALL	delay_func_mcs
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+LCD_init:
+        SBI	0x11, 0x02
+        SBI	0x11, 0x03
+        CBI	0x12, 0x02
+        CBI	0x12, 0x03
+        LDI	R16, 153
+        LDI	R17, 1
+        CALL	delay_func_ms
+        LDI	R17, 0
+        LDI	R16, 48
+        RCALL	LCD_write
+        LDI	R16, 49
+        LDI	R17, 0
+        CALL	delay_func_ms
+        LDI	R17, 0
+        LDI	R16, 48
+        RCALL	LCD_write
+        LDI	R16, 194
+        LDI	R17, 5
+        CALL	delay_func_mcs
+        LDI	R17, 0
+        LDI	R16, 48
+        RCALL	LCD_write
+        LDI	R16, 194
+        LDI	R17, 5
+        CALL	delay_func_mcs
+        LDI	R17, 0
+        LDI	R16, 56
+        RCALL	LCD_write
+        LDI	R17, 0
+        LDI	R16, 1
+        RCALL	LCD_write
+        LDI	R16, 29
+        LDI	R17, 0
+        CALL	delay_func_ms
+        LDI	R17, 0
+        LDI	R16, 6
+        RCALL	LCD_write
+        LDI	R17, 0
+        LDI	R16, 12
+        RCALL	LCD_write
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+LCD_clrscr:
+        LDI	R17, 0
+        LDI	R16, 1
+        RCALL	LCD_write
+        LDI	R16, 49
+        LDI	R17, 0
+        CALL	delay_func_ms
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+LCD_gotoxy:
+        TST	R17
+        BREQ	??LCD_gotoxy_0
+        SUBI	R16, 192
+??LCD_gotoxy_0:
+        ORI	R16, 0x80
+        LDI	R17, 0
+        RCALL	LCD_write
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+LCD_printchar:
+        LDI	R17, 1
+        RCALL	LCD_write
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+LCD_print:
+        ST	-Y, R26
+        MOV	R26, R16
+        RJMP	??LCD_print_0
+??LCD_print_1:
+        MOV	R30, R26
+        LDI	R31, 0
+        LD	R16, Z
+        RCALL	LCD_printchar
+        INC	R26
+??LCD_print_0:
+        MOV	R30, R26
+        LDI	R31, 0
+        LD	R16, Z
+        TST	R16
+        BRNE	??LCD_print_1
+        LD	R26, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+LCD_print_flash:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOVW	R25:R24, R17:R16
+        RJMP	??LCD_print_flash_0
+??LCD_print_flash_1:
+        MOVW	R31:R30, R25:R24
+        LPM	R16, Z
+        RCALL	LCD_printchar
+        ADIW	R25:R24, 1
+??LCD_print_flash_0:
+        MOVW	R31:R30, R25:R24
+        LPM	R16, Z
+        TST	R16
+        BRNE	??LCD_print_flash_1
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        ASEGN ABSOLUTE:DATA:NOROOT,032H
+// union <unnamed> volatile __io _A_PORTD
+_A_PORTD:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,031H
+// union <unnamed> volatile __io _A_DDRD
+_A_DDRD:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+//   2 bytes in segment ABSOLUTE
+// 218 bytes in segment CODE
+// 
+// 218 bytes of CODE memory
+//   0 bytes of DATA memory (+ 2 bytes shared)
+//
+//Errors: none
+//Warnings: none

@@ -1,0 +1,361 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     28/Jun/2007  00:57:50 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m162\DS1307.c                             /
+//    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D    /
+//                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb        /
+//                    D:\stend\src\m162\Release\List\ -y                     /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m162\DS1307.c           /
+//    List file    =  D:\stend\src\m162\Release\List\DS1307.s90              /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME DS1307
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        EXTERN ?EPILOGUE_B4_L09
+        EXTERN ?PROLOGUE4_L09
+        EXTERN ?UC_DIVMOD_L01
+        EXTERN ?need_segment_init
+
+        PUBWEAK `?<Segment init: NEAR_I>`
+        PUBLIC ByteToBCD
+        PUBLIC Clock_Init
+        PUBLIC DS1307_getdate
+        PUBLIC DS1307_gettime
+        PUBLIC DS1307_read
+        PUBLIC DS1307_setdate
+        PUBLIC DS1307_settime
+        PUBLIC DS1307_write
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN I2C_start
+        EXTERN I2C_write
+        EXTERN I2C_stop
+        EXTERN delay_func_mcs
+        EXTERN I2C_read
+
+
+        RSEG NEAR_I:DATA:NOROOT(0)
+        REQUIRE `?<Segment init: NEAR_I>`
+Clock_Init:
+        DS 7
+        REQUIRE `?<Initializer for Clock_Init>`
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_write:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R25, R16
+        MOV	R24, R17
+        RCALL	?Subroutine5
+??CrossCallReturnLabel_8:
+        LDI	R16, 208
+        RCALL	?Subroutine10
+??CrossCallReturnLabel_22:
+        MOV	R16, R25
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_3:
+        REQUIRE ?Subroutine14
+        ;		// Fall through to label ?Subroutine14
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine14:
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_read:
+        ST	-Y, R24
+        MOV	R24, R16
+        RCALL	?Subroutine5
+??CrossCallReturnLabel_7:
+        LDI	R16, 208
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_2:
+        LDI	R16, 164
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        RCALL	?Subroutine5
+??CrossCallReturnLabel_6:
+        LDI	R16, 209
+        RCALL	?Subroutine10
+??CrossCallReturnLabel_21:
+        CALL	I2C_read
+        MOV	R24, R16
+        CALL	I2C_stop
+        MOV	R16, R24
+        LD	R24, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine10:
+        JMP	I2C_write
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine5:
+        JMP	I2C_start
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine1:
+        RCALL	?Subroutine10
+??CrossCallReturnLabel_20:
+        MOV	R16, R24
+        RCALL	?Subroutine10
+??CrossCallReturnLabel_19:
+        JMP	I2C_stop
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_gettime:
+        CALL	?PROLOGUE4_L09
+        MOVW	R27:R26, R17:R16
+        LDI	R16, 2
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_5:
+        ST	X, R16
+        ANDI	R24, 0x0F
+        SUBI	R24, 208
+        MOVW	R31:R30, R27:R26
+        STD	Z+1, R24
+        LDI	R16, 58
+        STD	Z+2, R16
+        LDI	R16, 1
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_4:
+        MOVW	R31:R30, R27:R26
+        STD	Z+3, R16
+        ANDI	R24, 0x0F
+        SUBI	R24, 208
+        STD	Z+4, R24
+        LDI	R16, 58
+        STD	Z+5, R16
+        LDI	R16, 0
+        RCALL	?Subroutine13
+??CrossCallReturnLabel_33:
+        MOV	R24, R16
+        BST	R24, 7
+        BRTC	??CrossCallReturnLabel_26
+        LDI	R17, 0
+        RCALL	?Subroutine6
+??CrossCallReturnLabel_26:
+        MOV	R16, R24
+        RCALL	?Subroutine12
+??CrossCallReturnLabel_28:
+        MOVW	R31:R30, R27:R26
+        STD	Z+6, R16
+        ANDI	R24, 0x0F
+        SUBI	R24, 208
+        STD	Z+7, R24
+        LDI	R16, 0
+        STD	Z+8, R16
+        LDI	R30, 4
+        JMP	?EPILOGUE_B4_L09
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine2:
+        RCALL	?Subroutine13
+??CrossCallReturnLabel_32:
+        MOV	R24, R16
+        RJMP	?Subroutine12
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine13:
+        RJMP	DS1307_read
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine12:
+        SWAP	R16
+??Subroutine12_0:
+        ANDI	R16, 0x0F
+        SUBI	R16, 208
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+ByteToBCD:
+        MOV	R17, R25
+        MOV	R18, R24
+        MOV	R25, R16
+        RCALL	?Subroutine7
+??CrossCallReturnLabel_9:
+        MOV	R24, R16
+        SWAP	R24
+        ANDI	R24, 0xF0
+        MOV	R16, R25
+        RCALL	?Subroutine7
+??CrossCallReturnLabel_10:
+        MOV	R16, R20
+        ADD	R16, R24
+        MOV	R24, R18
+        MOV	R25, R17
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine7:
+        LDI	R20, 10
+        JMP	?UC_DIVMOD_L01
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_settime:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R25, R17
+        MOV	R24, R18
+        RCALL	?Subroutine8
+??CrossCallReturnLabel_11:
+        LDI	R16, 2
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_16:
+        LDI	R16, 1
+        RCALL	?Subroutine4
+??CrossCallReturnLabel_14:
+        RCALL	?Subroutine6
+??CrossCallReturnLabel_27:
+        RJMP	?Subroutine14
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine6:
+        LDI	R16, 0
+        REQUIRE ?Subroutine11
+        ;		// Fall through to label ?Subroutine11
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine11:
+        RJMP	DS1307_write
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_getdate:
+        ST	-Y, R27
+        ST	-Y, R26
+        MOVW	R27:R26, R17:R16
+        LDI	R16, 4
+        RCALL	?Subroutine9
+??CrossCallReturnLabel_17:
+        ST	X, R17
+        RCALL	??Subroutine12_0
+??CrossCallReturnLabel_29:
+        ADIW	R27:R26, 1
+        ST	X+, R16
+        LDI	R16, 46
+        ST	X+, R16
+        LDI	R16, 5
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_0:
+        LDI	R16, 46
+        ST	X+, R16
+        LDI	R16, 6
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_1:
+        LDI	R16, 0
+        ST	X, R16
+        LD	R26, Y+
+        LD	R27, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine0:
+        RCALL	?Subroutine9
+??CrossCallReturnLabel_18:
+        ST	X+, R17
+        RCALL	??Subroutine12_0
+??CrossCallReturnLabel_30:
+        ST	X+, R16
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine9:
+        RCALL	?Subroutine13
+??CrossCallReturnLabel_31:
+        MOV	R17, R16
+        SWAP	R17
+        ANDI	R17, 0x0F
+        SUBI	R17, 208
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+DS1307_setdate:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOVW	R25:R24, R17:R16
+        MOV	R16, R18
+        RCALL	?Subroutine8
+??CrossCallReturnLabel_12:
+        LDI	R16, 6
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_15:
+        LDI	R16, 5
+        RCALL	?Subroutine4
+??CrossCallReturnLabel_13:
+        LDI	R16, 4
+        RCALL	?Subroutine11
+??CrossCallReturnLabel_25:
+        RJMP	?Subroutine14
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine4:
+        RCALL	?Subroutine11
+??CrossCallReturnLabel_24:
+        MOV	R16, R24
+        RJMP	?Subroutine8
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine3:
+        RCALL	?Subroutine11
+??CrossCallReturnLabel_23:
+        MOV	R16, R25
+        REQUIRE ?Subroutine8
+        ;		// Fall through to label ?Subroutine8
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine8:
+        RCALL	ByteToBCD
+        MOV	R17, R16
+        RET
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        RSEG NEAR_ID:CODE:NOROOT(0)
+`?<Initializer for Clock_Init>`:
+        DB 0, 0, 35, 2, 25, 4, 5
+
+        RSEG INITTAB:CODE:NOROOT(0)
+`?<Segment init: NEAR_I>`:
+        DW	SFE(NEAR_I) - SFB(NEAR_I)
+        DW	SFB(NEAR_I)
+        DW	SFB(NEAR_ID)
+        REQUIRE ?need_segment_init
+
+        END
+// 
+// 344 bytes in segment CODE
+//   6 bytes in segment INITTAB
+//   7 bytes in segment NEAR_I
+//   7 bytes in segment NEAR_ID
+// 
+// 351 bytes of CODE memory (+ 6 bytes shared)
+//   7 bytes of DATA memory
+//
+//Errors: none
+//Warnings: none

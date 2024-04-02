@@ -1,0 +1,318 @@
+##############################################################################
+#                                                                            #
+#                                                      23/Apr/2006  03:05:37 #
+# IAR Atmel AVR C/C++ Compiler V4.12A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\KEYBOARD.c  #
+#    Command line =  F:\Projects\VitalyIgorevich\Packet\src\m162\KEYBOARD.c  #
+#                    --cpu=m162 -ms -o F:\Projects\VitalyIgorevich\Packet\sr #
+#                    c\m162\Debug\Obj\ -lCN F:\Projects\VitalyIgorevich\Pack #
+#                    et\src\m162\Debug\List\ -y --initializers_in_flash -z9  #
+#                    --cross_call_passes=2 --debug -e -I "E:\Program         #
+#                    Files\IAR Systems\Embedded Workbench 4.0                #
+#                    Evaluation\avr\INC\" -I "E:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 4.0                          #
+#                    Evaluation\avr\INC\CLIB\" --eeprom_size 512             #
+#    List file    =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\List\ #
+#                    KEYBOARD.lst                                            #
+#    Object file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\Obj\K #
+#                    EYBOARD.r90                                             #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+F:\Projects\VitalyIgorevich\Packet\src\m162\KEYBOARD.c
+      1          #include "KEYBOARD.h"
+
+   \                                 In segment ABSOLUTE, at 0x35
+   \   union <unnamed> volatile __io _A_PORTC
+   \                     _A_PORTC:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x34
+   \   union <unnamed> volatile __io _A_DDRC
+   \                     _A_DDRC:
+   \   00000000                      DS 1
+
+   \                                 In segment ABSOLUTE, at 0x33
+   \   union <unnamed> volatile __io _A_PINC
+   \                     _A_PINC:
+   \   00000000                      DS 1
+      2          #include "DELAY.H"
+      3          
+      4          // Функция получения кода нажатой клавиши
+      5          // Сканируем клавиатуру по линиям: выводим сигнал в одну линию, проверяем 
+      6          //								   статус, во вторую, и так далее
+
+   \                                 In segment CODE, align 2, keep-with-next
+      7          unsigned char KEY_getkey()
+   \                     KEY_getkey:
+      8          {
+      9          	KEY_DDR = 0x0F;
+   \   00000000   E00F               LDI     R16, 15
+   \   00000002   BB04               OUT     0x14, R16
+     10          	
+     11          	KEY_PORT = 240;	
+   \   00000004   EF00               LDI     R16, 240
+   \   00000006   ....               RCALL   ?Subroutine0
+     12          	DELAY_MCS(40);
+   \                     ??CrossCallReturnLabel_0:
+   \   00000008   3F00               CPI     R16, 240
+   \   0000000A   F409               BRNE    ??KEY_getkey_0
+     13           	if (KEY_PIN == 240) 
+     14          		return 0; 
+   \   0000000C   ....               RJMP    ?Subroutine2
+     15          	KEY_PORT = 254;
+   \                     ??KEY_getkey_0:
+   \   0000000E   EF0E               LDI     R16, 254
+   \   00000010   ....               RCALL   ?Subroutine0
+     16          	DELAY_MCS(40);
+   \                     ??CrossCallReturnLabel_1:
+   \   00000012   3F0E               CPI     R16, 254
+   \   00000014   F421               BRNE    ??KEY_getkey_1
+     17           	if (KEY_PIN != 254) 
+     18          		return ~KEY_PIN; 
+     19          	KEY_PORT = 253;
+   \   00000016   EF0D               LDI     R16, 253
+   \   00000018   ....               RCALL   ?Subroutine0
+     20          	DELAY_MCS(40);
+   \                     ??CrossCallReturnLabel_2:
+   \   0000001A   3F0D               CPI     R16, 253
+   \   0000001C   F019               BREQ    ??KEY_getkey_2
+     21           	if (KEY_PIN != 253) 
+     22          		return ~KEY_PIN;
+   \                     ??KEY_getkey_1:
+   \   0000001E   B303               IN      R16, 0x13
+   \   00000020   9500               COM     R16
+   \   00000022   9508               RET
+     23          	KEY_PORT = 251;
+   \                     ??KEY_getkey_2:
+   \   00000024   EF0B               LDI     R16, 251
+   \   00000026   ....               RCALL   ?Subroutine0
+     24          	DELAY_MCS(40);
+     25           	if (KEY_PIN != 251) 
+   \                     ??CrossCallReturnLabel_3:
+   \   00000028   3F0B               CPI     R16, 251
+   \   0000002A   F7C9               BRNE    ??KEY_getkey_1
+     26          		return ~KEY_PIN; 
+     27          	KEY_PORT = 247;
+   \   0000002C   EF07               LDI     R16, 247
+   \   0000002E   ....               RCALL   ?Subroutine1
+     28          	DELAY_MCS(40);
+     29          	return ~KEY_PIN;
+   \                     ??CrossCallReturnLabel_5:
+   \   00000030   CFF6               RJMP    ??KEY_getkey_1
+     30          }
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine0:
+   \   00000000   ....               RCALL   ?Subroutine1
+   \                     ??CrossCallReturnLabel_4:
+   \   00000002   B303               IN      R16, 0x13
+   \   00000004   9508               RET
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine1:
+   \   00000000   BB05               OUT     0x15, R16
+   \   00000002   E50F               LDI     R16, 95
+   \   00000004   E010               LDI     R17, 0
+   \   00000006   ........           JMP     delay_func_mcs
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine2:
+   \   00000000   E000               LDI     R16, 0
+   \   00000002   9508               RET
+     31          
+     32          // Функция ожидания отпескания клавиши
+
+   \                                 In segment CODE, align 2, keep-with-next
+     33          void KEY_waitforkeyrelease()
+   \                     KEY_waitforkeyrelease:
+   \                     ??KEY_waitforkeyrelease_0:
+     34          {
+     35          	while( KEY_getkey() );
+   \   00000000   ....               RCALL   KEY_getkey
+   \   00000002   2300               TST     R16
+   \   00000004   F7E9               BRNE    ??KEY_waitforkeyrelease_0
+     36          }
+   \   00000006   9508               RET
+     37          
+     38          // Функция преобразования кода клавиши в номер
+
+   \                                 In segment CODE, align 2, keep-with-next
+     39          char KEY_getkeyname( unsigned char keycode )
+   \                     KEY_getkeyname:
+     40          {
+     41          	switch( keycode ) {
+   \   00000000   ....               LDI     R30, LOW(`?<Jumptable for KEY_getkeyname>_0`)
+   \   00000002   ....               LDI     R31, (`?<Jumptable for KEY_getkeyname>_0`) >> 8
+   \   00000004   ........           JMP     ?CV_SWITCH_L06
+     42          	case KEY_0:
+     43          		return '0';
+   \                     ??KEY_getkeyname_0:
+   \   00000008   E300               LDI     R16, 48
+   \   0000000A   9508               RET
+     44          	case KEY_1:
+     45          		return '1';
+   \                     ??KEY_getkeyname_1:
+   \   0000000C   E301               LDI     R16, 49
+   \   0000000E   9508               RET
+     46          	case KEY_2:
+     47          		return '2';
+   \                     ??KEY_getkeyname_2:
+   \   00000010   E302               LDI     R16, 50
+   \   00000012   9508               RET
+     48          	case KEY_3:
+     49          		return '3';
+   \                     ??KEY_getkeyname_3:
+   \   00000014   E303               LDI     R16, 51
+   \   00000016   9508               RET
+     50          	case KEY_4:
+     51          		return '4';
+   \                     ??KEY_getkeyname_4:
+   \   00000018   E304               LDI     R16, 52
+   \   0000001A   9508               RET
+     52          	case KEY_5:
+     53          		return '5';
+   \                     ??KEY_getkeyname_5:
+   \   0000001C   E305               LDI     R16, 53
+   \   0000001E   9508               RET
+     54          	case KEY_6:
+     55          		return '6';
+   \                     ??KEY_getkeyname_6:
+   \   00000020   E306               LDI     R16, 54
+   \   00000022   9508               RET
+     56          	case KEY_7:
+     57          		return '7';
+   \                     ??KEY_getkeyname_7:
+   \   00000024   E307               LDI     R16, 55
+   \   00000026   9508               RET
+     58          	case KEY_8:
+     59          		return '8';
+   \                     ??KEY_getkeyname_8:
+   \   00000028   E308               LDI     R16, 56
+   \   0000002A   9508               RET
+     60          	case KEY_9:
+     61          		return '9';
+   \                     ??KEY_getkeyname_9:
+   \   0000002C   E309               LDI     R16, 57
+   \   0000002E   9508               RET
+     62          	case KEY_A:
+     63          		return 'A';
+   \                     ??KEY_getkeyname_10:
+   \   00000030   E401               LDI     R16, 65
+   \   00000032   9508               RET
+     64          	case KEY_B:
+     65          		return 'B';
+   \                     ??KEY_getkeyname_11:
+   \   00000034   E402               LDI     R16, 66
+   \   00000036   9508               RET
+     66          	case KEY_C:
+     67          		return 'C';
+   \                     ??KEY_getkeyname_12:
+   \   00000038   E403               LDI     R16, 67
+   \   0000003A   9508               RET
+     68          	case KEY_D:
+     69          		return 'D';
+   \                     ??KEY_getkeyname_13:
+   \   0000003C   E404               LDI     R16, 68
+   \   0000003E   9508               RET
+     70          	case KEY_ASTERISK:
+     71          		return '*';
+   \                     ??KEY_getkeyname_14:
+   \   00000040   E20A               LDI     R16, 42
+   \   00000042   9508               RET
+     72          	case KEY_BAR:
+     73          		return '#';
+   \                     ??KEY_getkeyname_15:
+   \   00000044   E203               LDI     R16, 35
+   \   00000046   9508               RET
+     74          	default:
+     75          		return 0;
+   \                     ??KEY_getkeyname_16:
+   \   00000048                      REQUIRE ?Subroutine2
+   \   00000048                      ;               // Fall through to label ?Subroutine2
+     76          	}
+     77          }
+
+   \                                 In segment SWITCH, align 2, keep-with-next
+   \                     `?<Jumptable for KEY_getkeyname>_0`:
+   \   00000000   11                 DB      17
+   \   00000001   01                 DB      1
+   \   00000002   ....               DW      (??KEY_getkeyname_16) /2
+   \   00000004   ....               DW      (??KEY_getkeyname_1) /2
+   \   00000006   01                 DB      0x1
+   \   00000007   ....               DW      (??KEY_getkeyname_4) /2
+   \   00000009   02                 DB      0x2
+   \   0000000A   ....               DW      (??KEY_getkeyname_7) /2
+   \   0000000C   04                 DB      0x4
+   \   0000000D   ....               DW      (??KEY_getkeyname_14) /2
+   \   0000000F   09                 DB      0x9
+   \   00000010   ....               DW      (??KEY_getkeyname_2) /2
+   \   00000012   01                 DB      0x1
+   \   00000013   ....               DW      (??KEY_getkeyname_5) /2
+   \   00000015   02                 DB      0x2
+   \   00000016   ....               DW      (??KEY_getkeyname_8) /2
+   \   00000018   04                 DB      0x4
+   \   00000019   ....               DW      (??KEY_getkeyname_0) /2
+   \   0000001B   19                 DB      0x19
+   \   0000001C   ....               DW      (??KEY_getkeyname_3) /2
+   \   0000001E   01                 DB      0x1
+   \   0000001F   ....               DW      (??KEY_getkeyname_6) /2
+   \   00000021   02                 DB      0x2
+   \   00000022   ....               DW      (??KEY_getkeyname_9) /2
+   \   00000024   04                 DB      0x4
+   \   00000025   ....               DW      (??KEY_getkeyname_15) /2
+   \   00000027   39                 DB      0x39
+   \   00000028   ....               DW      (??KEY_getkeyname_10) /2
+   \   0000002A   01                 DB      0x1
+   \   0000002B   ....               DW      (??KEY_getkeyname_11) /2
+   \   0000002D   02                 DB      0x2
+   \   0000002E   ....               DW      (??KEY_getkeyname_12) /2
+   \   00000030   04                 DB      0x4
+   \   00000031   ....               DW      (??KEY_getkeyname_13) /2
+   \   00000033   FB                 DB      251
+     78          
+
+   Maximum stack usage in bytes:
+
+     Function              CSTACK RSTACK
+     --------              ------ ------
+     KEY_getkey                0      2
+       -> delay_func_mcs       0      2
+       -> delay_func_mcs       0      2
+       -> delay_func_mcs       0      2
+       -> delay_func_mcs       0      2
+       -> delay_func_mcs       0      2
+     KEY_getkeyname            0      2
+     KEY_waitforkeyrelease     0      2
+       -> KEY_getkey           0      2
+
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     _A_PORTC                          1
+     _A_DDRC                           1
+     _A_PINC                           1
+     KEY_getkey                       50
+     ?Subroutine0                      6
+     ?Subroutine1                     10
+     ?Subroutine2                      4
+     ??KEY_waitforkeyrelease_0         8
+     KEY_getkeyname                   72
+     ?<Jumptable for KEY_getkeyname>_0
+                                      52
+
+ 
+   3 bytes in segment ABSOLUTE
+ 150 bytes in segment CODE
+  52 bytes in segment SWITCH
+ 
+ 202 bytes of CODE memory
+   0 bytes of DATA memory (+ 3 bytes shared)
+
+Errors: none
+Warnings: none

@@ -1,0 +1,115 @@
+##############################################################################
+#                                                                            #
+#                                                      28/Jun/2007  00:57:50 #
+# IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  D:\stend\src\m162\CONVERT.c                             #
+#    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D     #
+#                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb         #
+#                    D:\stend\src\m162\Release\List\ -y                      #
+#                    --initializers_in_flash -z9 -e -I "D:\Program           #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program     #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"               #
+#                    --eeprom_size 512 D:\stend\src\m162\CONVERT.c           #
+#    List file    =  D:\stend\src\m162\Release\List\CONVERT.lst              #
+#    Object file  =  D:\stend\src\m162\Release\Obj\CONVERT.r90               #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+D:\stend\src\m162\CONVERT.c
+      1          #include "Convert.h"
+      2          #include <string.h>
+      3          
+      4          unsigned char StringToByte( char* str )
+      5          {
+      6          	unsigned char value = 0, coeff = 1;
+      7          	int len = strlen( str );
+      8          	
+      9          	for( signed char i = len - 1; i >= 0 && i >= len - 3; i-- )
+     10          	{
+     11          		value += ( str[ i ] - '0' ) * coeff;
+     12          		coeff *= 10;
+     13          	}
+     14          	
+     15          	return value;
+     16          }
+     17          
+     18          unsigned char ByteToString( unsigned char value, char str[] )
+     19          {
+     20          	unsigned char nIndex = 0, digit, startFlag = 0;
+     21          
+     22          	if( value != 0 )
+     23          		for( unsigned char d = 100; d > 0; d /= 10 )
+     24          		{
+     25          			if( startFlag || value >= d )
+     26          			{
+     27          				digit = value / d;
+     28          				str[ nIndex++ ] = digit + '0';
+     29          				value -= digit * d;
+     30          				startFlag = 1;
+     31          			}
+     32          		}
+     33          	else
+     34          		str[ nIndex++ ] = '0';
+     35          			
+     36          	str[ nIndex ] = 0;
+     37          	
+     38          	return nIndex;
+     39          }
+     40          
+     41          unsigned char ShortToString( signed short value, char str[] )
+     42          {
+     43          	unsigned char nIndex = 0, digit, startFlag = 0;
+     44          
+     45          	if( value < 0 )
+     46          	{
+     47          		str[ nIndex++ ] = '-';
+     48          		value *= -1;
+     49          	}
+     50          
+     51          	if( value != 0 )
+     52          		for( signed short d = 10000; d > 0; d /= 10 )
+     53          		{
+     54          			if( startFlag || value >= d )
+     55          			{
+     56          				digit = value / d;
+     57          				str[ nIndex++ ] = digit + '0';
+     58          				value -= digit * d;
+     59          				startFlag = 1;
+     60          			}
+     61          		}
+     62          	else
+     63          		str[ nIndex++ ] = '0';
+     64          			
+     65          	str[ nIndex ] = 0;
+     66          	
+     67          	return nIndex;
+     68          }
+
+   Maximum stack usage in bytes:
+
+     Function      CSTACK RSTACK
+     --------      ------ ------
+     ByteToString      6      4
+     ShortToString     8      4
+     StringToByte      4      2
+       -> strlen       4      2
+
+
+   Segment part sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     StringToByte     70
+     ByteToString    100
+     ShortToString   148
+
+ 
+ 318 bytes in segment CODE
+ 
+ 318 bytes of CODE memory
+
+Errors: none
+Warnings: none

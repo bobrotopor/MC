@@ -1,0 +1,823 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     28/Jun/2007  00:57:53 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m162\Main.c                               /
+//    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D    /
+//                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb        /
+//                    D:\stend\src\m162\Release\List\ -y                     /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m162\Main.c             /
+//    List file    =  D:\stend\src\m162\Release\List\Main.s90                /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME Main
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        EXTERN ?CV_SWITCH_L06
+        EXTERN ?ML_FLASH_SRAM_16EC_16_L07
+        EXTERN ?UC_DIVMOD_L01
+        EXTERN ?need_segment_init
+
+        PUBWEAK `?<Segment init: NEAR_Z>`
+        PUBWEAK `??INTVEC 76`
+?Subroutine11 EQU 0
+        PUBLIC AutonomousMode
+        PUBLIC ExecuteTask1
+        PUBLIC ExecuteTask2
+        PUBLIC ExecuteTask3
+        PUBLIC ExecuteTask4
+        PUBLIC ExecuteTask5
+        PUBLIC ExecuteTask6
+        PUBLIC ExecuteTask7
+        PUBLIC ExecuteTask8
+        PUBLIC ExecuteTask9
+        PUBLIC LcdMessageLine1
+        PUBLIC LcdMessageLine2
+        PUBLIC OutputStartLCDMessage
+        PUBLIC UART0_RX_interrupt
+        PUBLIC UartMessage
+        PUBWEAK _A_DDRB
+        PUBWEAK _A_DDRD
+        PUBWEAK _A_PORTB
+        PUBWEAK _A_PORTD
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+        PUBLIC dateStr
+        PUBLIC enterAddressStr
+        PUBLIC enterDayStr
+        PUBLIC enterHourStr
+        PUBLIC enterMinuteStr
+        PUBLIC enterMonthStr
+        PUBLIC enterSecondStr
+        PUBLIC enterTaskNumberStr
+        PUBLIC enterValueStr
+        PUBLIC enterYearStr
+        PUBLIC main
+        PUBLIC sensorNotConnectedStr
+        PUBLIC temperatureStr
+        PUBLIC timeStr
+        PUBLIC valueStr
+
+        EXTERN LCD_clrscr
+        EXTERN KEY_getkey
+        EXTERN KEY_getkeyname
+        EXTERN LCD_printchar
+        EXTERN LCD_gotoxy
+        EXTERN KEY_waitforkeyrelease
+        EXTERN LED7_setdigit
+        EXTERN Beep
+        EXTERN DS1307_gettime
+        EXTERN DS1307_getdate
+        EXTERN UART_sendstring_flash
+        EXTERN UART_sendstring
+        EXTERN UART_sendcrlf
+        EXTERN UART_receivevalue
+        EXTERN DS1307_settime
+        EXTERN DS1307_setdate
+        EXTERN AT24CXX_write
+        EXTERN AT24CXX_read
+        EXTERN UART_sendvalue
+        EXTERN DS1820_startconverttemp
+        EXTERN DS1820_getconvertstatus
+        EXTERN DS1820_gettemperature
+        EXTERN LCD_print_flash
+        EXTERN LCD_print
+        EXTERN I2C_init
+        EXTERN SPI_init
+        EXTERN LCD_init
+        EXTERN UART_init
+        EXTERN delay_func_ms
+
+
+        RSEG NEAR_F:CODE:NOROOT(0)
+`?<Constant {'\\000'}>`:
+        DB 0, 0, 0, 0, 0, 0, 0, 0, 0
+        DB 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+        RSEG NEAR_F:CODE:NOROOT(0)
+UartMessage:
+        DB 20H, 20H, 20H, 20H, 20H, 20H, 20H, 20H
+        DB 20H, 20H, 20H, 20H, 20H, 20H, 20H, 20H
+        DB 2DH, 3DH, 20H, 20H, 53H, 54H, 45H, 4EH
+        DB 44H, 20H, 52H, 4BH, 2DH, 31H, 30H, 20H
+        DB 20H, 3DH, 2DH, 0DH, 0AH, 20H, 20H, 20H
+        DB 20H, 20H, 20H, 20H, 48H, 61H, 72H, 64H
+        DB 77H, 61H, 72H, 65H, 20H, 76H, 65H, 72H
+        DB 2EH, 20H, 31H, 2EH, 30H, 2CH, 20H, 46H
+        DB 69H, 72H, 6DH, 77H, 61H, 72H, 65H, 20H
+        DB 76H, 65H, 72H, 2EH, 20H, 32H, 2EH, 30H
+        DB 0DH, 0AH, 0
+enterTaskNumberStr:
+        DB "Enter task number: "
+
+        RSEG NEAR_F:CODE:NOROOT(0)
+LcdMessageLine1:
+        DB 45, 61, 67, 84, 69, 72, 224, 32, 32, 80, 75, 45, 49, 48, 61, 45, 0
+LcdMessageLine2:
+        DB "   Ver. 2.0"
+
+        RSEG NEAR_F:CODE:NOROOT(0)
+timeStr:
+        DB "Time: "
+dateStr:
+        DB "Date: "
+
+        RSEG NEAR_F:CODE:NOROOT(0)
+enterAddressStr:
+        DB "Enter address(0..255): "
+enterValueStr:
+        DB "Enter value(0..255): "
+valueStr:
+        DB "Value: "
+
+        RSEG NEAR_F:CODE:NOROOT(0)
+temperatureStr:
+        DB "Temperature: "
+sensorNotConnectedStr:
+        DB "Sensor is not connected"
+
+        RSEG NEAR_F:CODE:NOROOT(0)
+enterHourStr:
+        DB "Enter hour: "
+enterMinuteStr:
+        DB "Enter minute: "
+enterSecondStr:
+        DB "Enter second: "
+enterDayStr:
+        DB "Enter day: "
+enterMonthStr:
+        DB "Enter month: "
+enterYearStr:
+        DB "Enter year: "
+
+        RSEG CODE:CODE:NOROOT(1)
+ExecuteTask1:
+        ST	-Y, R25
+        ST	-Y, R24
+        LDI	R25, 0
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_9:
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_0:
+        BREQ	??CrossCallReturnLabel_17
+        RCALL	?Subroutine4
+??CrossCallReturnLabel_13:
+        CPI	R16, 48
+        BRCS	??ExecuteTask1_0
+        CPI	R16, 58
+        BRCC	??ExecuteTask1_0
+        CALL	LCD_printchar
+        INC	R25
+        CPI	R25, 16
+        BRNE	??ExecuteTask1_1
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_58:
+        RJMP	??ExecuteTask1_1
+??ExecuteTask1_0:
+        CPI	R24, 24
+        BRNE	??ExecuteTask1_1
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_8:
+        LDI	R25, 0
+??ExecuteTask1_1:
+        RCALL	?Subroutine5
+??CrossCallReturnLabel_17:
+        CPI	R24, 72
+        BRNE	??CrossCallReturnLabel_9
+        REQUIRE ?Subroutine18
+        ;		// Fall through to label ?Subroutine18
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine18:
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+ExecuteTask2:
+        ST	-Y, R24
+??ExecuteTask2_0:
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_1:
+        BREQ	??CrossCallReturnLabel_16
+        RCALL	?Subroutine4
+??CrossCallReturnLabel_12:
+        SUBI	R16, 48
+        CALL	LED7_setdigit
+        RCALL	?Subroutine5
+??CrossCallReturnLabel_16:
+        CPI	R24, 72
+        BRNE	??ExecuteTask2_0
+        RJMP	?Subroutine19
+
+        RSEG CODE:CODE:NOROOT(1)
+ExecuteTask3:
+        ST	-Y, R24
+??ExecuteTask3_0:
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_2:
+        BREQ	??CrossCallReturnLabel_15
+        LDI	R16, 100
+        LDI	R17, 0
+        CALL	Beep
+        RCALL	?Subroutine5
+??CrossCallReturnLabel_15:
+        CPI	R24, 72
+        BRNE	??ExecuteTask3_0
+        RJMP	?Subroutine19
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine5:
+        JMP	KEY_waitforkeyrelease
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine0:
+        CALL	KEY_getkey
+        MOV	R24, R16
+        TST	R16
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+ExecuteTask4:
+        ST	-Y, R24
+??ExecuteTask4_0:
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_3:
+        BREQ	??CrossCallReturnLabel_14
+        RCALL	?Subroutine4
+??CrossCallReturnLabel_11:
+        SUBI	R16, 49
+        BREQ	??ExecuteTask4_1
+        DEC	R16
+        BREQ	??ExecuteTask4_2
+        DEC	R16
+        BREQ	??ExecuteTask4_3
+        RJMP	??ExecuteTask4_4
+??ExecuteTask4_1:
+        IN	R16, 0x18
+        SBRS	R16, 0
+        SBI	0x18, 0x00
+??ExecuteTask4_5:
+        SBRC	R16, 0
+        CBI	0x18, 0x00
+??ExecuteTask4_6:
+        RJMP	??ExecuteTask4_4
+??ExecuteTask4_2:
+        IN	R16, 0x18
+        SBRS	R16, 1
+        SBI	0x18, 0x01
+??ExecuteTask4_7:
+        SBRC	R16, 1
+        CBI	0x18, 0x01
+??ExecuteTask4_8:
+        RJMP	??ExecuteTask4_4
+??ExecuteTask4_3:
+        IN	R16, 0x12
+        SBRS	R16, 5
+        SBI	0x12, 0x05
+??ExecuteTask4_9:
+        SBRC	R16, 5
+        CBI	0x12, 0x05
+??ExecuteTask4_4:
+        RCALL	?Subroutine5
+??CrossCallReturnLabel_14:
+        CPI	R24, 72
+        BRNE	??ExecuteTask4_0
+        RJMP	?Subroutine19
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine4:
+        JMP	KEY_getkeyname
+
+        RSEG CODE:CODE:NOROOT(1)
+ExecuteTask5:
+        SBIW	R29:R28, 18
+        MOVW	R17:R16, R29:R28
+        CALL	DS1307_gettime
+        RCALL	?Subroutine9
+??CrossCallReturnLabel_21:
+        LDI	R16, LOW(timeStr)
+        LDI	R17, (timeStr) >> 8
+        RCALL	?Subroutine10
+??CrossCallReturnLabel_23:
+        RCALL	?Subroutine12
+??CrossCallReturnLabel_27:
+        LDI	R16, LOW((timeStr + 7))
+        LDI	R17, (timeStr + 7) >> 8
+        RCALL	?Subroutine17
+??CrossCallReturnLabel_38:
+        RCALL	?Subroutine15
+??CrossCallReturnLabel_34:
+        CALL	UART_sendstring
+        RCALL	?Subroutine12
+??CrossCallReturnLabel_26:
+        ADIW	R29:R28, 18
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+ExecuteTask6:
+        ST	-Y, R25
+        ST	-Y, R24
+        LDI	R16, LOW(enterHourStr)
+        LDI	R17, (enterHourStr) >> 8
+        RCALL	?Subroutine8
+??CrossCallReturnLabel_52:
+        MOV	R25, R16
+        LDI	R16, LOW((enterHourStr + 13))
+        LDI	R17, (enterHourStr + 13) >> 8
+        RCALL	?Subroutine8
+??CrossCallReturnLabel_51:
+        MOV	R24, R16
+        LDI	R16, LOW((enterHourStr + 28))
+        LDI	R17, (enterHourStr + 28) >> 8
+        RCALL	?Subroutine7
+??CrossCallReturnLabel_18:
+        CALL	DS1307_settime
+        LDI	R16, LOW((enterHourStr + 43))
+        LDI	R17, (enterHourStr + 43) >> 8
+        RCALL	?Subroutine8
+??CrossCallReturnLabel_50:
+        MOV	R25, R16
+        LDI	R16, LOW((enterHourStr + 55))
+        LDI	R17, (enterHourStr + 55) >> 8
+        RCALL	?Subroutine8
+??CrossCallReturnLabel_49:
+        MOV	R24, R16
+        LDI	R16, LOW((enterHourStr + 69))
+        LDI	R17, (enterHourStr + 69) >> 8
+        RCALL	?Subroutine7
+??CrossCallReturnLabel_19:
+        CALL	DS1307_setdate
+        RJMP	?Subroutine18
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine8:
+        RCALL	?Subroutine17
+??CrossCallReturnLabel_44:
+        REQUIRE ?Subroutine20
+        ;		// Fall through to label ?Subroutine20
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine20:
+        JMP	UART_receivevalue
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine7:
+        RCALL	?Subroutine16
+??CrossCallReturnLabel_46:
+        MOV	R18, R16
+        MOV	R17, R24
+        MOV	R16, R25
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+ExecuteTask7:
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_4:
+        LDI	R16, LOW((enterAddressStr + 24))
+        LDI	R17, (enterAddressStr + 24) >> 8
+        RCALL	?Subroutine8
+??CrossCallReturnLabel_48:
+        MOV	R17, R16
+        MOV	R16, R24
+        CALL	AT24CXX_write
+        REQUIRE ?Subroutine19
+        ;		// Fall through to label ?Subroutine19
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine19:
+        LD	R24, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+ExecuteTask8:
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_5:
+        LDI	R16, LOW((enterAddressStr + 46))
+        LDI	R17, (enterAddressStr + 46) >> 8
+        RCALL	?Subroutine17
+??CrossCallReturnLabel_39:
+        MOV	R16, R24
+        CALL	AT24CXX_read
+        CALL	UART_sendvalue
+        RCALL	?Subroutine12
+??CrossCallReturnLabel_25:
+        RJMP	?Subroutine19
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine12:
+        JMP	UART_sendcrlf
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine1:
+        ST	-Y, R24
+        LDI	R16, LOW(enterAddressStr)
+        LDI	R17, (enterAddressStr) >> 8
+        RCALL	?Subroutine16
+??CrossCallReturnLabel_45:
+        MOV	R24, R16
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine16:
+        CALL	UART_sendstring_flash
+        RJMP	?Subroutine20
+
+        RSEG CODE:CODE:NOROOT(1)
+ExecuteTask9:
+        SBIW	R29:R28, 5
+        RCALL	?Subroutine13
+??CrossCallReturnLabel_30:
+        TST	R16
+        BRNE	??ExecuteTask9_0
+        LDI	R16, LOW((temperatureStr + 14))
+        LDI	R17, (temperatureStr + 14) >> 8
+        RCALL	?Subroutine17
+??CrossCallReturnLabel_40:
+        RJMP	??CrossCallReturnLabel_22
+??ExecuteTask9_0:
+        CALL	DS1820_getconvertstatus
+        TST	R16
+        BREQ	??ExecuteTask9_0
+        MOVW	R17:R16, R29:R28
+        CALL	DS1820_gettemperature
+        TST	R16
+        BREQ	??CrossCallReturnLabel_24
+        LDI	R16, LOW(temperatureStr)
+        LDI	R17, (temperatureStr) >> 8
+        RCALL	?Subroutine10
+??CrossCallReturnLabel_22:
+        RCALL	?Subroutine12
+??CrossCallReturnLabel_24:
+        ADIW	R29:R28, 5
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine17:
+        JMP	UART_sendstring_flash
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine10:
+        RCALL	?Subroutine17
+??CrossCallReturnLabel_37:
+        MOVW	R17:R16, R29:R28
+        JMP	UART_sendstring
+
+        RSEG CODE:CODE:NOROOT(1)
+OutputStartLCDMessage:
+        LDI	R16, LOW(LcdMessageLine1)
+        LDI	R17, (LcdMessageLine1) >> 8
+        CALL	LCD_print_flash
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_57:
+        LDI	R16, LOW((LcdMessageLine1 + 17))
+        LDI	R17, (LcdMessageLine1 + 17) >> 8
+        JMP	LCD_print_flash
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine2:
+        LDI	R17, 1
+        LDI	R16, 0
+        REQUIRE ?Subroutine21
+        ;		// Fall through to label ?Subroutine21
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine21:
+        JMP	LCD_gotoxy
+
+        RSEG CODE:CODE:NOROOT(1)
+UART0_RX_interrupt:
+        ST	-Y, R24
+        ST	-Y, R31
+        ST	-Y, R30
+        ST	-Y, R3
+        ST	-Y, R2
+        ST	-Y, R1
+        ST	-Y, R0
+        ST	-Y, R23
+        ST	-Y, R22
+        ST	-Y, R21
+        ST	-Y, R20
+        ST	-Y, R19
+        ST	-Y, R18
+        ST	-Y, R17
+        ST	-Y, R16
+        IN	R24, 0x3F
+        RCALL	?Subroutine20
+??CrossCallReturnLabel_47:
+        LDI	R30, LOW(`?<Jumptable for UART0_RX_interrupt>_0`)
+        LDI	R31, (`?<Jumptable for UART0_RX_interrupt>_0`) >> 8
+        JMP	?CV_SWITCH_L06
+??UART0_RX_interrupt_0:
+        RCALL	ExecuteTask1
+        RJMP	??UART0_RX_interrupt_1
+??UART0_RX_interrupt_2:
+        RCALL	ExecuteTask2
+        RJMP	??UART0_RX_interrupt_1
+??UART0_RX_interrupt_3:
+        RCALL	ExecuteTask3
+        RJMP	??UART0_RX_interrupt_1
+??UART0_RX_interrupt_4:
+        RCALL	ExecuteTask4
+        RJMP	??UART0_RX_interrupt_1
+??UART0_RX_interrupt_5:
+        RCALL	ExecuteTask5
+        RJMP	??UART0_RX_interrupt_1
+??UART0_RX_interrupt_6:
+        RCALL	ExecuteTask6
+        RJMP	??UART0_RX_interrupt_1
+??UART0_RX_interrupt_7:
+        RCALL	ExecuteTask7
+        RJMP	??UART0_RX_interrupt_1
+??UART0_RX_interrupt_8:
+        RCALL	ExecuteTask8
+        RJMP	??UART0_RX_interrupt_1
+??UART0_RX_interrupt_9:
+        RCALL	ExecuteTask9
+??UART0_RX_interrupt_1:
+        LDI	R16, LOW((UartMessage + 83))
+        LDI	R17, (UartMessage + 83) >> 8
+        RCALL	?Subroutine17
+??CrossCallReturnLabel_41:
+        OUT	0x3F, R24
+        LD	R16, Y+
+        LD	R17, Y+
+        LD	R18, Y+
+        LD	R19, Y+
+        LD	R20, Y+
+        LD	R21, Y+
+        LD	R22, Y+
+        LD	R23, Y+
+        LD	R0, Y+
+        LD	R1, Y+
+        LD	R2, Y+
+        LD	R3, Y+
+        LD	R30, Y+
+        LD	R31, Y+
+        LD	R24, Y+
+        RETI
+
+        RSEG CODE:CODE:NOROOT(1)
+AutonomousMode:
+        ST	-Y, R24
+        SBIW	R29:R28, 18
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_7:
+        LDI	R17, 0
+        LDI	R16, 0
+        RCALL	?Subroutine21
+??CrossCallReturnLabel_53:
+        LDI	R16, LOW(??strTemp)
+        LDI	R17, (??strTemp) >> 8
+        CALL	DS1820_gettemperature
+        TST	R16
+        BREQ	??AutonomousMode_0
+        SUBI	R16, 2
+        BREQ	??AutonomousMode_1
+        RJMP	??CrossCallReturnLabel_29
+??AutonomousMode_0:
+        LDI	R16, 0
+        STS	??strTemp, R16
+        RJMP	??CrossCallReturnLabel_29
+??AutonomousMode_1:
+        RCALL	?Subroutine13
+??CrossCallReturnLabel_29:
+        LDI	R16, LOW(??strTemp)
+        LDI	R17, (??strTemp) >> 8
+        RCALL	?Subroutine14
+??CrossCallReturnLabel_33:
+        MOVW	R17:R16, R29:R28
+        MOVW	R31:R30, R29:R28
+        LDI	R18, 0
+        LDI	R24, 9
+??AutonomousMode_2:
+        ST	Z+, R18
+        DEC	R24
+        BRNE	??AutonomousMode_2
+        CALL	DS1307_gettime
+        LDI	R17, 0
+        RCALL	?Subroutine6
+??CrossCallReturnLabel_55:
+        MOVW	R17:R16, R29:R28
+        RCALL	?Subroutine14
+??CrossCallReturnLabel_32:
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_56:
+        CALL	KEY_getkey
+        RCALL	?Subroutine4
+??CrossCallReturnLabel_10:
+        TST	R16
+        BREQ	??AutonomousMode_3
+        CALL	LCD_printchar
+??AutonomousMode_3:
+        MOVW	R19:R18, R29:R28
+        SUBI	R18, 247
+        SBCI	R19, 255
+        MOVW	R17:R16, R19:R18
+        LDI	R30, LOW((`?<Constant {'\\000'}>` + 9))
+        LDI	R31, (`?<Constant {'\\000'}>` + 9) >> 8
+        LDI	R20, 9
+        LDI	R21, 0
+        CALL	?ML_FLASH_SRAM_16EC_16_L07
+        RCALL	?Subroutine9
+??CrossCallReturnLabel_20:
+        LDI	R17, 1
+        RCALL	?Subroutine6
+??CrossCallReturnLabel_54:
+        RCALL	?Subroutine15
+??CrossCallReturnLabel_35:
+        RCALL	?Subroutine14
+??CrossCallReturnLabel_31:
+        LDS	R16, (??strTemp + 9)
+        LDI	R20, 3
+        CALL	?UC_DIVMOD_L01
+        TST	R20
+        BRNE	??AutonomousMode_4
+        IN	R16, 0x18
+        SBRS	R16, 0
+        SBI	0x18, 0x00
+??AutonomousMode_5:
+        SBRC	R16, 0
+        CBI	0x18, 0x00
+??AutonomousMode_6:
+        IN	R16, 0x18
+        SBRS	R16, 1
+        SBI	0x18, 0x01
+??AutonomousMode_7:
+        SBRC	R16, 1
+        CBI	0x18, 0x01
+??AutonomousMode_8:
+        IN	R16, 0x12
+        SBRS	R16, 5
+        SBI	0x12, 0x05
+??AutonomousMode_9:
+        SBRC	R16, 5
+        CBI	0x12, 0x05
+??AutonomousMode_4:
+        LDI	R30, LOW(??strTemp)
+        LDI	R31, (??strTemp) >> 8
+        LDD	R16, Z+9
+        INC	R16
+        STD	Z+9, R16
+        ADIW	R29:R28, 18
+        RJMP	?Subroutine19
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine15:
+        MOVW	R17:R16, R29:R28
+        SUBI	R16, 247
+        SBCI	R17, 255
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine14:
+        JMP	LCD_print
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine13:
+        JMP	DS1820_startconverttemp
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine9:
+        RCALL	?Subroutine15
+??CrossCallReturnLabel_36:
+        JMP	DS1307_getdate
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine6:
+        LDI	R16, 6
+        RJMP	?Subroutine21
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine3:
+        JMP	LCD_clrscr
+
+        RSEG NEAR_Z:DATA:NOROOT(0)
+        REQUIRE `?<Segment init: NEAR_Z>`
+??strTemp:
+        DS 9
+        DS 1
+
+        RSEG CODE:CODE:NOROOT(1)
+main:
+        SBI	0x17, 0x00
+        SBI	0x17, 0x01
+        SBI	0x11, 0x05
+        CALL	I2C_init
+        CALL	SPI_init
+        CALL	LCD_init
+        RCALL	?Subroutine3
+??CrossCallReturnLabel_6:
+        LDI	R16, 15
+        LDI	R17, 0
+        CALL	UART_init
+        SEI
+        RCALL	?Subroutine13
+??CrossCallReturnLabel_28:
+        LDI	R16, LOW(UartMessage)
+        LDI	R17, (UartMessage) >> 8
+        RCALL	?Subroutine17
+??CrossCallReturnLabel_42:
+        RCALL	OutputStartLCDMessage
+        LDI	R16, LOW((UartMessage + 83))
+        LDI	R17, (UartMessage + 83) >> 8
+        RCALL	?Subroutine17
+??CrossCallReturnLabel_43:
+        LDI	R16, 244
+        LDI	R17, 1
+        CALL	Beep
+        LDI	R16, 33
+        LDI	R17, 39
+??main_0:
+        CALL	delay_func_ms
+        RCALL	AutonomousMode
+        LDI	R16, 211
+        LDI	R17, 7
+        RJMP	??main_0
+
+        COMMON INTVEC:CODE:ROOT(1)
+        ORG 76
+`??INTVEC 76`:
+        JMP	UART0_RX_interrupt
+
+        RSEG INITTAB:CODE:NOROOT(0)
+`?<Segment init: NEAR_Z>`:
+        DW	SFE(NEAR_Z) - SFB(NEAR_Z)
+        DW	SFB(NEAR_Z)
+        DW	0
+        REQUIRE ?need_segment_init
+
+        RSEG SWITCH:CODE:NOROOT(1)
+`?<Jumptable for UART0_RX_interrupt>_0`:
+        DB	1
+        DB	0
+        DW	(??UART0_RX_interrupt_1) /2
+        DW	9
+        DW	(??UART0_RX_interrupt_0) /2
+        DW	(??UART0_RX_interrupt_2) /2
+        DW	(??UART0_RX_interrupt_3) /2
+        DW	(??UART0_RX_interrupt_4) /2
+        DW	(??UART0_RX_interrupt_5) /2
+        DW	(??UART0_RX_interrupt_6) /2
+        DW	(??UART0_RX_interrupt_7) /2
+        DW	(??UART0_RX_interrupt_8) /2
+        DW	(??UART0_RX_interrupt_9) /2
+
+        ASEGN ABSOLUTE:DATA:NOROOT,038H
+// union <unnamed> volatile __io _A_PORTB
+_A_PORTB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,037H
+// union <unnamed> volatile __io _A_DDRB
+_A_DDRB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,032H
+// union <unnamed> volatile __io _A_PORTD
+_A_PORTD:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,031H
+// union <unnamed> volatile __io _A_DDRD
+_A_DDRD:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+//   4 bytes in segment ABSOLUTE
+// 832 bytes in segment CODE
+//   6 bytes in segment INITTAB
+//   4 bytes in segment INTVEC
+// 338 bytes in segment NEAR_F
+//  10 bytes in segment NEAR_Z
+//  24 bytes in segment SWITCH
+// 
+// 1 194 bytes of CODE memory (+ 10 bytes shared)
+//    10 bytes of DATA memory (+  4 bytes shared)
+//
+//Errors: none
+//Warnings: none

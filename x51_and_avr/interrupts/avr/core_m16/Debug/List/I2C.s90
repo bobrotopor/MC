@@ -1,0 +1,203 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     21/May/2007  11:44:14 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m16\I2C.c                                 /
+//    Command line =  --cpu=m16 -mt -o D:\stend\src\m16\Debug\Obj\ -lb       /
+//                    D:\stend\src\m16\Debug\List\ --initializers_in_flash   /
+//                    -z3 --no_cse --no_inline --no_code_motion              /
+//                    --no_cross_call --no_clustering --no_tbaa --debug -e   /
+//                    -I "D:\Program Files\IAR Systems\AVR4.10A\avr\INC\"    /
+//                    -I "D:\Program Files\IAR Systems\AVR4.10A\avr\INC\CLIB /
+//                    \" --eeprom_size 512 D:\stend\src\m16\I2C.c            /
+//    List file    =  D:\stend\src\m16\Debug\List\I2C.s90                    /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME I2C
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        PUBLIC I2C_init
+        PUBLIC I2C_read
+        PUBLIC I2C_start
+        PUBLIC I2C_stop
+        PUBLIC I2C_write
+        PUBWEAK _A_DDRB
+        PUBWEAK _A_PINB
+        PUBWEAK _A_PORTB
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN delay_func_mcs
+
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_init:
+        CBI	0x17, 0x03
+        CBI	0x17, 0x02
+        CBI	0x18, 0x03
+        CBI	0x18, 0x02
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_start:
+        CBI	0x17, 0x02
+        CBI	0x17, 0x03
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        SBI	0x17, 0x03
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        SBI	0x17, 0x02
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_stop:
+        SBI	0x17, 0x03
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        CBI	0x17, 0x02
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        CBI	0x17, 0x03
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_write:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R24, R16
+        LDI	R25, 8
+        RJMP	??I2C_write_0
+??I2C_write_1:
+        SBI	0x17, 0x03
+??I2C_write_2:
+        LSL	R24
+        CBI	0x17, 0x02
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        SBI	0x17, 0x02
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+??I2C_write_0:
+        MOV	R16, R25
+        MOV	R25, R16
+        DEC	R25
+        TST	R16
+        BREQ	??I2C_write_3
+        BST	R24, 7
+        BRTC	??I2C_write_1
+        CBI	0x17, 0x03
+        RJMP	??I2C_write_2
+??I2C_write_3:
+        CBI	0x17, 0x03
+        CBI	0x17, 0x02
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        SBIS	0x16, 0x03
+        RJMP	??I2C_write_4
+        LDI	R24, 255
+        RJMP	??I2C_write_5
+??I2C_write_4:
+        LDI	R24, 0
+??I2C_write_5:
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        SBI	0x17, 0x02
+        MOV	R16, R24
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+I2C_read:
+        ST	-Y, R25
+        ST	-Y, R24
+        LDI	R24, 0
+        LDI	R25, 8
+        CBI	0x17, 0x03
+        RJMP	??I2C_read_0
+??I2C_read_1:
+        CBI	0x17, 0x02
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        LSL	R24
+        SBIC	0x16, 0x03
+        ORI	R24, 0x01
+??I2C_read_2:
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        SBI	0x17, 0x02
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+??I2C_read_0:
+        MOV	R16, R25
+        MOV	R25, R16
+        DEC	R25
+        TST	R16
+        BRNE	??I2C_read_1
+        CBI	0x17, 0x02
+        LDI	R16, 39
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        SBI	0x17, 0x02
+        MOV	R16, R24
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        ASEGN ABSOLUTE:DATA:NOROOT,038H
+// union <unnamed> volatile __io _A_PORTB
+_A_PORTB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,037H
+// union <unnamed> volatile __io _A_DDRB
+_A_DDRB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,036H
+// union <unnamed> volatile __io _A_PINB
+_A_PINB:
+        DS 1
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+//   3 bytes in segment ABSOLUTE
+// 228 bytes in segment CODE
+// 
+// 228 bytes of CODE memory
+//   0 bytes of DATA memory (+ 3 bytes shared)
+//
+//Errors: none
+//Warnings: none

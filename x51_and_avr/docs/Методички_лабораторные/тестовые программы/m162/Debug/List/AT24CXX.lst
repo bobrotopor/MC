@@ -1,0 +1,159 @@
+##############################################################################
+#                                                                            #
+#                                                      23/Apr/2006  03:05:40 #
+# IAR Atmel AVR C/C++ Compiler V4.12A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\AT24CXX.c   #
+#    Command line =  F:\Projects\VitalyIgorevich\Packet\src\m162\AT24CXX.c   #
+#                    --cpu=m162 -ms -o F:\Projects\VitalyIgorevich\Packet\sr #
+#                    c\m162\Debug\Obj\ -lCN F:\Projects\VitalyIgorevich\Pack #
+#                    et\src\m162\Debug\List\ -y --initializers_in_flash -z9  #
+#                    --cross_call_passes=2 --debug -e -I "E:\Program         #
+#                    Files\IAR Systems\Embedded Workbench 4.0                #
+#                    Evaluation\avr\INC\" -I "E:\Program Files\IAR           #
+#                    Systems\Embedded Workbench 4.0                          #
+#                    Evaluation\avr\INC\CLIB\" --eeprom_size 512             #
+#    List file    =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\List\ #
+#                    AT24CXX.lst                                             #
+#    Object file  =  F:\Projects\VitalyIgorevich\Packet\src\m162\Debug\Obj\A #
+#                    T24CXX.r90                                              #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+F:\Projects\VitalyIgorevich\Packet\src\m162\AT24CXX.c
+      1          #include "AT24CXX.h"
+      2          #include "I2C.h"
+      3          #include "DELAY.H"
+      4          
+      5          // Функция записи значения ячейки памяти EEPROM AT24CXX
+
+   \                                 In segment CODE, align 2, keep-with-next
+      6          void AT24CXX_write(unsigned char addr, unsigned char value)
+   \                     AT24CXX_write:
+      7          {
+   \   00000000   939A               ST      -Y, R25
+   \   00000002   938A               ST      -Y, R24
+   \   00000004   2F90               MOV     R25, R16
+   \   00000006   2F81               MOV     R24, R17
+      8          	I2C_start();
+   \   00000008   ....               RCALL   ?Subroutine1
+      9          	I2C_write(0xA0);			// Команда записи
+   \                     ??CrossCallReturnLabel_4:
+   \   0000000A   EA00               LDI     R16, 160
+   \   0000000C   ....               RCALL   ?Subroutine2
+     10          	I2C_write(addr);			// Установка адреса
+   \                     ??CrossCallReturnLabel_8:
+   \   0000000E   2F09               MOV     R16, R25
+   \   00000010   ....               RCALL   ?Subroutine0
+     11          	I2C_write(value);         	// Запись данных
+     12          	I2C_stop();
+     13          	DELAY_MS( 15 );				// Ждем окончания записи
+   \                     ??CrossCallReturnLabel_1:
+   \   00000012   E906               LDI     R16, 150
+   \   00000014   E010               LDI     R17, 0
+   \   00000016   ........           CALL    delay_func_ms
+     14          }
+   \   0000001A   9189               LD      R24, Y+
+   \   0000001C   9199               LD      R25, Y+
+   \   0000001E   9508               RET
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine2:
+   \   00000000   ........           JMP     I2C_write
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine1:
+   \   00000000   ........           JMP     I2C_start
+
+   \                                 In segment CODE, align 2, keep-with-next
+   \                     ?Subroutine0:
+   \   00000000   ....               RCALL   ?Subroutine2
+   \                     ??CrossCallReturnLabel_6:
+   \   00000002   2F08               MOV     R16, R24
+   \   00000004   ....               RCALL   ?Subroutine2
+   \                     ??CrossCallReturnLabel_5:
+   \   00000006   ........           JMP     I2C_stop
+     15          
+     16          // Функция чтения значения ячейки памяти EEPROM AT24CXX
+
+   \                                 In segment CODE, align 2, keep-with-next
+     17          unsigned char AT24CXX_read(unsigned char addr)
+   \                     AT24CXX_read:
+     18          {
+   \   00000000   938A               ST      -Y, R24
+   \   00000002   2F80               MOV     R24, R16
+     19          	unsigned char value;
+     20          	I2C_start();
+   \   00000004   ....               RCALL   ?Subroutine1
+     21          	I2C_write(0xA0);	    	// Команда записи
+   \                     ??CrossCallReturnLabel_3:
+   \   00000006   EA00               LDI     R16, 160
+   \   00000008   ....               RCALL   ?Subroutine0
+     22          	I2C_write(addr);   	 		// Установка адреса
+     23          	I2C_stop();
+     24          	DELAY_MCS(68);
+   \                     ??CrossCallReturnLabel_0:
+   \   0000000A   EA04               LDI     R16, 164
+   \   0000000C   E010               LDI     R17, 0
+   \   0000000E   ........           CALL    delay_func_mcs
+     25          	I2C_start(); 
+   \   00000012   ....               RCALL   ?Subroutine1
+     26          	I2C_write(0xA1);         	// Уоманда чтения
+   \                     ??CrossCallReturnLabel_2:
+   \   00000014   EA01               LDI     R16, 161
+   \   00000016   ....               RCALL   ?Subroutine2
+     27          	value = I2C_read();
+   \                     ??CrossCallReturnLabel_7:
+   \   00000018   ........           CALL    I2C_read
+   \   0000001C   2F80               MOV     R24, R16
+     28          	I2C_stop();
+   \   0000001E   ........           CALL    I2C_stop
+     29          	
+     30          	return value;
+   \   00000022   2F08               MOV     R16, R24
+   \   00000024   9189               LD      R24, Y+
+   \   00000026   9508               RET
+     31          }
+
+   Maximum stack usage in bytes:
+
+     Function            CSTACK RSTACK
+     --------            ------ ------
+     AT24CXX_read            1      2
+       -> I2C_start          1      2
+       -> I2C_write          1      2
+       -> I2C_write          1      2
+       -> I2C_stop           1      2
+       -> delay_func_mcs     1      2
+       -> I2C_start          1      2
+       -> I2C_write          1      2
+       -> I2C_read           1      2
+       -> I2C_stop           1      2
+     AT24CXX_write           2      2
+       -> I2C_start          2      2
+       -> I2C_write          2      2
+       -> I2C_write          2      2
+       -> I2C_write          2      2
+       -> I2C_stop           2      2
+       -> delay_func_ms      2      2
+
+
+   Segment part sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     AT24CXX_write    32
+     ?Subroutine2      4
+     ?Subroutine1      4
+     ?Subroutine0     10
+     AT24CXX_read     40
+
+ 
+ 90 bytes in segment CODE
+ 
+ 90 bytes of CODE memory
+
+Errors: none
+Warnings: none

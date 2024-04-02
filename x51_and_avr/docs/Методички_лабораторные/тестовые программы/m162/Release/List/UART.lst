@@ -1,0 +1,184 @@
+##############################################################################
+#                                                                            #
+#                                                      28/Jun/2007  00:57:54 #
+# IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  D:\stend\src\m162\UART.c                                #
+#    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D     #
+#                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb         #
+#                    D:\stend\src\m162\Release\List\ -y                      #
+#                    --initializers_in_flash -z9 -e -I "D:\Program           #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program     #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"               #
+#                    --eeprom_size 512 D:\stend\src\m162\UART.c              #
+#    List file    =  D:\stend\src\m162\Release\List\UART.lst                 #
+#    Object file  =  D:\stend\src\m162\Release\Obj\UART.r90                  #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+D:\stend\src\m162\UART.c
+      1          #include "UART.h"
+      2          #include "CONVERT.H"
+      3          
+      4          // Константное значение строки перевода каретки
+      5          flash char crlf[] = "\r\n";
+      6          
+      7          // Функция инициализации UART
+      8          void UART_init( unsigned short UBRR_value )
+      9          {
+     10          	UART_UBRRL = ( unsigned char ) UBRR_value;
+     11          	UART_UBRRH = ( unsigned char ) ( UBRR_value >> 8 );
+     12          	
+     13          	UART_UCSRB_RXEN = 1;
+     14          	UART_UCSRB_TXEN = 1;
+     15          	UART_UCSRB_RXCIE = 1;
+     16          }
+     17          
+     18          // Функция вывода байт в порт UART
+     19          void UART_sendbyte( unsigned char data )
+     20          {
+     21          	while( !UART_UCSRA_UDRE );
+     22          	
+     23          	UART_UDR = data;
+     24          }
+     25          
+     26          // Функция вывода строки из памяти
+     27          void UART_sendstring( char str[] )
+     28          {
+     29          	unsigned char i = 0;
+     30          	while( str[ i ] != 0 )
+     31          		UART_sendbyte( str[ i++ ] ); 
+     32          }
+     33          
+     34          // Функция вывода строки из flash
+     35          void UART_sendstring_flash( flash char str[] )
+     36          {
+     37          	unsigned char i = 0;
+     38          	while( str[ i ] != 0 )
+     39          		UART_sendbyte( str[ i++ ] ); 
+     40          }
+     41          
+     42          // Функция вывода числового значения
+     43          void UART_sendvalue( unsigned char value )
+     44          {
+     45          	char str[ 4 ];
+     46          	ByteToString( value, str );
+     47          	UART_sendstring( str );
+     48          }
+     49          
+     50          // Функция вывода символа(ов) перевода каретки
+     51          void UART_sendcrlf()
+     52          {
+     53          	UART_sendstring_flash( crlf );
+     54          }
+     55          
+     56          // Функция получения байта
+     57          unsigned char UART_receivebyte()
+     58          {
+     59          	while( !UART_UCSRA_RXC );
+     60          	
+     61          	return UART_UDR;
+     62          }
+     63          
+     64          // Функция получения линии
+     65          void UART_receiveline( char* pStr, unsigned char maxsize )
+     66          {
+     67          	unsigned char byte, nIndex = 0;
+     68          	unsigned char flag = 0;
+     69          
+     70          	while( !flag )
+     71          	{
+     72          		byte = UART_receivebyte();
+     73          		switch( byte ) {
+     74          		case '\r':
+     75          		case '\n':
+     76          			pStr[ nIndex ] = 0;
+     77          			flag = 1;
+     78          			UART_sendcrlf();
+     79          			break;
+     80          		default:
+     81          			UART_sendbyte( byte );
+     82          			if( nIndex < maxsize - 1 )
+     83          				pStr[ nIndex++ ] = byte;
+     84          			else
+     85          			{
+     86          				pStr[ nIndex++ ] = byte;
+     87          				pStr[ nIndex ] = 0;
+     88          				flag = 1;
+     89          			}
+     90          			break;
+     91          		}
+     92          	}
+     93          }
+     94          
+     95          // Функция получения числового значения
+     96          unsigned char UART_receivevalue()
+     97          {
+     98          	char line[ 20 ];
+     99          	
+    100          	UART_receiveline( line, sizeof( line ) );
+    101          	
+    102          	return StringToByte( line );
+    103          }
+
+   Maximum stack usage in bytes:
+
+     Function                   CSTACK RSTACK
+     --------                   ------ ------
+     UART_init                      0      2
+     UART_receivebyte               0      2
+     UART_receiveline              10      2
+       -> UART_receivebyte         10      2
+       -> UART_sendstring_flash    10      2
+       -> UART_sendbyte            10      2
+     UART_receivevalue             20      2
+       -> UART_receiveline         20      2
+       -> StringToByte             20      2
+     UART_sendbyte                  0      2
+     UART_sendcrlf                  0      2
+       -> UART_sendstring_flash     0      2
+     UART_sendstring                4      2
+       -> UART_sendbyte             4      2
+     UART_sendstring_flash          4      2
+       -> UART_sendbyte             4      2
+     UART_sendvalue                 4      2
+       -> ByteToString              4      2
+       -> UART_sendstring           4      2
+
+
+   Segment part sizes:
+
+     Function/Label        Bytes
+     --------------        -----
+     crlf                     3
+     UART_init               12
+     ??UART_sendbyte_0        8
+     UART_sendstring         16
+     ?Subroutine3             6
+     ?Subroutine2            10
+     ?Subroutine1             2
+     ?Subroutine0            10
+     UART_sendstring_flash   18
+     UART_sendvalue          16
+     UART_sendcrlf            6
+     ??UART_receivebyte_0     8
+     UART_receiveline        84
+     UART_receivevalue       18
+     _A_UBRR0H                1
+     _A_UDR0                  1
+     _A_UCSR0A                1
+     _A_UCSR0B                1
+     _A_UBRR0L                1
+
+ 
+   5 bytes in segment ABSOLUTE
+ 214 bytes in segment CODE
+   3 bytes in segment NEAR_F
+ 
+ 217 bytes of CODE memory
+   0 bytes of DATA memory (+ 5 bytes shared)
+
+Errors: none
+Warnings: none

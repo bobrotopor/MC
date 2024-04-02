@@ -1,0 +1,163 @@
+; Copyright Franklin Software, Inc. 1989 - 1996
+;	File Name:  REG8252S.INC
+;Last Modified By:  S. Leschisky ( MFC Fulcrum )
+;   Last Modified:  26/3/2001
+;           Notes:  Register Declarations for AT89S8252 Processor 
+
+; BYTE Registers
+P0      DATA    80H
+P1      DATA    90H
+P2      DATA    0A0H
+P3      DATA    0B0H
+PSW     DATA    0D0H
+ACC     DATA    0E0H
+B       DATA    0F0H
+SP      DATA    81H
+DP0L    DATA    82H
+DP0H    DATA    83H
+PCON    DATA    87H
+TCON    DATA    88H
+TMOD    DATA    89H
+TL0     DATA    8AH
+TL1     DATA    8BH
+TH0     DATA    8CH
+TH1     DATA    8DH
+IE      DATA    0A8H
+IP      DATA    0B8H
+SCON    DATA    98H
+SBUF    DATA    99H
+
+; 8052 Extensions
+T2CON   DATA    0C8H
+RCAP2L  DATA    0CAH
+RCAP2H  DATA    0CBH
+TL2     DATA    0CCH
+TH2     DATA    0CDH
+
+; S8252 Extensions
+DP1L    DATA    84H
+DP1H    DATA    85H
+SPDR    DATA    86H
+AUXR	DATA	8EH
+WMCON   DATA    96H
+SPSR	DATA	0AAH
+SPCR	DATA    0D5H
+
+; BIT Registers
+; PSW
+CY      BIT     0D7H
+AC      BIT     0D6H
+F0      BIT     0D5H
+RS1     BIT     0D4H
+RS0     BIT     0D3H
+OV      BIT     0D2H
+P       BIT     0D0H
+; TCON
+TF1     BIT     8FH
+TR1     BIT     8EH
+TF0     BIT     8DH
+TR0     BIT     8CH
+IE1     BIT     8BH
+IT1     BIT     8AH
+IE0     BIT     89H
+IT0     BIT     88H
+; IE 
+EA      BIT     0AFH
+ES      BIT     0ACH
+ET1     BIT     0ABH
+EX1     BIT     0AAH
+ET0     BIT     0A9H
+EX0     BIT     0A8H
+; IP 
+PS      BIT     0BCH
+PT1     BIT     0BBH
+PX1     BIT     0BAH
+PT0     BIT     0B9H
+PX0     BIT     0B8H
+; P3
+RD      BIT     0B7H
+WR      BIT     0B6H
+T1      BIT     0B5H
+T0      BIT     0B4H
+INT1    BIT     0B3H
+INT0    BIT     0B2H
+TXD     BIT     0B1H
+RXD     BIT     0B0H
+; SCON
+SM0     BIT     9FH
+SM1     BIT     9EH
+SM2     BIT     9DH
+REN     BIT     9CH
+TB8     BIT     9BH
+RB8     BIT     9AH
+TI      BIT     99H
+RI      BIT     98H
+; MSC51 I/O ports
+; P0
+P0.0	BIT	080H
+P0.1	BIT	081H
+P0.2	BIT	082H
+P0.3	BIT	083H
+P0.4	BIT	084H
+P0.5	BIT	085H
+P0.6	BIT	086H
+P0.7	BIT	087H
+; P1
+P1.0	BIT	090H
+P1.1	BIT	091H
+P1.2	BIT	092H
+P1.3	BIT	093H
+P1.4	BIT	094H
+P1.5	BIT	095H
+P1.6	BIT	096H
+P1.7	BIT	097H
+; P2
+P2.0	BIT	0A0H
+P2.1	BIT	0A1H
+P2.2	BIT	0A2H
+P2.3	BIT	0A3H
+P2.4	BIT	0A4H
+P2.5	BIT	0A5H
+P2.6	BIT	0A6H
+P2.7	BIT	0A7H
+; P3
+P3.0	BIT	0B0H
+P3.1	BIT	0B1H
+P3.2	BIT	0B2H
+P3.3	BIT	0B3H
+P3.4	BIT	0B4H
+P3.5	BIT	0B5H
+P3.6	BIT	0B6H
+P3.7	BIT	0B7H
+; 8052 Extensions
+; IE
+ET2     BIT     0ADH
+; IP
+PT2     BIT     0BDH
+; P1
+T2EX    BIT     91H
+T2      BIT     90H
+; T2CON
+TF2     BIT     0CFH
+EXF2    BIT     0CEH
+RCLK    BIT     0CDH
+TCLK    BIT     0CCH
+EXEN2   BIT     0CBH
+TR2     BIT     0CAH
+C_T2    BIT     0C9H
+CP_RL2  BIT     0C8H
+
+; S8252 Extensions
+; P1
+SS     	EQU	P1.4
+MOSI	EQU	P1.5
+MISO	EQU	P1.6
+SCK	EQU	P1.7
+;MOSI    BIT     095H
+;MISO    BIT     096H
+;SCK     BIT     097H
+
+
+
+
+

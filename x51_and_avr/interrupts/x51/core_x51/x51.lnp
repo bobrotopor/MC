@@ -1,0 +1,16 @@
+"AT24CXX.obj",
+"BEEP.obj",
+"DELAY.obj",
+"DS1307.obj",
+"DS1820.obj",
+"I2C.obj",
+"KEYBOARD.obj",
+"LCD_HD44780.obj",
+"LED7.obj",
+"Main.obj",
+"SHIFT.obj",
+"SPI.obj",
+"CONVERT.obj" 
+TO "x51" 
+RAMSIZE(256) 
+DISABLEWARNING (15) 

@@ -1,0 +1,58 @@
+##############################################################################
+#                                                                            #
+#                                                      28/Jun/2007  00:57:48 #
+# IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  D:\stend\src\m162\SHIFT.c                               #
+#    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D     #
+#                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb         #
+#                    D:\stend\src\m162\Release\List\ -y                      #
+#                    --initializers_in_flash -z9 -e -I "D:\Program           #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program     #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"               #
+#                    --eeprom_size 512 D:\stend\src\m162\SHIFT.c             #
+#    List file    =  D:\stend\src\m162\Release\List\SHIFT.lst                #
+#    Object file  =  D:\stend\src\m162\Release\Obj\SHIFT.r90                 #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+D:\stend\src\m162\SHIFT.c
+      1          #include "SHIFT.h"
+      2          #include "SPI.h"
+      3          
+      4          // Функция записи байта в сдвиговый регистр 74595
+      5          void SHIFT_write(const unsigned char w_data)
+      6          {
+      7          	SPI_rw(w_data);
+      8          	ST_DDR = 1;
+      9          	ST_PORT = 1;
+     10          	ST_PORT = 0;
+     11          }
+
+   Maximum stack usage in bytes:
+
+     Function    CSTACK RSTACK
+     --------    ------ ------
+     SHIFT_write     0      2
+       -> SPI_rw     0      2
+
+
+   Segment part sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     SHIFT_write      12
+     _A_PORTD          1
+     _A_DDRD           1
+
+ 
+  2 bytes in segment ABSOLUTE
+ 12 bytes in segment CODE
+ 
+ 12 bytes of CODE memory
+  0 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none

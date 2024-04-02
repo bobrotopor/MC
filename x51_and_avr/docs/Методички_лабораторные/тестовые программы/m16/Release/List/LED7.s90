@@ -1,0 +1,111 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     21/May/2007  11:45:17 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m16\LED7.c                                /
+//    Command line =  --cpu=m16 -mt -o D:\stend\src\m16\Release\Obj\ -D      /
+//                    NDEBUG -lb D:\stend\src\m16\Release\List\              /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m16\LED7.c              /
+//    List file    =  D:\stend\src\m16\Release\List\LED7.s90                 /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME LED7
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        EXTERN ?CV_SWITCH_L06
+
+        PUBLIC LED7_setdigit
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN SHIFT_write
+
+
+        RSEG CODE:CODE:NOROOT(1)
+LED7_setdigit:
+        LDI	R30, LOW(`?<Jumptable for LED7_setdigit>_0`)
+        LDI	R31, (`?<Jumptable for LED7_setdigit>_0`) >> 8
+        JMP	?CV_SWITCH_L06
+??LED7_setdigit_0:
+        LDI	R16, 192
+        RJMP	??LED7_setdigit_1
+??LED7_setdigit_2:
+        LDI	R16, 249
+??LED7_setdigit_1:
+        JMP	SHIFT_write
+??LED7_setdigit_3:
+        LDI	R16, 164
+        RJMP	??LED7_setdigit_1
+??LED7_setdigit_4:
+        LDI	R16, 176
+        RJMP	??LED7_setdigit_1
+??LED7_setdigit_5:
+        LDI	R16, 153
+        RJMP	??LED7_setdigit_1
+??LED7_setdigit_6:
+        LDI	R16, 146
+        RJMP	??LED7_setdigit_1
+??LED7_setdigit_7:
+        LDI	R16, 130
+        RJMP	??LED7_setdigit_1
+??LED7_setdigit_8:
+        LDI	R16, 248
+        RJMP	??LED7_setdigit_1
+??LED7_setdigit_9:
+        LDI	R16, 128
+        RJMP	??LED7_setdigit_1
+??LED7_setdigit_10:
+        LDI	R16, 144
+        CALL	SHIFT_write
+??LED7_setdigit_11:
+        RET
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        RSEG SWITCH:CODE:NOROOT(1)
+`?<Jumptable for LED7_setdigit>_0`:
+        DB	0
+        DB	0
+        DW	(??LED7_setdigit_11) /2
+        DW	10
+        DW	(??LED7_setdigit_0) /2
+        DW	(??LED7_setdigit_2) /2
+        DW	(??LED7_setdigit_3) /2
+        DW	(??LED7_setdigit_4) /2
+        DW	(??LED7_setdigit_5) /2
+        DW	(??LED7_setdigit_6) /2
+        DW	(??LED7_setdigit_7) /2
+        DW	(??LED7_setdigit_8) /2
+        DW	(??LED7_setdigit_9) /2
+        DW	(??LED7_setdigit_10) /2
+
+        END
+// 
+// 54 bytes in segment CODE
+// 26 bytes in segment SWITCH
+// 
+// 80 bytes of CODE memory
+//
+//Errors: none
+//Warnings: none

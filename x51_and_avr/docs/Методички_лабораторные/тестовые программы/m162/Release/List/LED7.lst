@@ -1,0 +1,107 @@
+##############################################################################
+#                                                                            #
+#                                                      28/Jun/2007  00:57:52 #
+# IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  D:\stend\src\m162\LED7.c                                #
+#    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D     #
+#                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb         #
+#                    D:\stend\src\m162\Release\List\ -y                      #
+#                    --initializers_in_flash -z9 -e -I "D:\Program           #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program     #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"               #
+#                    --eeprom_size 512 D:\stend\src\m162\LED7.c              #
+#    List file    =  D:\stend\src\m162\Release\List\LED7.lst                 #
+#    Object file  =  D:\stend\src\m162\Release\Obj\LED7.r90                  #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+D:\stend\src\m162\LED7.c
+      1          #include "LED7.h"
+      2          #include "SHIFT.h"
+      3          
+      4          // Коды цифр для 7-сегментного индикатора (при условии что 
+      5          // первым передается MSB слова данных)
+      6          #define CODE_0	0xC0
+      7          #define CODE_1	0xF9
+      8          #define CODE_2	0xA4
+      9          #define CODE_3	0xB0
+     10          #define CODE_4	0x99
+     11          #define CODE_5	0x92
+     12          #define CODE_6	0x82
+     13          #define CODE_7	0xf8
+     14          #define CODE_8	0x80
+     15          #define CODE_9	0x90
+     16          
+     17          // Функция вывода цифры на семисегментный индикатор
+     18          void LED7_setdigit(unsigned char digit)
+     19          {
+     20          	switch(digit) {
+     21          	case 0:
+     22          		SHIFT_write(CODE_0);
+     23          		break;
+     24          	case 1:
+     25          		SHIFT_write(CODE_1);
+     26          		break;
+     27          	case 2:
+     28          		SHIFT_write(CODE_2);
+     29          		break;
+     30          	case 3:
+     31          		SHIFT_write(CODE_3);
+     32          		break;
+     33          	case 4:
+     34          		SHIFT_write(CODE_4);
+     35          		break;
+     36          	case 5:
+     37          		SHIFT_write(CODE_5);
+     38          		break;
+     39          	case 6:
+     40          		SHIFT_write(CODE_6);
+     41          		break;
+     42          	case 7:
+     43          		SHIFT_write(CODE_7);
+     44          		break;
+     45          	case 8:
+     46          		SHIFT_write(CODE_8);
+     47          		break;
+     48          	case 9:
+     49          		SHIFT_write(CODE_9);
+     50          		break;
+     51          	}
+     52          }
+
+   Maximum stack usage in bytes:
+
+     Function         CSTACK RSTACK
+     --------         ------ ------
+     LED7_setdigit        0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+       -> SHIFT_write     0      2
+
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     LED7_setdigit                    54
+     ?<Jumptable for LED7_setdigit>_0
+                                      26
+
+ 
+ 54 bytes in segment CODE
+ 26 bytes in segment SWITCH
+ 
+ 80 bytes of CODE memory
+
+Errors: none
+Warnings: none

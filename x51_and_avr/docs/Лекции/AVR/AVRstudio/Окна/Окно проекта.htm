@@ -1,0 +1,406 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0063)http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html -->
+<HTML><HEAD><TITLE>НТУУ-КПИ</TITLE>
+<META content="text/html; charset=windows-1251" http-equiv=Content-Type>
+<META content="Denis Y. Lebedev" name=Author><LINK 
+href="Окно проекта.files/style.css" rel=stylesheet type=text/css>
+<META content="MSHTML 5.00.2920.0" name=GENERATOR></HEAD>
+<BODY aLink=#0099cc bgColor=#cccccc leftMargin=0 link=#006699 text=#000000 
+topMargin=0 vLink=#996600 marginheight="0" marginwidth="0">
+<TABLE background="Окно проекта.files/topline.gif" border=0 cellPadding=0 
+cellSpacing=0 width="100%">
+  <TBODY>
+  <TR>
+    <TD align=middle bgColor=#cccccc vAlign=top>
+      <TABLE border=0 cellPadding=0 cellSpacing=0 height=145 width="100%">
+        <TBODY>
+        <TR>
+          <TD background="Окно проекта.files/topline.gif" 
+          width="100%">&nbsp;</TD></TR></TBODY></TABLE></TD>
+    <TD align=middle bgColor=#cccccc height=40 vAlign=top width=678>
+      <TABLE border=0 cellPadding=0 cellSpacing=0 width=686>
+        <TBODY>
+        <TR>
+          <TD width=179><A name=top></A><IMG alt=КПИ height=145 
+            src="Окно проекта.files/kpi.gif" width=179></TD>
+          <TD width=318><IMG alt="Лаборатория Диагностических средств" 
+            height=145 src="Окно проекта.files/pson1.gif" width=318></TD>
+          <TD width=189><IMG alt=ПСОН height=145 
+            src="Окно проекта.files/pson2.gif" width=189></TD></TR></TBODY></TABLE></TD>
+    <TD align=middle height=40 vAlign=top>
+      <TABLE background="Окно проекта.files/topline.gif" border=0 cellPadding=0 
+      cellSpacing=0 height=40 width="100%">
+        <TBODY>
+        <TR>
+          <TD width="100%">&nbsp;</TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<TABLE border=0 cellPadding=0 cellSpacing=0 height=400 width=775>
+  <TBODY>
+  <TR>
+    <TD bgColor=#cccccc vAlign=top>
+      <TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
+        <TBODY>
+        <TR>
+          <TD vAlign=top width=141>
+            <CENTER><!--            Menu v inc file           -->
+            <SCRIPT language=JavaScript>
+<!--
+nMaxItem = 4;
+NameIndex = 0;
+OriginalState = 1;
+MouseOverState = 2;
+MouseClickState = 3;
+MouseDownState = 4;
+imgCounter = 0;
+ImageList = new Array();
+function AddImageToList(name, Original, MouseOver, MouseClick, MouseDown)
+{
+	ImageList[imgCounter] = new Array(nMaxItem);
+	ImageList[imgCounter][NameIndex] = name;
+	ImageList[imgCounter][OriginalState] = new Image();
+	ImageList[imgCounter][OriginalState].src = Original;
+	if (MouseOver != "")
+	{
+		ImageList[imgCounter][MouseOverState] = new Image();
+		ImageList[imgCounter][MouseOverState].src = MouseOver;
+	}
+	if (MouseClick != "")
+	{
+		ImageList[imgCounter][MouseClickState] = new Image();
+		ImageList[imgCounter][MouseClickState].src = MouseClick;
+	}
+	if (MouseDown != "")
+	{
+		ImageList[imgCounter][MouseDownState] = new Image();
+		ImageList[imgCounter][MouseDownState].src = MouseDown;
+	}
+	imgCounter++;
+}
+function ReplaceImage(nameFrom, nameTo, state)
+{
+	for (i = 0; i < imgCounter; i++)
+	{
+		if (document.images[ImageList[i][NameIndex]] != null)
+		{
+			if ((nameFrom == ImageList[i][NameIndex]) && (ImageList[i][state] != null))
+				document.images[nameTo].src = ImageList[i][state].src;
+}}}
+AddImageToList("JS0", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS1", "immenu/men-2x3.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS2", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS3", "immenu/men-4x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS4", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS5", "immenu/men-6x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS6", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS7", "immenu/men-8x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS8", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS9", "immenu/men-10x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS10", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS11", "immenu/soft.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS12", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS13", "immenu/men-14x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS14", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS15", "immenu/men-16x2.gif", "immenu/v-8x1.gif", "", "");
+AddImageToList("JS16", "immenu/men-2x2.gif", "", "", "");
+AddImageToList("JS17", "immenu/men-12x2.gif", "immenu/v-8x1.gif", "", "");
+//-->
+</SCRIPT>
+
+            <TABLE border=0 cellPadding=0 cellSpacing=0 height=293 width=141>
+              <TBODY>
+              <TR>
+                <TD colSpan=3 height=35 width=141><IMG border=0 height=35 
+                  src="Окно проекта.files/men-1x1.gif" width=141></TD></TR>
+              <TR>
+                <TD height=218 rowSpan=17 width=15><IMG border=0 height=218 
+                  src="Окно проекта.files/lin.gif" width=15></TD>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#" 
+                  onmouseout="ReplaceImage('JS0', 'JS0', OriginalState);" 
+                  onmouseover="ReplaceImage('JS0', 'JS0', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS0 
+                  src="Окно проекта.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/news.htm" 
+                  onmouseout="ReplaceImage('JS0', 'JS0', OriginalState);" 
+                  onmouseover="ReplaceImage('JS1', 'JS0', MouseOverState);" 
+                  target=_top><IMG alt=Новости border=0 height=16 name=JS1 
+                  src="Окно проекта.files/men-2x3.gif" width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Окно проекта.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#" 
+                  onmouseout="ReplaceImage('JS2', 'JS2', OriginalState);" 
+                  onmouseover="ReplaceImage('JS2', 'JS2', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS2 
+                  src="Окно проекта.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/work.htm" 
+                  onmouseout="ReplaceImage('JS2', 'JS2', OriginalState);" 
+                  onmouseover="ReplaceImage('JS3', 'JS2', MouseOverState);" 
+                  target=_top><IMG alt=Разработки border=0 height=16 name=JS3 
+                  src="Окно проекта.files/men-4x2.gif" width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=10 width=126><IMG border=0 height=10 
+                  src="Окно проекта.files/men-5x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#" 
+                  onmouseout="ReplaceImage('JS4', 'JS4', OriginalState);" 
+                  onmouseover="ReplaceImage('JS4', 'JS4', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS4 
+                  src="Окно проекта.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/texas.htm" 
+                  onmouseout="ReplaceImage('JS4', 'JS4', OriginalState);" 
+                  onmouseover="ReplaceImage('JS5', 'JS4', MouseOverState);" 
+                  target=_top><IMG alt="Texas Instruments" border=0 height=16 
+                  name=JS5 src="Окно проекта.files/men-6x2.gif" 
+              width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Окно проекта.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#" 
+                  onmouseout="ReplaceImage('JS6', 'JS6', OriginalState);" 
+                  onmouseover="ReplaceImage('JS6', 'JS6', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS6 
+                  src="Окно проекта.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/atmel.htm" 
+                  onmouseout="ReplaceImage('JS6', 'JS6', OriginalState);" 
+                  onmouseover="ReplaceImage('JS7', 'JS6', MouseOverState);" 
+                  target=_top><IMG alt=Atmel border=0 height=16 name=JS7 
+                  src="Окно проекта.files/men-8x2.gif" width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=10 width=126><IMG border=0 height=10 
+                  src="Окно проекта.files/men-5x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#" 
+                  onmouseout="ReplaceImage('JS8', 'JS8', OriginalState);" 
+                  onmouseover="ReplaceImage('JS8', 'JS8', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS8 
+                  src="Окно проекта.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/altera.htm" 
+                  onmouseout="ReplaceImage('JS8', 'JS8', OriginalState);" 
+                  onmouseover="ReplaceImage('JS9', 'JS8', MouseOverState);" 
+                  target=_top><IMG alt="Analog Devices" border=0 height=16 
+                  name=JS9 src="Окно проекта.files/men-10x2.gif" 
+                width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Окно проекта.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#" 
+                  onmouseout="ReplaceImage('JS10', 'JS10', OriginalState);" 
+                  onmouseover="ReplaceImage('JS10', 'JS10', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS10 
+                  src="Окно проекта.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/prog.htm" 
+                  onmouseout="ReplaceImage('JS10', 'JS10', OriginalState);" 
+                  onmouseover="ReplaceImage('JS11', 'JS10', MouseOverState);" 
+                  target=_top><IMG alt="Прогаммы, оболочки..." border=0 
+                  height=16 name=JS11 src="Окно проекта.files/soft.gif" 
+                  width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Окно проекта.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#" 
+                  onmouseout="ReplaceImage('JS12', 'JS12', OriginalState);" 
+                  onmouseover="ReplaceImage('JS12', 'JS12', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS12 
+                  src="Окно проекта.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/we.htm" 
+                  onmouseout="ReplaceImage('JS12', 'JS12', OriginalState);" 
+                  onmouseover="ReplaceImage('JS13', 'JS12', MouseOverState);" 
+                  target=_top><IMG alt="Немного о нас" border=0 height=16 
+                  name=JS13 src="Окно проекта.files/men-14x2.gif" 
+                width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Окно проекта.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#" 
+                  onmouseout="ReplaceImage('JS14', 'JS14', OriginalState);" 
+                  onmouseover="ReplaceImage('JS14', 'JS14', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS14 
+                  src="Окно проекта.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/contacts.htm" 
+                  onmouseout="ReplaceImage('JS14', 'JS14', OriginalState);" 
+                  onmouseover="ReplaceImage('JS15', 'JS14', MouseOverState);" 
+                  target=_top><IMG alt="Связь с нами" border=0 height=16 
+                  name=JS15 src="Окно проекта.files/men-16x2.gif" 
+                width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=2 height=9 width=126><IMG border=0 height=9 
+                  src="Окно проекта.files/men-3x1.gif" width=126></TD></TR>
+              <TR>
+                <TD height=16 width=18><A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#" 
+                  onmouseout="ReplaceImage('JS16', 'JS16', OriginalState);" 
+                  onmouseover="ReplaceImage('JS16', 'JS16', MouseOverState);"><IMG 
+                  border=0 height=16 name=JS16 
+                  src="Окно проекта.files/men-2x2.gif" width=18></A></TD>
+                <TD height=16 width=108><A 
+                  href="http://digitallab.kiev.ua/http://avia.vov.ru/kpi/forum.phtml" 
+                  onmouseout="ReplaceImage('JS16', 'JS16', OriginalState);" 
+                  onmouseover="ReplaceImage('JS17', 'JS16', MouseOverState);" 
+                  target=_top><IMG alt=Форум border=0 height=16 name=JS17 
+                  src="Окно проекта.files/men-12x2.gif" width=108></A></TD></TR>
+              <TR>
+                <TD colSpan=3 height=65 width=141><IMG border=0 height=65 
+                  src="Окно проекта.files/men-17x1.gif" 
+            width=141></TD></TR></TBODY></TABLE></CENTER></TD>
+          <TD align=middle vAlign=top width="100%"><IMG height=30 
+            src="Окно проекта.files/texttop.gif" width=572> 
+            <TABLE border=0 cellPadding=0 cellSpacing=0 height=400 
+              width="85%"><TBODY>
+              <TR>
+                <TD vAlign=top>
+                  <P class=p1>Создание нового проекта </P>
+                  <P class=big1>Вступление </P>
+                  <P class=p>Этот пример требует, чтобы вы создали папку с 
+                  именем "CODE" на вашем С: диске. В этой папке вы должны 
+                  расположить файл с именем "8515def.inc", этот файл - 
+                  установочный файл для AT90S8515 и содержит установки 
+                  микроконтроллера, нужные для компилятора. Этот файл будет 
+                  открыт в Application Note AVR000.</P>
+                  <H2 class=big1>Шаг 1 - Запуск AVR Studio</H2>
+                  <P class=p>Запуск AVR Studio. После запуска вы увидите такое 
+                  окно: </P>
+                  <P align=center><IMG src="Окно проекта.files/studio01.gif"> 
+                  </P>
+                  <H2 class=big1>Шаг 2 - Выбор нового проекта</H2>
+                  <P class=p>В этом примере мы будем создавать простую 
+                  программу, которая повышает значение одного из регистров, 
+                  создавая счетчик.</P>
+                  <P class=p>Для создания нового проекта, выберите “Project” 
+                  меню и выберите “New”. Появится диалоговое окно. В этом 
+                  диалоговом окне мы должны ввести имя проекта. Мы назвали 
+                  проект led, но это только название проекта.</P>
+                  <P class=p>Дальше нам необходимо выбрать расположение нашего 
+                  проекта. Это место, где AVR Studio будет сохранять все файлы 
+                  связаные с нашим проектом. Мы будем использовать папку 
+                  "C:\CODE". Если папка не существует, AVR Studio автоматически 
+                  создаст её.</P>
+                  <P class=p>Сейчас мы должны выбрать тип проекта:</P>
+                  <UL>
+                    <LI class=p><SPAN class=p>AVR Assembler: Этот тип проекта 
+                    сообщает AVR Studio, что мы используем встроеный Assembler, 
+                    когда компилируется проект. Никаких дополнительных настроек 
+                    от пользователя не требуется. Мы будем использовать этот тип 
+                    проекта в нашем примере. </SPAN>
+                    <LI class=p><SPAN class=p>Generic 3rd party C compiler: Этот 
+                    тип проекта требует от пользователя дополнительной настройки 
+                    AVR Studio и использования внешнего компилятора. 
+                  </SPAN></LI></UL>
+                  <P class=p>Нажмите кнопку 'OK'для продолжения.</P>
+                  <P align=center><IMG 
+src="Окно проекта.files/studio02.gif"></P>
+                  <P class=p>Созданное сейчас окно проекта показано ниже. В этом 
+                  окне вы сможете увидеть все файлы, связанные с нашим проектом. 
+                  На данном этапе никаких файлов нет.</P>
+                  <P align=center><IMG height=392 
+                  src="Окно проекта.files/studio03.gif" width=205></P>
+                  <H2 class=big1>Шаг 3 - Добавление файла ассемблера</H2>
+                  <P class=p>Сейчас мы должны добавить файл ассемблера в проект. 
+                  Это можно сделать двумя путями, добавляя готовый файл 
+                  ассемблера или создавая новый файл. Если вы создаёте новый 
+                  файл, AVR Studio автоматически создаст его для вас. Ниже 
+                  показано, как это сделать: Добавить новый файл можно, выбрав 
+                  папку "Assember Files" в окне проекта и нажав на правую кнопку 
+                  мышки и выбрав "Add File". Теперь мы попадем в диалоговое окно 
+                  "Open". Перейдите в папку 'c:\code' и введите "led.asm"в графе 
+                  File name. Когда вы нажмете "Open", файл будет создан AVR 
+                  Studio и помещен в соответствующую папку. Если вы хотите 
+                  открыть уже существующий файл, нажмите на нем дважды правой 
+                  кнопкой мышки.</P>
+                  <P align=center><IMG height=374 
+                  src="Окно проекта.files/studio04.gif" width=268></P>
+                  <P align=center><IMG height=266 
+                  src="Окно проекта.files/studio05.gif" width=428></P>
+                  <P class=p>Файл led.asm создан AVR Studio и помещен в 
+                  указанную вами папку. 
+                  <P align=center><IMG height=291 
+                  src="Окно проекта.files/studio06.gif" width=174> </P>
+                  <H2 class=big1>Шаг 4 - Редактирование файла ассемблера</H2>
+                  <P class=p>Мы создали и добавили новый, но пустой файл в наш 
+                  проект. Следующий шаг - это запись в этот файл нашего кода. 
+                  Откройте "led.asm", нажав на нем дважды правой кнопкой мышки в 
+                  окне проекта. Это откроет встроенный редактор. Файл пустой, и 
+                  вы должны ввести в него приведенный ниже код: </P><PRE>;******************************************************
+.include "8515def.inc"
+	rjmp RESET ;Reset Handle
+;******************************************************
+
+RESET:
+.def temp =r16
+
+	ldi temp,low(RAMEND)
+	out SPL,temp
+	ldi temp,high(RAMEND)
+	out SPH,tem    ;init Stack Pointer
+
+	ser temp
+	out DDRB,temp  ;Set direction out
+loop: 
+	out PORTB,temp
+	inc temp
+	rjmp loop
+</PRE>
+                  <P class=p>Что из этого получится, можно увидеть на рисунке 
+                  ниже:</P>
+                  <P align=center><IMG 
+src="Окно проекта.files/studio07.gif"></P>
+                  <P>&nbsp;</P>
+                  <H2 class=big1>Шаг 5 - Ассемблирование исходного кода</H2>
+                  <P class=p>Следующий шаг - ассемблирование файла. Это можно 
+                  сделать, выбрав "Assemble" в меню "Project" или нажав на 
+                  клавиатуре клавишу"F7". </P>
+                  <P align=center><IMG height=285 
+                  src="Окно проекта.files/studio08.gif" width=279></P>
+                  <P class=p>Сейчас должно появиться окно "Project Output", 
+                  показывающее информацию про ассемблирование. В нашем случае мы 
+                  можем видеть, что код из 10 слов (20 байт), и ассемблирование 
+                  было выполнено без ошибок.</P>
+                  <P align=center><IMG height=279 
+                  src="Окно проекта.files/studio09.gif" width=464></P>
+                  <P class=p>Теперь вы готовы переходить к изучению исполняемого 
+                  кода и запуску программ в режиме симулятора.</P>
+                  <H5 class=p1>&nbsp;</H5>
+                  <P class=p1><IMG height=16 src="Окно проекта.files/up.gif" 
+                  width=16 NOSAVE> <A 
+                  href="http://digitallab.kiev.ua/avr-stud/userguide/user_guide.html">Вернуться 
+                  в руководство пользователя AVR 
+            Studio</A></P></TD></TR></TBODY></TABLE>
+            <P><IMG height=31 src="Окно проекта.files/textbott.gif" 
+            width=569></P></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE><BR><MAP 
+name=Map><AREA alt="Письмо Web-дизайнеру" coords=343,14,373,26 
+  href="mailto:lebedevden@yahoo.com" shape=RECT 
+  title="Письмо Web-дизайнеру"><AREA coords=32,21,10 
+  href="http://digitallab.kiev.ua/avr-stud/userguide/project_setup.html#top" 
+  shape=CIRCLE></MAP>
+<TABLE border=0 cellPadding=0 cellSpacing=0 width="100%">
+  <TBODY>
+  <TR>
+    <TD align=middle background="Окно проекта.files/bottine.gif" height=45>
+      <TABLE border=0 cellPadding=0 cellSpacing=0 height=45 width=419>
+        <TBODY>
+        <TR>
+          <TD vAlign=bottom><IMG alt="Web-design -- Denis Y. Lebedev" border=0 
+            height=45 src="Окно проекта.files/myname.gif" useMap=#Map 
+          width=419></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<SCRIPT><!-- 
+</SCRIPT>
+</BODY></HTML>

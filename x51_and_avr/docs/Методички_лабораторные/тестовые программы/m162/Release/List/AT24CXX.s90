@@ -1,0 +1,121 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           /
+//                                                     28/Jun/2007  00:57:49 /
+// IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version               /
+// Copyright 1996-2005 IAR Systems. All rights reserved.                     /
+//                                                                           /
+//    Source file  =  D:\stend\src\m162\AT24CXX.c                            /
+//    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D    /
+//                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb        /
+//                    D:\stend\src\m162\Release\List\ -y                     /
+//                    --initializers_in_flash -z9 -e -I "D:\Program          /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program    /
+//                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"              /
+//                    --eeprom_size 512 D:\stend\src\m162\AT24CXX.c          /
+//    List file    =  D:\stend\src\m162\Release\List\AT24CXX.s90             /
+//                                                                           /
+//                                                                           /
+//////////////////////////////////////////////////////////////////////////////
+
+        NAME AT24CXX
+
+        RSEG CSTACK:DATA:NOROOT(0)
+        RSEG RSTACK:DATA:NOROOT(0)
+
+        PUBLIC AT24CXX_read
+        PUBLIC AT24CXX_write
+        PUBWEAK __?EEARH
+        PUBWEAK __?EEARL
+        PUBWEAK __?EECR
+        PUBWEAK __?EEDR
+
+        EXTERN I2C_start
+        EXTERN I2C_write
+        EXTERN I2C_stop
+        EXTERN delay_func_ms
+        EXTERN delay_func_mcs
+        EXTERN I2C_read
+
+
+        RSEG CODE:CODE:NOROOT(1)
+AT24CXX_write:
+        ST	-Y, R25
+        ST	-Y, R24
+        MOV	R25, R16
+        MOV	R24, R17
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_4:
+        LDI	R16, 160
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_8:
+        MOV	R16, R25
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_1:
+        LDI	R16, 150
+        LDI	R17, 0
+        CALL	delay_func_ms
+        LD	R24, Y+
+        LD	R25, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+AT24CXX_read:
+        ST	-Y, R24
+        MOV	R24, R16
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_3:
+        LDI	R16, 160
+        RCALL	?Subroutine0
+??CrossCallReturnLabel_0:
+        LDI	R16, 164
+        LDI	R17, 0
+        CALL	delay_func_mcs
+        RCALL	?Subroutine1
+??CrossCallReturnLabel_2:
+        LDI	R16, 161
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_7:
+        CALL	I2C_read
+        MOV	R24, R16
+        CALL	I2C_stop
+        MOV	R16, R24
+        LD	R24, Y+
+        RET
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine2:
+        JMP	I2C_write
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine1:
+        JMP	I2C_start
+
+        RSEG CODE:CODE:NOROOT(1)
+?Subroutine0:
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_6:
+        MOV	R16, R24
+        RCALL	?Subroutine2
+??CrossCallReturnLabel_5:
+        JMP	I2C_stop
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01cH
+__?EECR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01dH
+__?EEDR:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01eH
+__?EEARL:
+
+        ASEGN ABSOLUTE:DATA:NOROOT,01fH
+__?EEARH:
+
+        END
+// 
+// 90 bytes in segment CODE
+// 
+// 90 bytes of CODE memory
+//
+//Errors: none
+//Warnings: none

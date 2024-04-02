@@ -1,0 +1,63 @@
+BODY {
+	COLOR: #000000; FONT-FAMILY: "Times New Roman", Times, serif; FONT-SIZE: 12px; TEXT-ALIGN: center
+}
+DD {
+	FONT-FAMILY: "Times New Roman", Times, serif; FONT-SIZE: 14px; FONT-STYLE: normal; TEXT-ALIGN: justify; TEXT-DECORATION: none; TEXT-INDENT: 10pt
+}
+.p {
+	FONT-FAMILY: "Times New Roman", Times, serif; FONT-SIZE: 14px; FONT-STYLE: normal; TEXT-ALIGN: justify; TEXT-DECORATION: none; TEXT-INDENT: 10pt
+}
+.p1 {
+	FONT-FAMILY: Arial, Helvetica, sans-serif; FONT-SIZE: 14px; FONT-WEIGHT: bold; TEXT-ALIGN: center
+}
+A {
+	TEXT-DECORATION: none
+}
+INPUT {
+	BACKGROUND-COLOR: #cccccc; BORDER-BOTTOM: #335599 1px inset; BORDER-LEFT: #335599 1px inset; BORDER-RIGHT: #335599 1px inset; BORDER-TOP: #335599 1px inset; FONT-SIZE: 10px
+}
+A:hover {
+	COLOR: #993300; TEXT-DECORATION: none
+}
+UL {
+	TEXT-ALIGN: left
+}
+.big1 {
+	FONT-FAMILY: Georgia, "Times New Roman", Times, serif; FONT-SIZE: 15px; FONT-WEIGHT: bold; TEXT-ALIGN: center; TEXT-DECORATION: none
+}
+.text {
+	FONT-SIZE: 14px; TEXT-ALIGN: left
+}
+.bigright {
+	FONT-FAMILY: "Times New Roman", Times, serif; FONT-SIZE: 14px; TEXT-ALIGN: left
+}
+TABLE {
+	FONT-SIZE: 14px
+}
+TD {
+	FONT-SIZE: 14px
+}
+.pright {
+	FONT-SIZE: 14px; TEXT-ALIGN: right
+}
+.podpis {
+	COLOR: #666666; FONT-FAMILY: Georgia, "Times New Roman", Times, serif; FONT-SIZE: 10px
+}
+.text1 {
+	COLOR: #000099; FONT-FAMILY: Arial, Helvetica, sans-serif; FONT-SIZE: 12px
+}
+.text2 {
+	FONT-FAMILY: Arial, Helvetica, sans-serif; FONT-SIZE: 12px; FONT-STYLE: italic
+}
+.data {
+	COLOR: #006699; FONT-FAMILY: "Courier New", Courier, mono; FONT-SIZE: 12px
+}
+INPUT {
+	BACKGROUND-COLOR: #cccccc; BORDER-BOTTOM: #003399 1px inset; BORDER-LEFT: #003399 1px inset; BORDER-RIGHT: #003399 1px inset; BORDER-TOP: #003399 1px inset; FONT-SIZE: 10px
+}
+TEXTAREA {
+	BORDER-BOTTOM: #003399 1px inset; BORDER-LEFT: #003399 1px inset; BORDER-RIGHT: #003399 1px inset; BORDER-TOP: #003399 1px inset; FONT-SIZE: 11px
+}
+.podpis1 {
+	COLOR: #333333; FONT-FAMILY: "Times New Roman", Times, serif; FONT-SIZE: 11px; TEXT-ALIGN: justify
+}

@@ -1,0 +1,212 @@
+##############################################################################
+#                                                                            #
+#                                                      28/Jun/2007  00:57:50 #
+# IAR Atmel AVR C/C++ Compiler V4.10A/W32, Evaluation Version                #
+# Copyright 1996-2005 IAR Systems. All rights reserved.                      #
+#                                                                            #
+#    Source file  =  D:\stend\src\m162\DS1307.c                              #
+#    Command line =  --cpu=m162 -ms -o D:\stend\src\m162\Release\Obj\ -D     #
+#                    NDEBUG -lcN D:\stend\src\m162\Release\List\ -lb         #
+#                    D:\stend\src\m162\Release\List\ -y                      #
+#                    --initializers_in_flash -z9 -e -I "D:\Program           #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\" -I "D:\Program     #
+#                    Files\IAR Systems\AVR4.10A\avr\INC\CLIB\"               #
+#                    --eeprom_size 512 D:\stend\src\m162\DS1307.c            #
+#    List file    =  D:\stend\src\m162\Release\List\DS1307.lst               #
+#    Object file  =  D:\stend\src\m162\Release\Obj\DS1307.r90                #
+#                                                                            #
+#                                                                            #
+##############################################################################
+
+D:\stend\src\m162\DS1307.c
+      1          #include "DS1307.h"
+      2          #include "I2C.h"
+      3          #include "DELAY.h"
+      4          
+      5          unsigned char Clock_Init[] = {0x00, 0x00, 0x23, 0x02, 0x19, 0x04, 0x05};
+      6          
+      7          // Функция записи значения ячейки микросхемы DS1307
+      8          void DS1307_write(unsigned char addr, unsigned char value)
+      9          {
+     10          	I2C_start();
+     11          	I2C_write(0xd0);		// Команда записи
+     12          	I2C_write(addr);		// Установка адреса
+     13          	I2C_write(value);		// Запись значения
+     14          	I2C_stop();
+     15          }
+     16          
+     17          // Функция чтения значения ячейки микросхемы DS1307
+     18          unsigned char DS1307_read(unsigned char addr)
+     19          {
+     20          	unsigned char value;  
+     21          	I2C_start();
+     22          	I2C_write(0xd0);    	// Команда записи
+     23          	I2C_write(addr);       	// Установка адреса
+     24          	I2C_stop();
+     25          
+     26          	DELAY_MCS(68);
+     27          
+     28          	I2C_start(); 
+     29          	I2C_write(0xd1);         // Команда чтения
+     30          	value = I2C_read();	
+     31          	I2C_stop();
+     32          
+     33          	return value;
+     34          }
+     35          
+     36          // Функция получения значения времени
+     37          // Длина строки timestr должна быть равна 9
+     38          void DS1307_gettime(char* timestr)
+     39          {
+     40          	unsigned char value;
+     41          
+     42          	value = DS1307_read(2);					// Читаем часы
+     43          	timestr[0] = (value >> 4) + '0';
+     44          	timestr[1] = (value & 0x0F) + '0';
+     45          	timestr[2] = ':';
+     46          
+     47          	value = DS1307_read(1);					// Читаем минуты
+     48          	timestr[3] = (value >> 4) + '0';
+     49          	timestr[4] = (value & 0x0F) + '0';
+     50          	timestr[5] = ':';
+     51          
+     52          	value = DS1307_read(0);					// Читаем секунды
+     53          	if(value & 0x80)
+     54          		DS1307_write(0, 0);					// Чтобы не зависали часы	
+     55          	timestr[6] = (value >> 4) + '0';
+     56          	timestr[7] = (value & 0x0F) + '0';
+     57          	timestr[8] = 0;
+     58          }
+     59          
+     60          // Фукция преобразования числа в BCD-формат, когда на один десятичный разряд 
+     61          // отводится 4 бита
+     62          unsigned char ByteToBCD( unsigned char value )
+     63          {
+     64          	return ( ( value / 10 ) << 4 ) + ( value % 10 );
+     65          }
+     66          
+     67          // Функция задания значения времени
+     68          void DS1307_settime( unsigned char hour, unsigned char minute, unsigned char second )
+     69          {
+     70          	DS1307_write( 2, ByteToBCD( hour ) );
+     71          	DS1307_write( 1, ByteToBCD( minute ) );
+     72          	DS1307_write( 0, ByteToBCD( second ) );
+     73          }
+     74          
+     75          // Функция получения значения даты
+     76          // Длина строки datestr должна быть равна 9
+     77          void DS1307_getdate(char* datestr)
+     78          {
+     79          	unsigned char value;
+     80          
+     81          	value = DS1307_read(4);					// Читаем день(число)
+     82          	datestr[0] = (value >> 4) + '0';
+     83          	datestr[1] = (value & 0x0F) + '0';
+     84          	datestr[2] = '.';
+     85          
+     86          	value = DS1307_read(5);					// Читаем месяц
+     87          	datestr[3] = (value >> 4) + '0';
+     88          	datestr[4] = (value & 0x0F) + '0';
+     89          	datestr[5] = '.';
+     90          
+     91          	value = DS1307_read(6);					// Читаем год
+     92          	datestr[6] = (value >> 4) + '0';
+     93          	datestr[7] = (value & 0x0F) + '0';
+     94          	datestr[8] = 0;
+     95          }
+     96          
+     97          // Функция задания значения даты
+     98          void DS1307_setdate( unsigned char day, unsigned char month, unsigned char year )
+     99          {
+    100          	DS1307_write( 6, ByteToBCD( year ) );
+    101          	DS1307_write( 5, ByteToBCD( month ) );
+    102          	DS1307_write( 4, ByteToBCD( day ) );
+    103          }
+
+   Maximum stack usage in bytes:
+
+     Function            CSTACK RSTACK
+     --------            ------ ------
+     ByteToBCD               2      4
+     DS1307_getdate          2      2
+       -> DS1307_read        2      2
+       -> DS1307_read        2      2
+       -> DS1307_read        2      2
+     DS1307_gettime          4      2
+       -> DS1307_read        4      2
+       -> DS1307_read        4      2
+       -> DS1307_read        4      2
+       -> DS1307_write       4      2
+     DS1307_read             1      2
+       -> I2C_start          1      2
+       -> I2C_write          1      2
+       -> I2C_write          1      2
+       -> I2C_stop           1      2
+       -> delay_func_mcs     1      2
+       -> I2C_start          1      2
+       -> I2C_write          1      2
+       -> I2C_read           1      2
+       -> I2C_stop           1      2
+     DS1307_setdate          2      2
+       -> ByteToBCD          2      2
+       -> DS1307_write       2      2
+       -> ByteToBCD          2      2
+       -> DS1307_write       2      2
+       -> ByteToBCD          2      2
+       -> DS1307_write       2      2
+     DS1307_settime          2      2
+       -> ByteToBCD          2      2
+       -> DS1307_write       2      2
+       -> ByteToBCD          2      2
+       -> DS1307_write       2      2
+       -> ByteToBCD          2      2
+       -> DS1307_write       2      2
+     DS1307_write            2      2
+       -> I2C_start          2      2
+       -> I2C_write          2      2
+       -> I2C_write          2      2
+       -> I2C_write          2      2
+       -> I2C_stop           2      2
+
+
+   Segment part sizes:
+
+     Function/Label                Bytes
+     --------------                -----
+     Clock_Init                       7
+     DS1307_write                    18
+     ?Subroutine14                    6
+     ?Subroutine10                    4
+     ?Subroutine5                     4
+     ?Subroutine1                    10
+     DS1307_read                     40
+     DS1307_gettime                  80
+     ?Subroutine2                     6
+     ?Subroutine13                    2
+     ?Subroutine12                    8
+     ?Subroutine6                     2
+     ?Subroutine11                    2
+     ByteToBCD                       28
+     ?Subroutine7                     6
+     DS1307_settime                  22
+     ?Subroutine4                     6
+     ?Subroutine3                     4
+     ?Subroutine8                     6
+     DS1307_getdate                  44
+     ?Subroutine0                    10
+     ?Subroutine9                    12
+     DS1307_setdate                  24
+     ?<Initializer for Clock_Init>    7
+      Others                          6
+
+ 
+ 344 bytes in segment CODE
+   6 bytes in segment INITTAB
+   7 bytes in segment NEAR_I
+   7 bytes in segment NEAR_ID
+ 
+ 351 bytes of CODE memory (+ 6 bytes shared)
+   7 bytes of DATA memory
+
+Errors: none
+Warnings: none
