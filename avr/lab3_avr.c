@@ -42,6 +42,8 @@ int mode = 0;
 char is_mode_executed = FALSE;
 unsigned char pc_keyboard_data = 0;
 
+
+void init_ADC() {ADCSRA |= (1 << ADEN);}    // активация АЦП
 void init_timer1()
 { // Настройка таймера 1 (частота atmega16 - 8МГц) 1000 Гц (1 мс)
     // Настройка тактирования таймера 1000 Гц (1 мс)
@@ -51,6 +53,41 @@ void init_timer1()
 
     OCR1A = 1000;      // Значение для достижения 1000 Гц (1 мс) компаратор А
     TIMSK_OCIE1A |= 1; // Запуск компаратора таймера А
+}
+
+void echo_ADC(int adc1, int adc2) 
+{ // Вывод консоль по UART показания двух АЦП в вольтах
+    char str_data_ADC1[10];
+    char str_data_ADC2[10];
+    ShortToString( adc1, str_data_ADC1 );
+	ShortToString( adc2, str_data_ADC2 );
+    UART_sendstring( "ADC1: " );
+    UART_sendstring( str_data_ADC1 );
+    UART_sendstring("\n\r");
+    UART_sendstring( "ADC2: " );
+    UART_sendstring( str_data_ADC2 );
+    UART_sendstring("\n\r");
+}
+
+void beep_if_ADC_over99(int adc1, int adc2) 
+{ // Включение зуммера при преодолении порога 99
+    if ((ADC_get( 0 ) > 99) || (ADC_get( 1 ) > 99)) 
+        BEEP_PORT = 0;
+    else 
+        BEEP_PORT = 1;
+}
+
+
+void ADC_handler() 
+{
+    if (ms % 10 == 0) 
+    {
+        adc1 =  ADC_get( 0 );
+        adc2 =  ADC_get( 1 );
+        echo_ADC(adc1, adc2);
+        beep_if_ADC_over99(adc1, adc2) ;
+        LED7_setdigit(int(adc2/10)); // Вывод данных второго АЦП на семисигментный индикатор
+    }
 }
 
 void change_time_n_date()
@@ -79,7 +116,7 @@ void change_time_n_date()
 }
 
 void display_time_n_date()
-{                      // вывести время и дату на ЖК дисплей
+{ // вывести время и дату на ЖК дисплей
     if (ms % 250 == 0) // обновляем данные каждые 250 мс
     {
         LCD_clrscr();
@@ -87,6 +124,7 @@ void display_time_n_date()
         char date[9];
         DS1307_gettime(time);
         DS1307_getdate(date);
+        LCD_gotoxy(0, 0);
         LCD_print(time);
         LCD_gotoxy(1, 0);
         LCD_print(date);
@@ -106,6 +144,7 @@ __interrupt void Timer1_COMPA(void)
 {
     ms_ctr++;
     mode_handler();
+    ADC_handler();
 }
 
 #pragma vector = UART_RXC_vect
@@ -117,14 +156,15 @@ __interrupt void UART0_RX_interrupt()
     UART_sendvalue('\n');
 
     if (pc_keyboard_data == '1')
-        mode = 1;
+        mode = 1;   //режим изменения даты и времени
     if (pc_keyboard_data == '2')
-        mode = 2;
+        mode = 2;   //режим отображения даты и времени
     if (pc_keyboard_data == '3')
-    {
+    {               //отчистка дисплея и сброс индекса режима
         mode = 0;
         LCD_clrscr();
     }
+
 }
 
 
@@ -135,6 +175,7 @@ int main()
     SPI_init();
     LCD_init();
     LCD_clrscr();
+    init_ADC();
 
     UART_init(CALC_UBRR(57600));
     __enable_interrupt();
