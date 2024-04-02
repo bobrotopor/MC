@@ -26,9 +26,6 @@
 кратные 10 выводить на семисегментный индикатор. При показаниях больше 99 включить зуммер.
 */
 
-#define FALSE 0
-#define TRUE 1
-
 flash char UartMessageTask4[] = "Задача №4\r\n";
 flash char enterHourStr[] = "Enter hour: ";
 flash char enterMinuteStr[] = "Enter minute: ";
@@ -39,7 +36,6 @@ flash char enterYearStr[] = "Enter year: ";
 flash char sensorNotConnectedStr[] = "Sensor is not connected";
 
 int mode = 0;
-char is_mode_executed = FALSE;
 unsigned char pc_keyboard_data = 0;
 
 
