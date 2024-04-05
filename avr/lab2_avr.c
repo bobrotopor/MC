@@ -33,7 +33,7 @@
 #define TRUE 1
 
 int signal_dur_seq[] = {100, 300, 100}; // последовательность длительности сигналов в серии
-flash char UartMessageTask3[] = "Задача №3\r\n";
+flash char UartMessageTask3[] = "Task 3\r\n";
 
 char key = 0;                // ключ символа нажатой кнопки клавиатуры
 char prev_key = 0;           // ключ символа нажатой кнопки клавиатуры на прошлом опросе кнопки

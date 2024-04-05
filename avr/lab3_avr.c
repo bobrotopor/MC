@@ -26,7 +26,7 @@
 кратные 10 выводить на семисегментный индикатор. При показаниях больше 99 включить зуммер.
 */
 
-flash char UartMessageTask4[] = "Задача №4\r\n";
+flash char UartMessageTask4[] = "Task 4\r\n";
 flash char enterHourStr[] = "Enter hour: ";
 flash char enterMinuteStr[] = "Enter minute: ";
 flash char enterSecondStr[] = "Enter second: ";
