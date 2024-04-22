@@ -35,8 +35,9 @@ flash char enterMonthStr[] = "Enter month: ";
 flash char enterYearStr[] = "Enter year: ";
 flash char sensorNotConnectedStr[] = "Sensor is not connected";
 
-int mode = 0;
+int mode = 0;   //0 - бездействие, 1 - режим изменения даты/времени, 2- режим отображения даты/времени 
 unsigned char pc_keyboard_data = 0;
+unsigned int ms_ctr = 0;     // счетчик миллисекунд от начала работы программы
 
 
 void init_ADC() {ADCSRA |= (1 << ADEN);}    // активация АЦП
@@ -76,7 +77,7 @@ void beep_if_ADC_over99(int adc1, int adc2)
 
 void ADC_handler() 
 {
-    if (ms % 10 == 0) 
+    if (ms_ctr % 10 == 0) 
     {
         adc1 =  ADC_get( 0 );
         adc2 =  ADC_get( 1 );
@@ -108,12 +109,12 @@ void change_time_n_date()
     year = UART_receivevalue();
 
     DS1307_setdate(day, month, year);
-    mode = 0; // тк нужно выполнить однократно сбрасываем индес режима
+    mode = 0; // тк нужно выполнить однократно устанавливаем режим бездейстивя
 }
 
 void display_time_n_date()
 { // вывести время и дату на ЖК дисплей
-    if (ms % 250 == 0) // обновляем данные каждые 250 мс
+    if (ms_ctr % 250 == 0) // обновляем данные каждые 250 мс
     {
         LCD_clrscr();
         char time[9];
@@ -132,7 +133,7 @@ void mode_handler()
     if (mode == 1)
         change_time_n_date();
     if (mode == 2)
-        display_time();
+        display_time_n_date();
 }
 
 #pragma vector = TIMER1_COMPA_vect
@@ -156,11 +157,10 @@ __interrupt void UART0_RX_interrupt()
     if (pc_keyboard_data == '2')
         mode = 2;   //режим отображения даты и времени
     if (pc_keyboard_data == '3')
-    {               //отчистка дисплея и сброс индекса режима
+    {               //отчистка дисплея и установка режима бездейстивя
         mode = 0;
         LCD_clrscr();
     }
-
 }
 
 

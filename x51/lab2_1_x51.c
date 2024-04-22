@@ -129,11 +129,20 @@ void ISR(void) interrupt 1 using 0
 
 void main() // Основная функция
 {
-	P0 = 0xFF; // Иниц LED, LCD, SPI, I2C, прерывания разрешены
+    // Иниц LED, LCD, SPI, I2C, прерывания разрешены
+	P0 = 0xFF; 
 	P1 = 0xFF;
 	P2 = 0xFF;
 	P3 = 0xFF;
 	EA = 1;
+    SCON  = 0x50;			
+	TMOD  = 0x20;			
+	TH1   = 250;			
+	TL1   = 250;			
+	TR1   = 1;
+	TI    = 1;
+	ES=1; 
+    
 	init_timer();
 	SPI_init();
 	I2C_init();
