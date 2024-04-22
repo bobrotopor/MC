@@ -37,7 +37,7 @@ flash char UartMessageTask3[] = "Task 3\r\n";
 
 char key = 0;                // ключ символа нажатой кнопки клавиатуры
 char prev_key = 0;           // ключ символа нажатой кнопки клавиатуры на прошлом опросе кнопки
-char is_seq_started = 0;     // флажок запуска последовательности сигналов после нажатия кнопки
+char is_beep_seq_started = 0;     // флажок запуска последовательности сигналов после нажатия кнопки
 char is_need_delay = 0;      // флажок для организации паузы между сигналами
 int curr_signal_dur_idx = 0; // индекс проигрываемого сигнала в серии сигналов
 unsigned int ms_ctr = 0;     // счетчик миллисекунд от начала работы программы
@@ -64,18 +64,21 @@ __interrupt void Timer1_COMPA(void)
 }
 
 void change_key_handler()
-{// обработчик изменения нажатой клавиши клавиатуры
+{// обработчик нового значения нажатой клавиши клавиатуры
     beep_ctr = ms_ctr;
 
     curr_signal_dur_idx = 0;
     is_seq_started = TRUE;
     is_need_delay = FALSE;
-    
-    LCD_clrscr();
 
     keyname = KEY_getkeyname(key);
-    if (keyname >= '0' && keyname <= '9')
-        LCD_print(keyname);
+    if (keyname >= '0' && keyname <= '9') {
+        SHIFT_write(0);
+        LED7_setdigit( keyname - '0' );
+    }
+    
+    LCD_clrscr();
+    LCD_print(keyname);
 
     beep_on();
 }

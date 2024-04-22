@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "pindef.h": "c"
+        "pindef.h": "c",
+        "keyboard.h": "c"
     }
 }

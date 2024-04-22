@@ -14,6 +14,17 @@
 #include "I2C.H"
 #include "SHIFT.H"
 
+/*
+
+1) При запуске программы на экран терминала выводится сообщение «Задача №2».
+2) При нажатии клавиши 1 клавиатуры PC предлагается ввести время и дату, 
+кото-рые затем устанавливаются как текущие в RTC DS11507. 
+При нажатии клавиши 2 на ЖКИ стенда в первой строке выводится текущее время, 
+во второй дата. При нажатии клавиши 3 происходит очистка ЖКИ.
+Нажатие на другие клавиши игнорируется.
+
+*/
+
 unsigned char task;
 
 void ExecuteTask1() // ввод пользователем даты и времени
@@ -99,48 +110,19 @@ void Serial_ISR(void) interrupt 4 using 0 // обработчик прерыва
 void main()
 {
 
-	P0 = 0xFF;
+	P0 = 0xFF; // Иниц LED, LCD, SPI, I2C, прерывания разрешены
 	P1 = 0xFF;
 	P2 = 0xFF;
 	P3 = 0xFF;
-
-	SCON = 0x50;
-	TMOD = 0x20;
-	TH1 = 250;
-	TL1 = 250;
-	TR1 = 1;
-	TI = 1;
-	ES = 1; // разрешение прерываний от UART
-
-	printf("                -=  STEND RK-10  =-\n");
-	printf("       Hardware ver. 1.0, Firmware ver. 1.0\n");
-
-	DELAY_MCS(174);
-
-	SPI_init(); // иниц SPI, I2C, DS1307, LCD
-
-	I2C_init();
-	DS1307_init();
-	DS1820_startconverttemp();
-
-	LCD_init();	  //  LCD
-	LCD_clrscr(); // LCD
-
-	OutputStartLCDMessage();
-
-	printf("Enter task number:");
-
 	EA = 1;
+	init_timer();
+	SPI_init();
+	I2C_init();
+	LCD_init();
+
+	printf("Task_2"); 
 	while (1)
 	{
-		if (task == 2)
-		{
-			ExecuteTask2();
-		}
-		if (task == 3)
-		{
-			ExecuteTask3();
-		}
-		delay_ms(5);
+
 	}
 }
