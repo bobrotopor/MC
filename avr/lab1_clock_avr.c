@@ -1,5 +1,3 @@
-#include <stdbool.h>
-
 #include "SPI.H"
 #include "LCD_HD44780.H"
 #include "I2C.H"
@@ -21,11 +19,14 @@
 2) Выводить текущее время на LCD дисплей, полученное из микросхемы DS1307 
    (информация на дисплее обновляетя каждые 250 мс - 4 Гц);						
 3) При нажатии # клавиатуры стенда включается режим изменения времени - пользователю нужно последовательно
-   ввести час, минуты, секунды;
+   через клавиатуру ПК ввести час, минуты, секунды;
 4) После изменения текущего времени снова включается режим отображения.
 */
 
 #define DISPLAY_DELAY 500 // [мс], время отображения одного кадра на LCD дисплее   
+
+#define FALSE 0
+#define TRUE 1
 
 flash char UartMessageClockMode[] = "ClockMode\r\n";
 
@@ -35,7 +36,7 @@ flash char enterHourStr[] = "Enter hour: ";
 flash char enterMinuteStr[] = "Enter minute: ";
 flash char enterSecondStr[] = "Enter second: ";
 
-bool is_time_change_mode = false;	// флаг режима изменения времени
+char is_time_change_mode = FALSE;	// флаг режима изменения времени
 unsigned char key = 0;				// ключ символа нажатой кнопки клавиатуры
 unsigned int ms_ctr = 0;			// счетчик миллисекунд от начала работы программы
 
@@ -52,7 +53,7 @@ void set_new_time()
 	second = UART_receivevalue();	
 
     DS1307_settime( hour, minute, second );
-	is_time_change_mode = false;
+	is_time_change_mode = FALSE;
 
 }
 
@@ -93,12 +94,11 @@ __interrupt void Timer1_COMPA(void)
 #pragma vector = TIMER1_COMPB_vect
 __interrupt void Timer1_COMPB(void)
 {
-	if ( is_time_change_mode == false ) // выводим текущее время
+	if ( is_time_change_mode == FALSE ) // выводим текущее время
 		display_time();					// если не находимя в режиме изменения времени
 }
 
-void button_handler() {		// обработчик кнопки
-
+void button_handler() {		// обработчик нажатия кнопок клавиатуры стенда
 	if (ms_ctr % 10 == 0)	// опрашиваем клавиатуру раз в 10 мс
 		key = KEY_getkey();
 }
@@ -106,7 +106,7 @@ void button_handler() {		// обработчик кнопки
 
 void change_mode() {
 	if (key == KEY_BAR) //если нажата # активируем флажок изменения времени
-		is_time_change_mode = true;
+		is_time_change_mode = TRUE;
 }
 
 
@@ -129,9 +129,9 @@ int main()
 	{
 		button_handler();	// читаем данные с клавиатуры
 		change_mode();		// устанавливаем режим изменения времени, если была нажата #
-		if (is_time_change_mode == true) {
+		if (is_time_change_mode == TRUE) {
 			set_new_time();
-			is_time_change_mode == false;
+			is_time_change_mode == FALSE;
 		}
 	}
 }
