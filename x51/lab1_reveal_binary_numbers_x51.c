@@ -19,7 +19,7 @@
 Студент: 	Балкунов К.С.
 Группа:		СМ7-74Б
 Формулировка задачи:
-	1) Вывести цифры от 0 до 7 десятичной системы счисления, используя клавиатуру,
+	1) Вывести цифры от 0 до 7 десятичной системы счисления, используя клавиатуру стенда,
 		в двоичном представолении, используя светодиоды стенда.
 	2) Параллеьно с включением светодиодов, воспроизвести динамиком двоичное число 
 		по следущем правилам: 
@@ -27,6 +27,12 @@
 			* Число воспроизводится от младшего бита к старшему.
 	3) При нажатии * светодиоды выключаются. Динамик при этом перестаёт издавать звуки.
 */
+
+#define CLOCK 22110000
+#define TIMER_FREQ_HZ 1000
+#define RELOAD_VALUE (65536 - (CLOCK / 12 / TIMER_FREQ_HZ))
+#define RELOAD_VALUE_H ((unsigned char)(RELOAD_VALUE >> 8))
+#define RELOAD_VALUE_L ((unsigned char)(RELOAD_VALUE))
 
 /*Что бы не запутаться и учесть то, что МК осуществляет управление выводом отрицательной
 полярности добавим макросы ВКЛЮЧЕНИЯ и ВЫКЛЮЧЕНИЯ светодиодов*/
@@ -43,7 +49,10 @@
 #define ISR_DURATION 25
 #define ISR_DURATION_2 ISR_DURATION*2
 
-bool led_pins_signals[][LEDS_COUNT] = {
+#define FALSE 0
+#define TRUE 1
+
+char led_pins_signals[][LEDS_COUNT] = {
 	{LOW, LOW, LOW},	// 000
 	{HIGH, LOW, LOW},	// 001
 	{LOW, HIGH, LOW},	// 010
@@ -54,10 +63,22 @@ bool led_pins_signals[][LEDS_COUNT] = {
 	{HIGH, HIGH, HIGH}, // 111
 };
 
+unsigned int ms_counter = 0;	// счетчик миллисекнуд
 unsigned char key = 0;	 // Адрес клавиши
 int curr_key_number = 0; // цифра по адресу клавиши
-bool is_reveal_process_started = false;	// флажок процесса проигрывания числа и отображения
-bool need_duration = false;		// флажок задержки между проигрыванием битов
+char is_reveal_process_started = FALSE;	// флажок процесса проигрывания числа и отображения
+char need_duration = FALSE;		// флажок задержки между проигрыванием битов
+
+
+void init_timer0(void) 
+{// инициализация таймера 0
+	TMOD = 0x01; // 16-битовый режим
+	TL0 = RELOAD_VALUE_L;
+	TH0 = RELOAD_VALUE_H;
+	ET0 = 1; // Бит разрешения прерывания от таймера 0
+	TR0 = 1; // Бит управления таймера 0 для пуска/останова таймера/счетчика 
+}
+
 
 void button_handler() {
 	// Обработчик нажатия кнопок клавиатуры
@@ -80,7 +101,7 @@ void reveal_curr_number(unsigned int ms_counter)
 
 	static int singed_bits_counter = 0;		// счетчик сыгнранных зуммером битов двоичного числа
 	static unsigned int local_counter = 0;	// миллисекндный счетчик для задержки между сигналами
-	bool is_bit_singed = false;				// проигран ли один из битов двоичного числа?  
+	char is_bit_singed = FALSE;				// проигран ли один из битов двоичного числа?  
 	
 	// если нажата * (звездочка) выключаем все светодиоды и зуммер
 	if (key == KEY_ASTERISK)
@@ -123,13 +144,13 @@ void set_led_pins_signals(unsigned int curr_number)
 	LED3 = led_pins_signals[curr_number][2];
 }
 
-bool sing_binary_bit_by_zoomer(unsigned int curr_number, unsigned int curr_bit, unsigned int ms_counter) 
+char sing_binary_bit_by_zoomer(unsigned int curr_number, unsigned int curr_bit, unsigned int ms_counter) 
 {
 	// Вопспроизвести динамиком (зумером) двочиное число. 
 	// Динный сигнал соответствует биту 1, короткий - 0. 
 	// Число воспроизводится от младшего бита к старшему.
 	static unsigned int local_counter = 0;
-	bool is_bit_singed = false;	// возвращаемое значение
+	char is_bit_singed = FALSE;	// возвращаемое значение
 	
 	if (led_pins_signals[curr_number][curr_bit] == HIGH && need_duration == false) {
 		BEEP_BIT = HIGH;			// если текущий бит двочиного числа равен 1,
@@ -156,24 +177,10 @@ bool sing_binary_bit_by_zoomer(unsigned int curr_number, unsigned int curr_bit, 
 }
 
 
-void init_timer0(void) {                            // инициализировать таймер 0
-  unsigned int counts;                              
-  TMOD |= 0x01;                                     // 16-битовый режим
+void timer0_ISR(void) interrupt 1 using 0 
+{   // обработчик прерывания по таймеру 
 
-  counts = (unsigned int)(ISR_DURATION * 1000.0 / TACT_TIME_MCS); 
-                                                    // 25 мс (40 Гц)
-
-  TH0 = 0xFFFF - counts + 1;                        // начальное значение таймера 0 
-  TL0 = 0xFFFF - counts + 1;                       
-  ET0 = 1;                                          // Бит разрешения прерывания от таймера 0
-  TR0 = 1;                                          // Бит управления таймера 0 для пуска/останова таймера/счетчика 
-                                         
-}
-
-
-void timer0_ISR(void) interrupt 1 using 0 {      // обработчик прерывания по таймеру 
-
-	static unsigned int ms_counter = 0;
+	
 	button_handler();
 	
 	if (ms_counter % ISR_DURATION_2 == 0)
@@ -192,15 +199,7 @@ void main()
 	P1 = 0xFF;
 	P2 = 0xFF;
 	P3 = 0xFF;
-
-	SCON = 0x50; // 8-битовый UART
-	TMOD = 0x20; // Таймер 1: 8-битовый режим, авто-перезагружаемый
-	TH1 = 250;	 // Задаем начальное значение таймера для скорости
-				 // 9600 бод.
-	TL1 = 250;
-	TR1 = 1; // Запускаем таймер
-	TI = 1;
-	ES = 1; // Разрешаем прерывание от UART
+	EA = 1;  // Разрешаем прерывания
 
 	while (1)
 	{

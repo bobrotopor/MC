@@ -81,7 +81,7 @@ void display_time_n_date()
 		DS1307_getdate(date);
 		LCD_gotoxy(0, 0);
 		LCD_print(time);
-		LCD_gotoxy(1, 0);
+		LCD_gotoxy( 0, 1 );
 		LCD_print(date);
 	}
 }

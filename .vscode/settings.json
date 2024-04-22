@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "pindef.h": "c",
-        "keyboard.h": "c"
+        "keyboard.h": "c",
+        "i2c.h": "c"
     }
 }
