@@ -37,29 +37,35 @@ flash char UartMessageTask3[] = "Task 3\r\n";
 
 char key = 0;                // ключ символа нажатой кнопки клавиатуры
 char prev_key = 0;           // ключ символа нажатой кнопки клавиатуры на прошлом опросе кнопки
+
 char is_beep_seq_started = 0;     // флажок запуска последовательности сигналов после нажатия кнопки
 char is_need_delay = 0;      // флажок для организации паузы между сигналами
+char button_read_flag = FALSE;	//флажок чтения адресов кнопок клавиатуры стенда
+
 int curr_signal_dur_idx = 0; // индекс проигрываемого сигнала в серии сигналов
 unsigned int ms_ctr = 0;     // счетчик миллисекунд от начала работы программы
 unsigned int beep_ctr = 0;   // счетчик для задания длительности сигналов зумера
+unsigned int button_ms_ctr = 0; // счетчик миллисекнуд для исключения дребезга контактов
 
 void beep_on() {BEEP_BIT = 0;}
 void beep_off() {BEEP_BIT = 1;}
 
-void init_timer1()
-{   // Настройка таймера 1 (частота atmega16 - 8МГц) 1000 Гц (1 мс)
+void init_timer0()
+{   // Настройка таймера 0 на 1000 Гц (1 мс)
     // Настройка тактирования таймера 1000 Гц (1 мс)
-    TCCR1B = 0;                    // Очистить регистр управления компаратором 1В
-    TCCR1B |= (1 << TCCR1B_WGM12); // устанавливаем режим СТС (сброс по совпадению)
-    TCCR1B |= (1 << TCCR1B_CS11);  // Предделитель 8
+    TCCR0 = 0;                    // Очистить конфигурационный регистр таймера 0
+    TCCR0 |= (1 << WGM01);  // устанавливаем режим СТС (сброс по совпадению)
+    TCCR0 |= (1 << CS02);     // Предделитель 256
 
-    OCR1A = 1000;      // Значение для достижения 1000 Гц (1 мс) компаратор А
-    TIMSK_OCIE1A |= 1; // Запуск компаратора таймера А
+    OCR0 = 58;         // Значение для достижения 1000 Гц (1 мс) компаратор А
+    TIMSK_OCIE0 |= 1;  // Запуск компаратора таймера 0
 }
 
-#pragma vector = TIMER1_COMPA_vect
-__interrupt void Timer1_COMPA(void)
+#pragma vector = TIMER0_COMP_vect     
+__interrupt void TIMER0_COMP(void)
 {
+    if (ms_ctr % 10 == 0) button_handler();
+    if (ms_ctr % 100 == 0) beep_handler();
     ms_ctr++;
 }
 
@@ -98,25 +104,38 @@ void beep_handler()
         if (curr_signal_dur_idx == 2) {
             curr_signal_dur_idx = 0;
             is_seq_started = FALSE;
-            continue;
+            return;
         }
         beep_on();
     }
 }
 
-void button_handler()
-{ // обработчик нажатия кнопки
 
-    if (ms_ctr % BUTTONS_ASK_DUR == 0) // опрашиваем клавиатуру раз в 10 мс
-        key = KEY_getkey();
-    if (!key)
-        continue;
-    if (key != prev_key)
-        change_key_handler();
-    
-    beep_handler();
-    prev_key = key;
+void button_handler()
+{
+	// Обработчик нажатия кнопок клавиатуры
+	key = KEY_getkey(); // подлучаем адрес нажатой клавиши
+
+	if (key != prev_key)
+	{
+		if (button_read_flag == FALSE)
+		{
+			button_read_flag = TRUE;
+			button_ms_ctr = ms_ctr;
+			return;
+		}
+
+		if (button_read_flag == TRUE && ms_ctr - button_ms_ctr > 20)
+			button_read_flag = FALSE;
+		else
+			return;
+
+		change_key_handler();
+
+		prev_key = key;
+	}
 }
+
 
 int main()
 {
@@ -126,10 +145,10 @@ int main()
     LCD_init();
     LCD_clrscr();
 
-    UART_init(CALC_UBRR(57600));
+    UART_init(CALC_UBRR(9600));
     __enable_interrupt();
 
-    init_timer1();
+    init_timer0();
     UART_sendstring_flash(UartMessageTask3);
     OutputStartLCDMessage();
 

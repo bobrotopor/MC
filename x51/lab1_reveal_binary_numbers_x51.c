@@ -21,9 +21,9 @@
 Формулировка задачи:
 	1) Вывести цифры от 0 до 7 десятичной системы счисления, используя клавиатуру стенда,
 		в двоичном представолении, используя светодиоды стенда.
-	2) Параллеьно с включением светодиодов, воспроизвести динамиком двоичное число 
-		по следущем правилам: 
-			* Динный сигнал соответствует биту 1, короткий - 0. 
+	2) Параллеьно с включением светодиодов, воспроизвести динамиком двоичное число
+		по следущем правилам:
+			* Динный сигнал соответствует биту 1, короткий - 0.
 			* Число воспроизводится от младшего бита к старшему.
 	3) При нажатии * светодиоды выключаются. Динамик при этом перестаёт издавать звуки.
 */
@@ -36,18 +36,15 @@
 
 /*Что бы не запутаться и учесть то, что МК осуществляет управление выводом отрицательной
 полярности добавим макросы ВКЛЮЧЕНИЯ и ВЫКЛЮЧЕНИЯ светодиодов*/
-#define HIGH 0		 // сигнал для подачи высокого уровня на выход для включения светодиода
-#define LOW 1		 // сигнал для подачи низкого уровня на выход для выключения светодиода
-#define BITS_COUNT 3			// кол-во битов двоичного числа
-#define LEDS_COUNT BITS_COUNT 	// количество светодиодов подключенных к пинам контроллера на стенде
+#define HIGH 0				  // сигнал для подачи высокого уровня на выход для включения светодиода
+#define LOW 1				  // сигнал для подачи низкого уровня на выход для выключения светодиода
+#define BITS_COUNT 3		  // кол-во битов двоичного числа
+#define LEDS_COUNT BITS_COUNT // количество светодиодов подключенных к пинам контроллера на стенде
 #define BITS_COUNT_MINUS_1 BITS_COUNT - 1
 
-#define BEEP_DURATION 250		// зажкржка между сигналами
-#define BEEP_HIGH 500			// длительность сигнала соответствующему биту 1
-#define BEEP_LOW 250			// длительность сигнала соответствующему биту 0
-
-#define ISR_DURATION 25
-#define ISR_DURATION_2 ISR_DURATION*2
+#define BEEP_DURATION 250 // зажкржка между сигналами
+#define BEEP_HIGH 500	  // длительность сигнала соответствующему биту 1
+#define BEEP_LOW 250	  // длительность сигнала соответствующему биту 0
 
 #define FALSE 0
 #define TRUE 1
@@ -63,27 +60,30 @@ char led_pins_signals[][LEDS_COUNT] = {
 	{HIGH, HIGH, HIGH}, // 111
 };
 
-unsigned int ms_counter = 0;	// счетчик миллисекнуд
-int singed_bits_counter = 0;	// счетчик сыгнранных зуммером битов двоичного числа
-unsigned int dur_counter = 0;	// миллисекндный счетчик для задержки между сигналами
+unsigned int ms_counter = 0;	 // счетчик миллисекнуд
+unsigned int button_ms_counter = 0; // счетчик миллисекнуд для исключения дребезга контактов
+int singed_bits_counter = 0;	 // счетчик сыгнранных зуммером битов двоичного числа
+unsigned int dur_counter = 0;	 // миллисекндный счетчик для задержки между сигналами
 
-unsigned char key = 0;	 // Адрес клавиши
-int curr_key_number = 0; // цифра по адресу клавиши
-char is_reveal_process_started = FALSE;	// флажок процесса проигрывания числа и отображения
-char need_duration = FALSE;		// флажок задержки между проигрыванием битов
+unsigned char key = 0;		// Адрес клавиши
+unsigned char prev_key = 0; // Адрес клавиши на прошлом тике опроса клавиатуры
+int curr_key_number = 0;	// текущая цифра по адресу клавиши
+char button_read_flag = FALSE;	//флажок чтения адресов кнопок клавиатуры стенда
 
+char is_reveal_process_started = FALSE; // флажок процесса проигрывания числа и отображения
+char need_duration = FALSE;				// флажок задержки между проигрыванием битов
 
-void init_timer0(void) 
-{// инициализация таймера 0
+void init_timer0(void)
+{				 // инициализация таймера 0
 	TMOD = 0x01; // 16-битовый режим
 	TL0 = RELOAD_VALUE_L;
 	TH0 = RELOAD_VALUE_H;
 	ET0 = 1; // Бит разрешения прерывания от таймера 0
-	TR0 = 1; // Бит управления таймера 0 для пуска/останова таймера/счетчика 
+	TR0 = 1; // Бит управления таймера 0 для пуска/останова таймера/счетчика
 }
 
-void stop_revealing() 
-{//остановить проигрывание и отображение битов двоичного числа
+void stop_revealing()
+{ // остановить проигрывание и отображение битов двоичного числа
 	LED1 = LOW;
 	LED2 = LOW;
 	LED3 = LOW;
@@ -95,17 +95,37 @@ void stop_revealing()
 	is_reveal_process_started = FALSE;
 }
 
-void button_handler() {
+void button_handler()
+{
 	// Обработчик нажатия кнопок клавиатуры
-	key = KEY_getkey(); 						// подлучаем адрес нажатой клавиши
-	curr_key_number = KEY_getkeynumber(key);	// получаем цифру по адресу клавиши
+	key = KEY_getkey(); // подлучаем адрес нажатой клавиши
 
-	if (key == KEY_ASTERISK)					//При нажатии * светодиоды выключаются. 
-		stop_revealing();						//Динамик при этом перестаёт издавать звуки.
-			
-	if (curr_key_number >= 0 && curr_key_number < 8) {
-		is_reveal_process_started = TRUE;
-		dur_counter = ms_counter; //обновляем счетчик для генерации сигналов зумера
+	if (key != prev_key)
+	{
+		if (button_read_flag == FALSE)
+		{
+			button_read_flag = TRUE;
+			button_ms_counter = ms_counter;
+			return;
+		}
+
+		if (button_read_flag == TRUE && ms_counter - button_ms_counter > 20)
+			button_read_flag = FALSE;
+		else
+			return;
+
+		curr_key_number = KEY_getkeynumber(key); // получаем цифру по адресу клавиши
+
+		if (key == KEY_ASTERISK) // При нажатии * светодиоды выключаются.
+			stop_revealing();	 // Динамик при этом перестаёт издавать звуки.
+
+		if (curr_key_number >= 0 && curr_key_number < 8)
+		{
+			is_reveal_process_started = TRUE;
+			dur_counter = ms_counter; // обновляем счетчик для генерации сигналов зумера
+		}
+
+		prev_key = key;
 	}
 }
 
@@ -113,27 +133,27 @@ void reveal_curr_number()
 {
 	// Вывести цифры от 0 до 7 десятичной системы счисления в двоичном представолении,
 	// через светодиоды стенда.
-	char is_bit_singed = FALSE;				// проигран ли один из битов двоичного числа?  
+	char is_bit_singed = FALSE; // проигран ли один из битов двоичного числа?
 
 	// если нажата цифра в диапоне от 0 до 7,
 	// то зажигаем светодиоды в соответсвии с битами двоичного числа
 	if (curr_key_number >= 0 && curr_key_number < 8 && is_reveal_process_started == TRUE)
 	{
-		set_led_pins_signals(curr_key_number);			// включить светодиоды в соответсвтии 
-														// с двоичным числом
-		
+		set_led_pins_signals(curr_key_number); // включить светодиоды в соответсвтии
+											   // с двоичным числом
+
 		// вопспроизвести динамиком бит двочиного числа
-		is_bit_singed = sing_binary_bit_by_zoomer(curr_key_number, singed_bits_counter);		
+		is_bit_singed = sing_binary_bit_by_zoomer(curr_key_number, singed_bits_counter);
 		if (is_bit_singed)
 			singed_bits_counter++;
 	}
 
-	if (singed_bits_counter == BITS_COUNT_MINUS_1) {	// если сыграли зуммером все биты сбрасываем счетчик битов,
-		singed_bits_counter = 0;						// сбрасываем флаг is_reveal_process_started на 0
+	if (singed_bits_counter == BITS_COUNT_MINUS_1)
+	{							 // если сыграли зуммером все биты сбрасываем счетчик битов,
+		singed_bits_counter = 0; // сбрасываем флаг is_reveal_process_started на 0
 		is_reveal_process_started = FALSE;
 	}
 }
-
 
 void set_led_pins_signals(unsigned int curr_number)
 {
@@ -143,49 +163,52 @@ void set_led_pins_signals(unsigned int curr_number)
 	LED3 = led_pins_signals[curr_number][2];
 }
 
-char sing_binary_bit_by_zoomer(unsigned int curr_number, unsigned int curr_bit) 
+char sing_binary_bit_by_zoomer(unsigned int curr_number, unsigned int curr_bit)
 {
-	// Вопспроизвести динамиком (зумером) двочиное число. 
-	// Динный сигнал соответствует биту 1, короткий - 0. 
+	// Вопспроизвести динамиком (зумером) двочиное число.
+	// Динный сигнал соответствует биту 1, короткий - 0.
 	// Число воспроизводится от младшего бита к старшему.
-	char is_bit_singed = FALSE;	// возвращаемое значение
-	
-	if (led_pins_signals[curr_number][curr_bit] == HIGH && need_duration == FALSE) {
-		BEEP_BIT = HIGH;			// если текущий бит двочиного числа равен 1,
-								// то включаем зумер на время BEEP_HIGH.
-		if (ms_counter - dur_counter > BEEP_HIGH) {
+	char is_bit_singed = FALSE; // возвращаемое значение
+
+	if (led_pins_signals[curr_number][curr_bit] == HIGH && need_duration == FALSE)
+	{
+		BEEP_BIT = HIGH; // если текущий бит двочиного числа равен 1,
+						 // то включаем зумер на время BEEP_HIGH.
+		if (ms_counter - dur_counter > BEEP_HIGH)
+		{
 			dur_counter = ms_counter;
 			BEEP_BIT = LOW;
 			need_duration = TRUE;
 		}
 	}
-	else						
-		BEEP_BIT = HIGH;			// иначе включаем зумер на время BEEP_LOW
-		if (ms_counter - dur_counter > BEEP_LOW && need_duration == FALSE) {
-			dur_counter = ms_counter;
-			BEEP_BIT = LOW;
-			need_duration = TRUE;
-		}
+	else
+		BEEP_BIT = HIGH; // иначе включаем зумер на время BEEP_LOW
+	if (ms_counter - dur_counter > BEEP_LOW && need_duration == FALSE)
+	{
+		dur_counter = ms_counter;
+		BEEP_BIT = LOW;
+		need_duration = TRUE;
+	}
 	// задержка между сыгранными битами величиной в BEEP_DURATION
-	if (ms_counter - dur_counter > BEEP_DURATION && need_duration == TRUE) {
+	if (ms_counter - dur_counter > BEEP_DURATION && need_duration == TRUE)
+	{
 		need_duration = FALSE;
 		is_bit_singed = TRUE;
 	}
 	return is_bit_singed;
 }
 
+void timer0_ISR(void) interrupt 1 using 0
+{ // обработчик прерывания по таймеру
 
-void timer0_ISR(void) interrupt 1 using 0 
-{   // обработчик прерывания по таймеру 
+	if (ms_counter % 10 == 0)
+		button_handler();
 
-	button_handler();
-	
-	if (ms_counter % ISR_DURATION_2 == 0)
-		reveal_curr_number(ms_counter);
+	if (ms_counter % 50 == 0)
+		reveal_curr_number();
 
-	ms_counter+=ISR_DURATION;
+	ms_counter++;
 }
-
 
 // главная функция
 void main()
@@ -195,7 +218,7 @@ void main()
 	P1 = 0xFF;
 	P2 = 0xFF;
 	P3 = 0xFF;
-	EA = 1;  // Разрешаем прерывания
+	EA = 1; // Разрешаем прерывания
 
 	while (1)
 	{

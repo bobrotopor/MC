@@ -43,22 +43,41 @@ int signal_dur_seq[] = {100, 300, 100}; // последовательность 
 
 char key = 0;                // ключ символа нажатой кнопки клавиатуры
 char prev_key = 0;           // ключ символа нажатой кнопки клавиатуры на прошлом опросе кнопки
+char curr_key_name = 0;      // значение кнопки по ключу key
+char prev_key_name = 0;      // значение кнопки по ключу prev_key
+
 char is_beep_seq_started = 0;     // флажок запуска последовательности сигналов после нажатия кнопки
 char is_need_delay = 0;      // флажок для организации паузы между сигналами
+char button_read_flag = FALSE;	//флажок чтения адресов кнопок клавиатуры стенда
+
 int curr_signal_dur_idx = 0; // индекс проигрываемого сигнала в серии сигналов
+
 unsigned int ms_ctr = 0;     // счетчик миллисекунд от начала работы программы
 unsigned int beep_ctr = 0;   // счетчик для задания длительности сигналов зумера
+unsigned int button_ms_ctr = 0; // счетчик миллисекнуд для исключения дребезга контактов
+
 
 void beep_on() {BEEP_BIT = 0;}
 void beep_off() {BEEP_BIT = 1;}
 
-void init_timer(void) 
+void init_timer0(void) 
 {// инициализация таймера
 	TMOD = 0x01;
 	TL0 = RELOAD_VALUE_L;
 	TH0 = RELOAD_VALUE_H;
 	ET0 = 1;
 	TR0 = 1;
+}
+
+void init_UART() 
+{// инициализация UART
+    SCON = 0x50; // 8-битовый UART
+    TMOD = 0x20; // Таймер 1: 8-битовый режим, авто-перезагружаемый
+    TH1 = 250;   // Задаем начальное значение таймера для скорости 9600 бод
+    TL1 = 250;
+    TR1 = 1; // Запускаем таймер
+    TI = 1;
+    ES = 1; // Разрешаем прерывание от UART
 }
 
 void change_key_handler()
@@ -73,15 +92,12 @@ void change_key_handler()
 	LCD_clrscr();
 	SHIFT_write(0);
 
-    curr_keyname = KEY_getkeyname(key);
-    prev_keyname = KEY_getkeyname(prev_key);
-
-	if (curr_keyname == KEY_ASTERISK) {
-		LED7_setdigit( prev_keyname );
+	if (key == KEY_ASTERISK) {
+		LED7_setdigit( prev_key_name );
 	}
 	else {
-		LED7_setdigit( curr_keyname );
-		LCD_print( curr_keyname );
+		LED7_setdigit( curr_key_name );
+		LCD_print( curr_key_name );
 	}
 
     beep_on();
@@ -102,28 +118,49 @@ void beep_handler()
         if (curr_signal_dur_idx == 2) {
             curr_signal_dur_idx = 0;
             is_beep_seq_started = FALSE;
-            continue;
+            return;
         }
         beep_on();
     }
 }
 
 void button_handler()
-{ // обработчик нажатия кнопки
+{
+	// Обработчик нажатия кнопок клавиатуры
+	key = KEY_getkey(); // подлучаем адрес нажатой клавиши
 
-    if (ms_ctr % BUTTONS_ASK_DUR == 0) // опрашиваем клавиатуру раз в 10 мс
-        key = KEY_getkey();
-    if (!key)
-        continue;
-    if (key != prev_key)
+	if (key != prev_key)
+	{
+		if (button_read_flag == FALSE)
+		{
+			button_read_flag = TRUE;
+			button_ms_ctr = ms_counter;
+			return;
+		}
+
+		if (button_read_flag == TRUE && ms_counter - button_ms_ctr > 20)
+			button_read_flag = FALSE;
+		else
+			return;
+
+		key_name = KEY_getkeynumber(key); // получаем цифру по адресу клавиши
+
         change_key_handler();
-    
-    beep_handler();
-    prev_key = key;
+
+		prev_key = key;
+        prev_key_name = KEY_getkeyname(prev_key);
+	}
 }
 
 void ISR(void) interrupt 1 using 0 
 {// обработка прерывания
+
+    if (ms_ctr % 10 == 0)
+        button_handler();
+
+    if (ms_ctr % 100 == 0)
+        beep_handler();
+
 	ms_ctr++;
 }
 
@@ -143,7 +180,8 @@ void main() // Основная функция
 	TI    = 1;
 	ES=1; 
     
-	init_timer();
+	init_timer0();
+    init_UART();
 	SPI_init();
 	I2C_init();
 	LCD_init();

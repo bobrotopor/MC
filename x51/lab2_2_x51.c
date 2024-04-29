@@ -36,13 +36,24 @@ int mode = 0;
 unsigned char pc_keyboard_data = 0;
 unsigned int ms_ctr = 0; // счетчик миллисекунд от начала работы программы
 
-void init_timer(void)
+void init_timer0(void)
 { // инициализация таймера
 	TMOD = 0x01;
 	TL0 = RELOAD_VALUE_L;
 	TH0 = RELOAD_VALUE_H;
 	ET0 = 1;
 	TR0 = 1;
+}
+
+void init_UART() 
+{// инициализация UART
+    SCON = 0x50; // 8-битовый UART
+    TMOD = 0x20; // Таймер 1: 8-битовый режим, авто-перезагружаемый
+    TH1 = 250;   // Задаем начальное значение таймера для скорости 9600 бод
+    TL1 = 250;
+    TR1 = 1; // Запускаем таймер
+    TI = 1;
+    ES = 1; // Разрешаем прерывание от UART
 }
 
 void change_time_n_date()
@@ -72,26 +83,15 @@ void change_time_n_date()
 
 void display_time_n_date()
 {						   // вывести время и дату на ЖК дисплей
-	if (ms_ctr % 250 == 0) // обновляем данные каждые 250 мс
-	{
-		LCD_clrscr();
-		char time[9];
-		char date[9];
-		DS1307_gettime(time);
-		DS1307_getdate(date);
-		LCD_gotoxy(0, 0);
-		LCD_print(time);
-		LCD_gotoxy( 0, 1 );
-		LCD_print(date);
-	}
-}
-
-void mode_handler()
-{//обработчик режимов
-	if (mode == 1)
-		change_time_n_date();
-	if (mode == 2)
-		display_time_n_date();
+	LCD_clrscr();
+	char time[9];
+	char date[9];
+	DS1307_gettime(time);
+	DS1307_getdate(date);
+	LCD_gotoxy(0, 0);
+	LCD_print(time);
+	LCD_gotoxy( 0, 1 );
+	LCD_print(date);
 }
 
 
@@ -114,8 +114,11 @@ void Serial_ISR(void) interrupt 4 using 0
 
 void ISR(void) interrupt 1 using 0
 { // обработка прерывания милисекундного счётчика
+	if (mode == 1)
+		change_time_n_date();
+	if (mode == 2 && ms_ctr % 250 == 0)
+		display_time_n_date();
 	ms_ctr++;
-	mode_handler();
 }
 
 void main()
@@ -134,7 +137,8 @@ void main()
 	TI = 1;
 	ES = 1;
 
-	init_timer();
+	init_timer0();
+	init_UART();
 	SPI_init();
 	I2C_init();
 	LCD_init();
